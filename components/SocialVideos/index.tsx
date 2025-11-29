@@ -90,6 +90,7 @@ const SocialVideos = () => {
                     <section>
                       <a
                         target="_blank"
+                        rel="noopener noreferrer"
                         title={`@${getUsername(video.url)}`}
                         href={`https://www.tiktok.com/@${getUsername(video.url)}?refer=embed`}
                       >
