@@ -3,26 +3,26 @@ import { Menu } from "@/types/menu";
 const menuData: Menu[] = [
   {
     id: 1,
-    title: "หน้าหลัก",
-    path: "/",
+    title: "ขายรถ",
+    path: "/sell",
     newTab: false,
   },
   {
     id: 2,
-    title: "ขั้นตอนการขาย",
-    path: "/#features",
+    title: "รถทั้งหมด",
+    path: "/cars",
     newTab: false,
   },
   {
     id: 3,
-    title: "โซลูชันสำหรับองค์กร",
-    path: "/about",
+    title: "บทความ",
+    path: "/blog",
     newTab: false,
   },
   {
     id: 4,
-    title: "เคสลูกค้า",
-    path: "/#testimonials",
+    title: "เกี่ยวกับเรา",
+    path: "/about",
     newTab: false,
   },
   {

@@ -1,15 +1,10 @@
-import AboutSectionOne from "@/components/About/AboutSectionOne";
-import AboutSectionTwo from "@/components/About/AboutSectionTwo";
-import Blog from "@/components/Blog";
-import Brands from "@/components/Brands";
+import AboutUs from "@/components/AboutUs";
+import CarCarousel from "@/components/CarCarousel";
+import HowToSell from "@/components/HowToSell";
 import ScrollUp from "@/components/Common/ScrollUp";
-import Contact from "@/components/Contact";
-import Features from "@/components/Features";
 import Hero from "@/components/Hero";
-import Pricing from "@/components/Pricing";
-import SeoContent from "@/components/Seo/SeoContent";
-import Testimonials from "@/components/Testimonials";
-import Video from "@/components/Video";
+import SellBanner from "@/components/SellBanner";
+import SocialVideos from "@/components/SocialVideos";
 import { Metadata } from "next";
 import Script from "next/script";
 
@@ -171,16 +166,11 @@ export default function Home() {
     <>
       <ScrollUp />
       <Hero />
-      <Features />
-      <Video />
-      <Brands />
-      <AboutSectionOne />
-      <AboutSectionTwo />
-      <Testimonials />
-      <Pricing />
-      <SeoContent />
-      <Blog />
-      <Contact />
+      <CarCarousel />
+      <HowToSell />
+      <AboutUs />
+      <SellBanner />
+      <SocialVideos />
       <Script
         id="v-autocar-structured-data"
         type="application/ld+json"
