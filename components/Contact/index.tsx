@@ -44,25 +44,26 @@ const Contact = () => {
 
   return (
     <section id="contact" className="overflow-hidden bg-white py-16 md:py-20 lg:py-28">
-      {/* Full-width Map */}
-      <div className="mb-8 w-full">
-        <div
-          ref={mapContainerRef}
-          className="relative h-[400px] w-full rounded-lg border border-gray-300 overflow-hidden md:h-[450px] lg:h-[500px]"
-          style={{ zIndex: 0 }}
-        ></div>
-      </div>
-      
       <div className="container px-4">
+        {/* Full-width Map */}
+        <div className="mb-12 w-full">
+          <div
+            ref={mapContainerRef}
+            className="relative h-[400px] w-full rounded-lg border border-gray-300 overflow-hidden md:h-[450px] lg:h-[500px]"
+            style={{ zIndex: 0 }}
+          ></div>
+        </div>
 
         <div className="relative grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Left side - Map and Address */}
           <div className="space-y-6">
-
-            {/* Detailed Location Map */}
-            <div className="relative h-[200px] w-full rounded-lg border border-gray-300 bg-gray-100 md:h-[250px]">
-              <div className="flex h-full items-center justify-center">
-                <p className="text-gray-400">แผนที่ย่อ</p>
+            {/* Detailed Location Map - Orange/Yellow directional map */}
+            <div className="relative h-[250px] w-full rounded-lg border border-gray-300 bg-gradient-to-br from-orange-200 via-yellow-200 to-orange-300 md:h-[300px] overflow-hidden">
+              <div className="flex h-full items-center justify-center p-4">
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-gray-700 mb-2">แผนที่เส้นทาง</p>
+                  <p className="text-xs text-gray-600">V.AUTO CAR</p>
+                </div>
               </div>
             </div>
 
@@ -70,13 +71,13 @@ const Contact = () => {
             <div>
               <h3 className="mb-4 text-2xl font-bold text-[#EF4444]">ที่อยู่</h3>
               <p className="text-base leading-relaxed text-gray-700">
-              KCC กาญจนา คาร์ เซนเตอร์ 1647 แขวงบางไผ่ บางแค กรุงเทพมหานคร 10160
+                KCC กาญจนา คาร์ เซนเตอร์ 1647 แขวงบางไผ่ บางแค กรุงเทพมหานคร 10160
               </p>
             </div>
           </div>
 
           {/* Divider */}
-          <div className="hidden lg:block absolute left-[52%] top-0 bottom-0 w-px bg-gray-300"></div>
+          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gray-300 -translate-x-1/2"></div>
 
           {/* Right side - Contact Methods */}
           <div className="space-y-6 text-center">
@@ -98,10 +99,10 @@ const Contact = () => {
 
             {/* LINE Button */}
             <Link
-              href="https://line.me"
+              href="https://line.me/ti/p/@nattaauto"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-1/3 mx-auto items-center justify-center gap-3 rounded-lg bg-[#8BC43F] px-6 py-4 text-white transition hover:bg-[#7AB32F]"
+              className="flex w-full max-w-xs mx-auto items-center justify-center gap-3 rounded-lg bg-[#8BC43F] px-6 py-4 text-white transition hover:bg-[#7AB32F]"
             >
               <Image
                 src={getImagePath("/images/logo/line 01 Icon-06.svg")}
@@ -116,7 +117,7 @@ const Contact = () => {
             {/* Phone Button */}
             <Link
               href="tel:0625646455"
-              className="mx-auto flex w-1/3 items-center justify-center gap-3 rounded-lg bg-[#EF4444] px-6 py-4 text-white transition hover:bg-[#DC2626]"
+              className="mx-auto flex w-full max-w-xs items-center justify-center gap-3 rounded-lg bg-[#EF4444] px-6 py-4 text-white transition hover:bg-[#DC2626]"
             >
               <svg
                 className="h-6 w-6"
@@ -136,6 +137,68 @@ const Contact = () => {
           </div>
         </div>
 
+        {/* Social Media Links */}
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {/* Facebook Button */}
+          <Link
+            href="https://www.facebook.com/thaanaat.k"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 rounded-lg bg-[#1877F2] px-6 py-4 text-white transition hover:bg-[#166FE5]"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+            <div className="text-left">
+              <p className="font-semibold">V Autocar</p>
+              <p className="text-sm opacity-90">thaanaat.k</p>
+            </div>
+          </Link>
+
+          {/* TikTok Button */}
+          <Link
+            href="https://www.tiktok.com/@v_autocar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 rounded-lg bg-[#1a1a1a] px-6 py-4 text-white transition hover:bg-[#2a2a2a]"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+            </svg>
+            <div className="text-left">
+              <p className="font-semibold">V Autocar</p>
+              <p className="text-sm opacity-90">thaanaat.k</p>
+            </div>
+          </Link>
+
+          {/* YouTube Button */}
+          <Link
+            href="https://www.youtube.com/@nattaauto"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 rounded-lg bg-[#FF0000] px-6 py-4 text-white transition hover:bg-[#E60000]"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+            <div className="text-left">
+              <p className="font-semibold">V Autocar</p>
+              <p className="text-sm opacity-90">thaanaat.k</p>
+            </div>
+          </Link>
+        </div>
       </div>
     </section>
   );
