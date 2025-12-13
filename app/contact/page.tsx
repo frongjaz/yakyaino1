@@ -12,11 +12,6 @@ export const metadata: Metadata = {
 const ContactPage = () => {
   return (
     <>
-      <Breadcrumb
-        pageName="ติดต่อทีม V-Autocar"
-        description="บอกความต้องการของคุณ ไม่ว่าคุณจะขายรถเพียงคันเดียวหรือทั้งฟลีต เราพร้อมช่วยประเมินและปิดดีลอย่างมั่นใจ."
-      />
-
       <Contact />
     </>
   );

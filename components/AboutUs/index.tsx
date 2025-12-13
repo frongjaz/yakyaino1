@@ -3,36 +3,45 @@ import Image from "next/image";
 import Link from "next/link";
 
 const AboutUs = () => {
+  const images = [
+    {
+      src: "/images/about/S__5800084_0.jpg",
+      alt: "Car Dealership Showroom 1",
+    },
+    {
+      src: "/images/about/S__5800062.jpg",
+      alt: "Car Dealership Showroom 2",
+    },
+    {
+      src: "/images/about/S__5800061.jpg",
+      alt: "Car Dealership Showroom 3",
+    },
+  ];
+
   return (
     <section className="bg-white py-16 md:py-20">
       <div className="container px-4">
-        <h2 className="mb-6 text-center text-3xl font-bold text-black md:text-4xl">
+        <h2 className="mb-6 text-center text-3xl font-bold text-[#EF4444] md:text-4xl">
           เกี่ยวกับเรา
         </h2>
         <p className="mx-auto mb-8 max-w-3xl text-center text-base leading-relaxed text-gray-700 md:text-lg">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit
-          in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+          Lorem Ipsum is simply dummy text of the printing and typesetting
+          industry. Lorem Ipsum has been the industry's standard dummy text ever
+          since the 1500s, when an unknown printer took a galley of type and
+          scrambled it to make a type specimen book.
         </p>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {[1, 2, 3].map((index) => (
+          {images.map((image, index) => (
             <div key={index} className="relative h-[250px] w-full md:h-[300px]">
               <Image
-                src={getImagePath("/images/video/car5.jpg")}
-                alt={`Showroom ${index}`}
+                src={getImagePath(image.src)}
+                alt={image.alt}
                 fill
-                className="h-full w-full rounded-lg object-cover"
+                className={`h-full w-full rounded-lg object-cover ${
+                  index === 0 ? "object-bottom" : ""
+                }`}
               />
-              {index === 2 && (
-                <div className="absolute bottom-4 left-4 right-4 rounded-lg bg-black/60 p-4 text-white">
-                  <p className="font-bold">V-AUTOCAR</p>
-                  <p className="text-sm">062-5646425</p>
-                  <p className="text-sm">062-5646452</p>
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -40,7 +49,7 @@ const AboutUs = () => {
         <div className="mt-8 text-center">
           <Link
             href="/about"
-            className="inline-block rounded-md bg-[#EF4444] px-8 py-3 font-semibold text-white transition hover:bg-[#DC2626]"
+            className="inline-block rounded-full border-2 border-[#EF4444] bg-white px-8 py-3 font-semibold text-[#EF4444] transition hover:bg-[#EF4444] hover:text-white"
           >
             อ่านต่อ
           </Link>

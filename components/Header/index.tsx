@@ -51,37 +51,14 @@ const Header = () => {
                 } `}
               >
                 <div className="flex items-center gap-2">
-                  {/* Shield/crest logo with car silhouette */}
-                  <svg
-                    width="45"
-                    height="45"
-                    viewBox="0 0 45 45"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="flex-shrink-0"
-                  >
-                    {/* Shield outline */}
-                    <path
-                      d="M22.5 3L7 9V19C7 29 15 37 22.5 39C30 37 38 29 38 19V9L22.5 3Z"
-                      stroke="#C0C0C0"
-                      strokeWidth="1.5"
-                      fill="none"
-                    />
-                    {/* Car silhouette inside shield */}
-                    <path
-                      d="M15 22C15 20.8954 15.8954 20 17 20H28C29.1046 20 30 20.8954 30 22V26C30 27.1046 29.1046 28 28 28H17C15.8954 28 15 27.1046 15 26V22Z"
-                      fill="#EF4444"
-                    />
-                    <circle cx="19" cy="28" r="2" fill="#EF4444" />
-                    <circle cx="26" cy="28" r="2" fill="#EF4444" />
-                    <path
-                      d="M18 20L19 18H26L27 20"
-                      stroke="#EF4444"
-                      strokeWidth="1"
-                      fill="none"
-                    />
-                  </svg>
-                  
+                  <Image
+                    src="/images/logo/V auto car logo-02.png"
+                    alt="V-AUTOCAR Premium Used Cars"
+                    width={150}
+                    height={60}
+                    className="h-auto max-h-12 lg:max-h-16 w-auto object-contain"
+                    priority
+                  />
                 </div>
               </Link>
             </div>
