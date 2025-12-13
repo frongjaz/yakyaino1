@@ -2,45 +2,65 @@
 import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
-// Fix for default marker icon in Next.js
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
+import { useEffect, useRef, useState } from "react";
 
 const Contact = () => {
-  const mapRef = useRef<L.Map | null>(null);
+  const mapRef = useRef<any>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+    setIsClient(true);
+    // Load leaflet CSS dynamically
+    if (typeof window !== "undefined") {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      link.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
+      link.crossOrigin = "";
+      document.head.appendChild(link);
+      return () => {
+        document.head.removeChild(link);
+      };
+    }
+  }, []);
 
-    // Initialize map (Bangkok coordinates as default, you can change this)
-    const map = L.map(mapContainerRef.current).setView([13.7447016, 100.4025408], 17);
+  useEffect(() => {
+    if (!isClient || !mapContainerRef.current || mapRef.current || typeof window === "undefined") return;
 
-    // Add OpenStreetMap tile layer
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-    }).addTo(map);
-    // Add marker
-    const marker = L.marker([13.7447016, 100.4025408]).addTo(map);
-    marker.bindPopup("V AUTOCAR").openPopup();
+    // Dynamic import leaflet only on client side
+    import("leaflet").then((L) => {
+      // Fix for default marker icon in Next.js
+      delete (L.default.Icon.Default.prototype as any)._getIconUrl;
+      L.default.Icon.Default.mergeOptions({
+        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+      });
 
-    mapRef.current = map;
+      // Initialize map (Bangkok coordinates as default, you can change this)
+      const map = L.default.map(mapContainerRef.current!).setView([13.7447016, 100.4025408], 17);
+
+      // Add OpenStreetMap tile layer
+      L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+      }).addTo(map);
+      // Add marker
+      const marker = L.default.marker([13.7447016, 100.4025408]).addTo(map);
+      marker.bindPopup("V AUTOCAR").openPopup();
+
+      mapRef.current = map;
+    });
 
     return () => {
-      map.remove();
-      mapRef.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, []);
+  }, [isClient]);
 
   return (
     <section id="contact" className="overflow-hidden bg-white py-16 md:py-20 lg:py-28">
