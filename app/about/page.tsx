@@ -1,6 +1,8 @@
-import AboutSectionOne from "@/components/About/AboutSectionOne";
-import AboutSectionTwo from "@/components/About/AboutSectionTwo";
-import Breadcrumb from "@/components/Common/Breadcrumb";
+import AboutHero from "@/components/AboutPage/AboutHero";
+import AboutUsContent from "@/components/AboutPage/AboutUsContent";
+import HistorySection from "@/components/AboutPage/HistorySection";
+import TikTokVideos from "@/components/AboutPage/TikTokVideos";
+import CustomerReviews from "@/components/AboutPage/CustomerReviews";
 
 import { Metadata } from "next";
 
@@ -13,12 +15,11 @@ export const metadata: Metadata = {
 const AboutPage = () => {
   return (
     <>
-      <Breadcrumb
-        pageName="เกี่ยวกับ V-Autocar"
-        description="เราเชื่อว่าการขายรถควรเป็นเรื่องง่าย โปร่งใส และได้ราคาที่เป็นธรรมสำหรับทุกฝ่าย ทีมงานของเราพร้อมเดินเคียงข้างคุณในทุกดีล."
-      />
-      <AboutSectionOne />
-      <AboutSectionTwo />
+      <AboutHero />
+      <AboutUsContent />
+      <HistorySection />
+      <TikTokVideos />
+      <CustomerReviews />
     </>
   );
 };

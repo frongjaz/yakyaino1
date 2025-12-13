@@ -38,7 +38,7 @@ const Header = () => {
         }`}
       >
         {/* Red top border */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#EF4444]"></div>
+       
         
         <div className="container">
           <div className="relative -mx-4 flex items-center justify-between">
@@ -142,7 +142,9 @@ const Header = () => {
             </div>
           </div>
         </div>
+        
       </header>
+      
     </>
   );
 };

@@ -1,0 +1,209 @@
+"use client";
+import { getImagePath } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
+
+type CarListing = {
+  id: string | number;
+  brand: string;
+  model: string;
+  year: number;
+  price: number;
+  image: string;
+  photoCount: number;
+};
+
+const CarListingsGrid = () => {
+  // Sample data - will be replaced with database data
+  const cars: CarListing[] = [
+    {
+      id: 1,
+      brand: "MAZDA",
+      model: "CX-30 2.0 C",
+      year: 2023,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 6,
+    },
+    {
+      id: 2,
+      brand: "BMW",
+      model: "X1 2.0 M SPORT",
+      year: 2019,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 3,
+    },
+    {
+      id: 3,
+      brand: "MAZDA",
+      model: "CX-3",
+      year: 2023,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 5,
+    },
+    {
+      id: 4,
+      brand: "BMW",
+      model: "520D 2.0",
+      year: 2012,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 4,
+    },
+    {
+      id: 5,
+      brand: "MAZDA",
+      model: "CX-3",
+      year: 2023,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 6,
+    },
+    {
+      id: 6,
+      brand: "HONDA",
+      model: "HR-V",
+      year: 2023,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 3,
+    },
+    {
+      id: 7,
+      brand: "BMW",
+      model: "Z3",
+      year: 2025,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 5,
+    },
+    {
+      id: 8,
+      brand: "PORSCHE",
+      model: "Cayman",
+      year: 2025,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 4,
+    },
+    {
+      id: 9,
+      brand: "BENZ",
+      model: "S300",
+      year: 2025,
+      price: 1000000,
+      image: "/images/hero/1231384.png",
+      photoCount: 6,
+    },
+  ];
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("th-TH").format(price);
+  };
+
+  return (
+    <section className="bg-[#2C2C2C] py-12 md:py-16">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {cars.map((car) => (
+            <div
+              key={car.id}
+              className="group relative overflow-hidden rounded-lg bg-gray-800 transition hover:shadow-lg"
+            >
+              {/* Car Image */}
+              <div className="relative h-48 w-full md:h-56">
+                <Image
+                  src={getImagePath(car.image)}
+                  alt={`${car.brand} ${car.model}`}
+                  fill
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                
+                {/* Photo Count Badge - White circle with black border */}
+                <div className="absolute left-4 top-4 flex items-center gap-1 rounded-full border-2 border-black bg-white px-2 py-1">
+                  <svg
+                    className="h-3.5 w-3.5 text-black"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <span className="text-xs font-semibold text-black">
+                    {car.photoCount}
+                  </span>
+                </div>
+
+                {/* Year Badge - Red with rounded corners */}
+                <div className="absolute right-4 top-4 rounded-md bg-[#EF4444] px-3 py-1.5 text-sm font-bold text-white">
+                  {car.year}
+                </div>
+              </div>
+
+              {/* Car Info - Dark Rectangle at Bottom */}
+              <div className="bg-gray-800 p-4">
+                {/* Brand - Red, Bold, Uppercase */}
+                <h3 className="mb-1 text-lg font-bold uppercase text-[#EF4444]">
+                  {car.brand}
+                </h3>
+                
+                {/* Model + Year - White */}
+                <p className="mb-3 text-sm text-white">
+                  {car.model} {car.year}
+                </p>
+                
+                {/* Price - Red, Bold, Right aligned */}
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex-1"></div>
+                  <p className="text-xl font-bold text-[#EF4444]">
+                    {formatPrice(car.price)}
+                  </p>
+                </div>
+                
+                {/* Divider Line */}
+                <div className="mb-3 h-px bg-gray-700"></div>
+                
+                {/* View All Link */}
+                <Link
+                  href={`/cars/${car.id}`}
+                  className="flex items-center justify-between text-sm text-white transition hover:text-gray-300"
+                >
+                  <span>ดูทั้งหมด</span>
+                  <svg
+                    className="h-4 w-4 text-[#EF4444]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default CarListingsGrid;
+

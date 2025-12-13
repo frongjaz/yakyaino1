@@ -22,7 +22,7 @@ const Footer = () => {
       <footer className="relative overflow-hidden pt-16 md:pt-20 lg:pt-24">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <Image
+                  <Image
             src={getImagePath("/images/hero/hand-steering-wheel-sunset-highway-drive-evening-car-travel.jpg")}
             alt="Car Interior Background"
             fill
@@ -43,14 +43,14 @@ const Footer = () => {
             {/* Left section - Logo and Description */}
             <div className="md:col-span-1">
               <Link href="/" className="mb-6 inline-block">
-                <Image
+                  <Image
                   src={getImagePath("/images/logo/V auto car logo-02.png")}
                   alt="V-AUTOCAR Logo"
                   width={120}
                   height={48}
                   className="h-auto max-w-[120px] w-auto"
-                />
-              </Link>
+                  />
+                </Link>
               <p className="mb-6 text-sm leading-relaxed text-white">
                 Lorem Ipsum is simply dummy text of the printing and typesetting
                 industry.
@@ -82,24 +82,24 @@ const Footer = () => {
                 บริการของเรา
               </h3>
               <ul className="space-y-2">
-                <li>
-                  <Link
+                  <li>
+                    <Link
                     href="#"
                     className="block border-b border-white/20 pb-2 text-sm text-white transition hover:text-[#EF4444]"
-                  >
+                    >
                     ขายรถ
-                  </Link>
-                </li>
-                <li>
-                  <Link
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
                     href="#"
                     className="block border-b border-white/20 pb-2 text-sm text-white transition hover:text-[#EF4444]"
-                  >
+                    >
                     รถทั้งหมด
-                  </Link>
-                </li>
-              </ul>
-            </div>
+                    </Link>
+                  </li>
+                </ul>
+              </div>
 
             {/* Contact Section */}
             <div className="md:col-span-1">
@@ -116,9 +116,9 @@ const Footer = () => {
                       height={16}
                       className="h-4 w-4"
                     />
-                  </div>
+            </div>
                   <span className="text-sm text-white">@nattaauto</span>
-                </li>
+                  </li>
                 <li className="flex items-center gap-3">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1877F2]">
                     <svg
@@ -130,7 +130,7 @@ const Footer = () => {
                     </svg>
                   </div>
                   <span className="text-sm text-white">thaanaat.k</span>
-                </li>
+                  </li>
                 <li className="flex items-center gap-3">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black">
                     <svg
@@ -140,9 +140,9 @@ const Footer = () => {
                     >
                       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                     </svg>
-                  </div>
+              </div>
                   <span className="text-sm text-white">@nattaauto</span>
-                </li>
+                  </li>
                 <li className="flex items-center gap-3">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FF0000]">
                     <svg
@@ -154,7 +154,7 @@ const Footer = () => {
                     </svg>
                   </div>
                   <span className="text-sm text-white">@nattaauto</span>
-                </li>
+                  </li>
                 <li className="flex items-center gap-3">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
                     <svg
@@ -172,8 +172,8 @@ const Footer = () => {
                     </svg>
                   </div>
                   <span className="text-sm text-white">062-564-6455</span>
-                </li>
-              </ul>
+                  </li>
+                </ul>
             </div>
           </div>
         </div>

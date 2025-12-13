@@ -36,15 +36,16 @@ const Hero = () => {
         id="home"
         className=""
       >
-        <div className="relative w-full">
-          {/* Banner image - Full frame */}
-          <div className="relative h-[400px] w-full md:h-[500px] lg:h-[600px] xl:h-[700px]">
+        <div className="relative w-full max-w-full overflow-hidden">
+          {/* Banner image - Responsive with max height */}
+          <div className="relative h-[300px] w-full max-w-full md:h-[400px] lg:h-[500px] xl:max-h-[600px] xl:h-[600px]">
             <Image
               src={getImagePath(slides[currentSlide].image)}
               alt={slides[currentSlide].alt}
               fill
               priority
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover object-center"
+              sizes="100vw"
             />
           </div>
 

@@ -64,15 +64,16 @@ const Contact = () => {
 
   return (
     <section id="contact" className="overflow-hidden bg-white py-16 md:py-20 lg:py-28">
+      {/* Full-width Map - Outside Container */}
+      <div className="mb-12 w-full">
+        <div
+          ref={mapContainerRef}
+          className="relative h-[400px] w-full border border-gray-300 overflow-hidden md:h-[450px] lg:h-[500px]"
+          style={{ zIndex: 0 }}
+        ></div>
+      </div>
+
       <div className="container px-4">
-        {/* Full-width Map */}
-        <div className="mb-12 w-full">
-          <div
-            ref={mapContainerRef}
-            className="relative h-[400px] w-full rounded-lg border border-gray-300 overflow-hidden md:h-[450px] lg:h-[500px]"
-            style={{ zIndex: 0 }}
-          ></div>
-        </div>
 
         <div className="relative grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Left side - Map and Address */}
