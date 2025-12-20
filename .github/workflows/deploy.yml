@@ -2,14 +2,16 @@ name: Deploy Next.js Static to HostAtom (FTP)
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout source code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -27,7 +29,7 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: ""
 
       - name: Deploy to HostAtom via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftp.checkkub.com
           username: ${{ secrets.FTP_USERNAME }}
