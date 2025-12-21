@@ -7,12 +7,12 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-        src={getImagePath("/images/logo/sale_page Icon-13.svg")}
-        alt="SUV"
-        width={80}
-        height={80}
-        className="h-16 w-16 md:h-20 md:w-20"
-      />
+          src={getImagePath("/images/logo/sale_page Icon-13.svg")}
+          alt="รถเก๋ง"
+          width={120}
+          height={120}
+          className="h-24 w-24 md:h-28 md:w-28"
+        />
       ),
       label: "รถเก๋ง",
     },
@@ -20,10 +20,10 @@ const AcceptCars = () => {
       icon: (
         <Image
           src={getImagePath("/images/logo/sale_page Icon-14.svg")}
-          alt="SUV"
-          width={80}
-          height={80}
-          className="h-16 w-16 md:h-20 md:w-20"
+          alt="รถ SUV"
+          width={120}
+          height={120}
+          className="h-24 w-24 md:h-28 md:w-28"
         />
       ),
       label: "รถ Suv",
@@ -31,23 +31,23 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-        src={getImagePath("/images/logo/sale_page Icon-15.svg")}
-        alt="SUV"
-        width={80}
-        height={80}
-        className="h-16 w-16 md:h-20 md:w-20"
-      />
+          src={getImagePath("/images/logo/sale_page Icon-15.svg")}
+          alt="รถกระบะ"
+          width={120}
+          height={120}
+          className="h-24 w-24 md:h-28 md:w-28"
+        />
       ),
       label: "รถกระบะ",
     },
     {
-        icon: (
-          <Image
+      icon: (
+        <Image
           src={getImagePath("/images/logo/sale_page Icon-16.svg")}
-          alt="SUV"
-          width={80}
-          height={80}
-          className="h-16 w-16 md:h-20 md:w-20"
+          alt="รถมอเตอร์ไซค์"
+          width={120}
+          height={120}
+          className="h-24 w-24 md:h-28 md:w-28"
         />
       ),
       label: "รถมอเตอร์ไซค์",
@@ -55,24 +55,24 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-        src={getImagePath("/images/logo/sale_page Icon-17.svg")}
-        alt="SUV"
-        width={80}
-        height={80}
-        className="h-16 w-16 md:h-20 md:w-20"
-      />
+          src={getImagePath("/images/logo/sale_page Icon-17.svg")}
+          alt="รถตู้"
+          width={120}
+          height={120}
+          className="h-24 w-24 md:h-28 md:w-28"
+        />
       ),
       label: "รถตู้",
     },
     {
       icon: (
         <Image
-        src={getImagePath("/images/logo/sale_page Icon-18.svg")}
-        alt="SUV"
-        width={80}
-        height={80}
-        className="h-16 w-16 md:h-20 md:w-20"
-      />
+          src={getImagePath("/images/logo/sale_page Icon-18.svg")}
+          alt="รถหรู"
+          width={120}
+          height={120}
+          className="h-24 w-24 md:h-28 md:w-28"
+        />
       ),
       label: "รถหรู",
     },

@@ -13,7 +13,7 @@ const CarContactSection = () => {
       <div className="space-y-3">
         {/* LINE Button */}
         <Link
-          href="https://line.me"
+          href="https://line.me/ti/p/@nattaauto"
           target="_blank"
           rel="noopener noreferrer"
           className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#8BC43F] px-6 py-3 font-semibold text-white transition hover:bg-[#7AB32F]"

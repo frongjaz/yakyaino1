@@ -43,20 +43,20 @@ const Header = () => {
         <div className="container">
           <div className="relative -mx-4 flex items-center justify-between">
             {/* Logo on left */}
-            <div className="w-60 max-w-full px-4 xl:mr-12">
+            <div className="w-64 max-w-full px-4 xl:mr-12">
               <Link
                 href="/"
                 className={`header-logo block w-full ${
-                  sticky ? "py-5 lg:py-2" : "py-8"
+                  sticky ? "py-3 lg:py-1" : "py-4"
                 } `}
               >
                 <div className="flex items-center gap-2">
                   <Image
-                    src={getImagePath("/images/logo/V auto car logo-02.png")}
+                    src={getImagePath("/images/logo/checkkub.png")}
                     alt="V-AUTOCAR Premium Used Cars"
-                    width={150}
-                    height={60}
-                    className="h-auto max-h-12 lg:max-h-16 w-auto object-contain"
+                    width={180}
+                    height={72}
+                    className="h-auto max-h-14 lg:max-h-20 w-auto object-contain"
                     priority
                   />
                 </div>
@@ -99,11 +99,11 @@ const Header = () => {
                   {menuData.map((menuItem, index) => (
                     <li key={index} className="flex items-center">
                       {index > 0 && (
-                        <span className="h-4 w-[1px] bg-gray-400 mx-2 lg:mx-4"></span>
+                        <span className="h-3 w-[1px] bg-gray-400 mx-1.5 lg:mx-3"></span>
                       )}
                       <Link
                         href={menuItem.path || "#"}
-                        className={`px-3 lg:px-4 py-4 lg:py-6 text-sm lg:text-base transition-colors whitespace-nowrap ${
+                        className={`px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm transition-colors whitespace-nowrap ${
                           usePathName === menuItem.path
                             ? "text-[#EF4444] hover:text-[#EF4444]"
                             : "text-gray-300 hover:text-white"
@@ -123,7 +123,7 @@ const Header = () => {
                 <input
                   type="text"
                   placeholder=""
-                  className="w-[180px] lg:w-[220px] h-9 lg:h-10 px-4 pl-9 lg:pl-10 rounded-full border border-gray-400 bg-transparent text-white placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors"
+                  className="w-[160px] lg:w-[200px] h-8 lg:h-9 px-3 pl-8 lg:pl-9 rounded-full border border-gray-400 bg-transparent text-white placeholder-gray-400 focus:outline-none focus:border-gray-300 transition-colors text-sm"
                 />
                 <svg
                   className="absolute left-2.5 lg:left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-gray-400"

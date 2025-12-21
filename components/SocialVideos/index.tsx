@@ -17,7 +17,7 @@ const SocialVideos = () => {
       title: "",
     },
     {
-      url: "https://www.tiktok.com/@v_autocar/video/7281662392226925826",
+      url: "https://www.tiktok.com/@v_autocar/video/7456310987864526088",
       title: "",
     },
     {
@@ -74,16 +74,16 @@ const SocialVideos = () => {
             const embedUrl = getTikTokEmbedUrl(video.url);
 
             return (
-              <div key={index} className="flex justify-center">
-                <div className="relative h-[500px] w-full min-w-[325px] max-w-[400px] overflow-hidden rounded-lg flex items-center justify-center">
+              <div key={index} className="flex justify-center w-full">
+                <div className="relative w-full max-w-full md:max-w-[400px] overflow-hidden rounded-lg flex items-center justify-center" style={{ minHeight: "400px" }}>
                   <blockquote
                     className="tiktok-embed"
                     cite={embedUrl}
                     data-video-id={videoId || undefined}
                     data-embed-from="embed_page"
                     style={{
-                      maxWidth: "605px",
-                      minWidth: "325px",
+                      maxWidth: "100%",
+                      minWidth: "100%",
                       width: "100%",
                     }}
                   >

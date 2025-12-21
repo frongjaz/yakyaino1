@@ -2,6 +2,7 @@
 import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 type RelatedCar = {
   id: string | number;
@@ -13,40 +14,139 @@ type RelatedCar = {
   photoCount: number;
 };
 
-const RelatedCars = () => {
-  const relatedCars: RelatedCar[] = [
-    {
-      id: 1,
-      brand: "BMW",
-      model: "520D 2.0",
-      year: 2012,
-      price: 1000000,
-      image: "/images/hero/1231384.png",
-      photoCount: 6,
-    },
-    {
-      id: 2,
-      brand: "MAZDA",
-      model: "CX-3 1.5 XDL",
-      year: 2018,
-      price: 1000000,
-      image: "/images/hero/1231384.png",
-      photoCount: 6,
-    },
-    {
-      id: 3,
-      brand: "HONDA",
-      model: "HR-V 1.5 EL E:HEV",
-      year: 2025,
-      price: 1000000,
-      image: "/images/hero/1231384.png",
-      photoCount: 6,
-    },
-  ];
+// All available cars data
+const allCars: RelatedCar[] = [
+  {
+    id: 1,
+    brand: "Benz",
+    model: "GLA200",
+    year: 2022,
+    price: 1199000,
+    image: "/images/hero/main1.png",
+    photoCount: 4,
+  },
+  {
+    id: 2,
+    brand: "BENZ",
+    model: "CLS 250",
+    year: 2016,
+    price: 1090000,
+    image: "/images/hero/main11.jpg",
+    photoCount: 3,
+  },
+  {
+    id: 3,
+    brand: "TOYOTA",
+    model: "Corolla Altis",
+    year: 2023,
+    price: 699000,
+    image: "/images/hero/main21.jpg",
+    photoCount: 5,
+  },
+  {
+    id: 4,
+    brand: "HONDA",
+    model: "ACCORD",
+    year: 2022,
+    price: 899000,
+    image: "/images/hero/main31.jpg",
+    photoCount: 4,
+  },
+  {
+    id: 5,
+    brand: "TOYOTA",
+    model: "Harrier",
+    year: 2014,
+    price: 699000,
+    image: "/images/hero/main41.jpg",
+    photoCount: 6,
+  },
+  {
+    id: 6,
+    brand: "BMW",
+    model: "530E",
+    year: 2020,
+    price: 799000,
+    image: "/images/hero/main51.jpg",
+    photoCount: 3,
+  },
+  {
+    id: 7,
+    brand: "TOYOTA",
+    model: "Alphard",
+    year: 2023,
+    price: 2459000,
+    image: "/images/hero/main61.jpg",
+    photoCount: 5,
+  },
+  {
+    id: 8,
+    brand: "Benz",
+    model: "SLK200",
+    year: 2013,
+    price: 899000,
+    image: "/images/hero/main71.jpg",
+    photoCount: 4,
+  },
+  {
+    id: 9,
+    brand: "BMW",
+    model: "740LI",
+    year: 2017,
+    price: 1269000,
+    image: "/images/hero/main81.jpg",
+    photoCount: 6,
+  },
+];
+
+// Fisher-Yates shuffle algorithm for random selection
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+interface RelatedCarsProps {
+  currentCarId?: string | number;
+  count?: number;
+}
+
+const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
+  const [relatedCars, setRelatedCars] = useState<RelatedCar[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    // Filter out current car if provided
+    const availableCars = allCars.filter(
+      (car) => String(car.id) !== String(currentCarId)
+    );
+
+    // Shuffle and take the requested count (only on client-side)
+    const shuffled = shuffleArray(availableCars);
+    setRelatedCars(shuffled.slice(0, Math.min(count, shuffled.length)));
+  }, [currentCarId, count]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("th-TH").format(price);
   };
+
+  // Don't render until mounted to avoid hydration mismatch
+  if (!isMounted) {
+    return (
+      <section className="bg-white py-12">
+        <div className="container mx-auto px-4">
+          <h2 className="mb-8 text-2xl font-bold text-gray-900">รถที่เกี่ยวข้อง</h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {/* Loading placeholder - empty state during hydration */}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-white py-12">
@@ -59,12 +159,13 @@ const RelatedCars = () => {
               className="group relative overflow-hidden rounded-lg bg-gray-800"
             >
               {/* Car Image */}
-              <div className="relative h-48 w-full">
+              <div className="relative aspect-[4/3] w-full overflow-hidden">
                 <Image
                   src={getImagePath(car.image)}
                   alt={`${car.brand} ${car.model}`}
                   fill
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
                 
                 {/* Photo Count Badge */}

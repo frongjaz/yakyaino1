@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { getImagePath } from "@/lib/utils";
 
@@ -16,6 +16,17 @@ interface CarCarouselProps {
 
 const CarCarousel = ({ cars: propCars }: CarCarouselProps = { cars: undefined }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Default cars data (will be replaced by database data in the future)
   const defaultCars: Car[] = [
@@ -29,13 +40,15 @@ const CarCarousel = ({ cars: propCars }: CarCarouselProps = { cars: undefined })
   // Use prop cars if provided, otherwise use default cars
   const cars = propCars || defaultCars;
 
-  const visibleCars = 5;
+  // On mobile: show 1 car, on desktop: show 5 cars
+  const visibleCars = isMobile ? 1 : 5;
   const maxIndex = Math.max(0, cars.length - visibleCars);
   const canGoNext = currentIndex < maxIndex;
   const canGoPrev = currentIndex > 0;
 
-  // Calculate item width percentage (each item takes 100% / total items)
-  const itemWidth = 100 / cars.length;
+  // Calculate item width percentage
+  // On mobile: each item takes 100% width, on desktop: 100% / total items
+  const itemWidth = isMobile ? 100 : 100 / cars.length;
 
   const nextSlide = () => {
     if (canGoNext) {
@@ -96,15 +109,18 @@ const CarCarousel = ({ cars: propCars }: CarCarouselProps = { cars: undefined })
                   className="flex-shrink-0 px-4"
                   style={{ width: `${itemWidth}%` }}
                 >
-                  <div className="relative h-[200px] w-full md:h-[250px]">
+                  <div className={`relative w-full overflow-hidden rounded-lg ${
+                    isMobile ? "aspect-[3/2] min-h-[250px]" : "aspect-square"
+                  }`}>
                     <Image
                       src={getImagePath(car.image)}
                       alt={car.name}
                       fill
-                      className="h-full w-full object-cover rounded-lg"
+                      className="object-contain rounded-lg"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>
-                  <p className="mt-4 text-center text-sm font-medium text-white md:text-base">
+                  <p className="mt-4 text-center text-sm font-medium text-black md:text-base">
                     {car.name}
                   </p>
                 </div>

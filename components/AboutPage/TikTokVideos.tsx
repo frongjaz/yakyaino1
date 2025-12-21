@@ -29,12 +29,13 @@ const TikTokVideos = () => {
           {videos.map((video, index) => (
             <div key={index} className="group relative">
               {/* Video Thumbnail */}
-              <div className="relative h-[250px] w-full overflow-hidden rounded-lg md:h-[300px]">
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg">
                 <Image
                   src={getImagePath(video.thumbnail)}
                   alt={video.alt}
                   fill
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
                 {/* Play Icon Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/30">

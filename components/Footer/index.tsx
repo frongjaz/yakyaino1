@@ -44,7 +44,7 @@ const Footer = () => {
             <div className="md:col-span-1">
               <Link href="/" className="mb-6 inline-block">
                   <Image
-                  src={getImagePath("/images/logo/V auto car logo-02.png")}
+                  src={getImagePath("/images/logo/checkkub.png")}
                   alt="V-AUTOCAR Logo"
                   width={120}
                   height={48}

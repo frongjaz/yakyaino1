@@ -7,6 +7,7 @@ interface CarSpecificationsProps {
   model: string;
   grade?: string;
   year: number;
+  engine?: string;
   type?: string;
   gearbox?: string;
   color: string;
@@ -20,6 +21,7 @@ const CarSpecifications = ({
   model,
   grade,
   year,
+  engine,
   type,
   gearbox,
   color,
@@ -47,6 +49,11 @@ const CarSpecifications = ({
       icon: "calendar",
       label: "Year",
       value: year.toString(),
+    },
+    {
+      icon: "engine",
+      label: "Engine",
+      value: engine || "N/A",
     },
     {
       icon: "gear",
@@ -103,6 +110,10 @@ const CarSpecifications = ({
       case "speedometer":
         return (
         <Image src={getImagePath("/images/logo/car_pageRIcon-39.svg")} alt="Share" width={50} height={50} />
+        );
+      case "engine":
+        return (
+        <Image src={getImagePath("/images/logo/car_pageRIcon-36.svg")} alt="Engine" width={50} height={50} />
         );
       default:
         return null;

@@ -33,14 +33,15 @@ const AboutUs = () => {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {images.map((image, index) => (
-            <div key={index} className="relative h-[250px] w-full md:h-[300px]">
+            <div key={index} className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
               <Image
                 src={getImagePath(image.src)}
                 alt={image.alt}
                 fill
                 className={`h-full w-full rounded-lg object-cover ${
-                  index === 0 ? "object-bottom" : ""
+                  index === 0 ? "object-bottom" : "object-center"
                 }`}
+                sizes="(max-width: 768px) 100vw, 33vw"
               />
             </div>
           ))}

@@ -27,12 +27,13 @@ const HistorySection = () => {
           </div>
 
           {/* Right: Image */}
-          <div className="relative h-[400px] w-full overflow-hidden rounded-lg md:h-[500px]">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg md:aspect-[3/4]">
             <Image
               src={getImagePath("/images/hero/5668644531.png")}
               alt="ประวัติคุณชัย"
               fill
-              className="h-full w-full object-cover object-top"
+              className="object-contain object-top"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
             {/* Fade gradient from bottom */}
             <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#2C2C2C] to-transparent"></div>

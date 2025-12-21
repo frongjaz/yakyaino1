@@ -28,12 +28,13 @@ const CustomerReviews = () => {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {reviews.map((review, index) => (
             <div key={index} className="relative">
-              <div className="relative h-[300px] w-full overflow-hidden rounded-lg md:h-[350px]">
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
                 <Image
                   src={getImagePath(review.image)}
                   alt={review.alt}
                   fill
-                  className="h-full w-full object-cover"
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
                 {/* Red bow decoration overlay (optional) */}
                 <div className="absolute top-4 right-4">
