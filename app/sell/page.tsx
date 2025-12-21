@@ -7,7 +7,7 @@ import ScrollUp from "@/components/Common/ScrollUp";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ขายรถ | V-Autocar",
+  title: "ขายรถ | CheckKub",
   description: "ขายรถกับเรา รวดเร็ว โปร่งใส ราคายุติธรรม รับซื้อรถทุกประเภท ชำระเงินทันที",
 };
 

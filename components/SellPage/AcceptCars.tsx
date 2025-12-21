@@ -7,7 +7,7 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-          src={getImagePath("/images/logo/sale_page Icon-13.svg")}
+          src={getImagePath("/images/logo/Sale_page Icon-13.svg")}
           alt="รถเก๋ง"
           width={120}
           height={120}
@@ -19,7 +19,7 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-          src={getImagePath("/images/logo/sale_page Icon-14.svg")}
+          src={getImagePath("/images/logo/Sale_page Icon-14.svg")}
           alt="รถ SUV"
           width={120}
           height={120}
@@ -31,7 +31,7 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-          src={getImagePath("/images/logo/sale_page Icon-15.svg")}
+          src={getImagePath("/images/logo/Sale_page Icon-15.svg")}
           alt="รถกระบะ"
           width={120}
           height={120}
@@ -43,7 +43,7 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-          src={getImagePath("/images/logo/sale_page Icon-16.svg")}
+          src={getImagePath("/images/logo/Sale_page Icon-16.svg")}
           alt="รถมอเตอร์ไซค์"
           width={120}
           height={120}
@@ -55,7 +55,7 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-          src={getImagePath("/images/logo/sale_page Icon-17.svg")}
+          src={getImagePath("/images/logo/Sale_page Icon-17.svg")}
           alt="รถตู้"
           width={120}
           height={120}
@@ -67,7 +67,7 @@ const AcceptCars = () => {
     {
       icon: (
         <Image
-          src={getImagePath("/images/logo/sale_page Icon-18.svg")}
+          src={getImagePath("/images/logo/Sale_page Icon-18.svg")}
           alt="รถหรู"
           width={120}
           height={120}

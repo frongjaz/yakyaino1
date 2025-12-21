@@ -9,7 +9,7 @@ const SeoContent = () => {
             บริการรับซื้อรถจำนวนมากทั่วประเทศ ครบทุกขั้นตอนในที่เดียว
           </h2>
           <p className="text-base leading-relaxed text-body-color dark:text-body-color-dark sm:text-lg">
-            V-Autocar เชี่ยวชาญด้านการ
+            CheckKub เชี่ยวชาญด้านการ
             <span className={highlight}> รับซื้อรถจำนวนมาก </span>
             ทั้งรถบ้าน รถบริษัท รถเช่าระยะยาว และฟลีตรถขนส่งทุกประเภท เราออกข้อเสนอที่ยุติธรรมจากข้อมูลตลาดปัจจุบัน
             พร้อมจัดทีมตรวจสภาพ โอนกรรมสิทธิ์ และโอนเงินแบบไม่ต้องรอนาน
@@ -65,7 +65,7 @@ const SeoContent = () => {
           <div className="space-y-6">
             <details className="group rounded-xl border border-body-color/20 bg-white p-4 dark:border-white/10 dark:bg-transparent">
               <summary className="cursor-pointer text-lg font-semibold text-black dark:text-white">
-                ขั้นตอนรับซื้อรถจำนวนมากกับ V-Autocar ใช้เวลานานแค่ไหน
+                ขั้นตอนรับซื้อรถจำนวนมากกับ CheckKub ใช้เวลานานแค่ไหน
               </summary>
               <p className="mt-3 text-base text-body-color dark:text-body-color-dark">
                 หลังได้รับข้อมูลรถครบ ทีมงานจะเสนอราคาภายใน 24 ชั่วโมง นัดตรวจสภาพตามจำนวนรถที่มี
@@ -86,7 +86,7 @@ const SeoContent = () => {
                 รับซื้อรถสภาพอย่างไรบ้าง และมีบริการรับรถนอกพื้นที่หรือไม่
               </summary>
               <p className="mt-3 text-base text-body-color dark:text-body-color-dark">
-                V-Autocar รับซื้อรถทุกสภาพ ทั้งใช้งานปกติ รถชนเล็กน้อย หรือรถที่ต้องซ่อมก่อนขาย
+                CheckKub รับซื้อรถทุกสภาพ ทั้งใช้งานปกติ รถชนเล็กน้อย หรือรถที่ต้องซ่อมก่อนขาย
                 เรามีทีมงานเดินทางได้ทั่วประเทศ รวมถึงบริการยกรถและขนส่งตามความเหมาะสมของแต่ละดีล
               </p>
             </details>

@@ -5,9 +5,9 @@ import Breadcrumb from "@/components/Common/Breadcrumb";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "บทความ V-Autocar | ข้อมูลตลาดรถและเคล็ดลับการขาย",
+  title: "บทความ CheckKub | ข้อมูลตลาดรถและเคล็ดลับการขาย",
   description:
-    "ติดตามข่าวสารและบทวิเคราะห์จากทีม V-Autocar เพื่อวางแผนการขายรถให้ได้ราคาดีที่สุด.",
+    "ติดตามข่าวสารและบทวิเคราะห์จากทีม CheckKub เพื่อวางแผนการขายรถให้ได้ราคาดีที่สุด.",
 };
 
 const Blog = () => {

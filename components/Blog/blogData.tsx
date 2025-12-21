@@ -9,7 +9,7 @@ const getBlogData = (): Blog[] => [
       "สำรวจเรตราคาล่าสุดของรถ SUV ยอดนิยม วิเคราะห์ปัจจัยที่ทำให้ราคาปรับขึ้น-ลง และวิธีเตรียมรถเพื่อให้ได้ข้อเสนอที่ดีที่สุด.",
     image: getImagePath("/images/blog/blog-01.jpg"),
     author: {
-      name: "ทีมข้อมูลตลาด V-Autocar",
+      name: "ทีมข้อมูลตลาด CheckKub",
       image: getImagePath("/images/blog/author-01.png"),
       designation: "Market Analyst",
     },
@@ -34,7 +34,7 @@ const getBlogData = (): Blog[] => [
     id: 3,
     title: "เทคนิคต่อรองราคาสำหรับผู้ประกอบการเต็นท์รถ",
     paragraph:
-      "แชร์ประสบการณ์ตรงจากพาร์ทเนอร์ V-Autocar ว่าควรดูองค์ประกอบใดบ้างก่อนตกลงขาย เพื่อให้ได้ตัวเลขที่ทั้งสองฝ่ายพึงพอใจ.",
+      "แชร์ประสบการณ์ตรงจากพาร์ทเนอร์ CheckKub ว่าควรดูองค์ประกอบใดบ้างก่อนตกลงขาย เพื่อให้ได้ตัวเลขที่ทั้งสองฝ่ายพึงพอใจ.",
     image: getImagePath("/images/blog/blog-03.jpg"),
     author: {
       name: "รุ่งโรจน์ ทองอินทร์",

@@ -6,7 +6,7 @@ import Pagination from "@/components/AllCarsPage/Pagination";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "รถทั้งหมด | V-Autocar",
+  title: "รถทั้งหมด | CheckKub",
   description: "ค้นหาและดูรถยนต์ทั้งหมดที่มีจำหน่าย",
 };
 

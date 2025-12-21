@@ -8,7 +8,7 @@ const Features = () => {
       <section id="features" className="py-16 md:py-20 lg:py-28">
         <div className="container">
           <SectionTitle
-            title="ทำไมคนขายรถถึงมั่นใจใน V-Autocar"
+            title="ทำไมคนขายรถถึงมั่นใจใน CheckKub"
             paragraph="เรารับซื้อรถจำนวนมากจากเจ้าของรถ บริษัทฟลีต และดีลเลอร์ทั่วประเทศ พร้อมขั้นตอนที่โปร่งใส การประเมินรวดเร็ว และทีมงานที่ดูแลทุกขั้นตอนของการขายให้เสร็จสมบูรณ์."
             center
           />

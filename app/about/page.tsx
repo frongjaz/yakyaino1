@@ -7,9 +7,9 @@ import CustomerReviews from "@/components/AboutPage/CustomerReviews";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "เกี่ยวกับ V-Autocar | โซลูชันรับซื้อรถสำหรับองค์กร",
+  title: "เกี่ยวกับ CheckKub | โซลูชันรับซื้อรถสำหรับองค์กร",
   description:
-    "รู้จักกับทีม V-Autocar ผู้เชี่ยวชาญด้านการรับซื้อรถจำนวนมากที่พร้อมดูแลคุณตั้งแต่การประเมินจนถึงปิดการขาย.",
+    "รู้จักกับทีม CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถจำนวนมากที่พร้อมดูแลคุณตั้งแต่การประเมินจนถึงปิดการขาย.",
 };
 
 const AboutPage = () => {

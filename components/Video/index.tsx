@@ -14,7 +14,7 @@ const Video = () => {
     <section className="relative z-10 py-16 md:py-20 lg:py-28">
       <div className="container">
         <SectionTitle
-          title="ชมขั้นตอนรับซื้อของ V-Autocar"
+          title="ชมขั้นตอนรับซื้อของ CheckKub"
           paragraph="รู้จักทีมงานและกระบวนการทำงานของเรา ตั้งแต่รับข้อมูลรถ นัดสำรวจ ไปจนถึงวันรับรถจริง เพื่อให้คุณมั่นใจว่าทุกขั้นตอนโปร่งใสและปลอดภัย."
           center
           mb="80px"

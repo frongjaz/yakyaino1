@@ -14,7 +14,7 @@ const NewsLatterBox = () => {
         ขอให้ทีมรับซื้อโทรกลับ
       </h3>
       <p className="mb-11 border-b border-body-color border-opacity-25 pb-11 text-base leading-relaxed text-body-color dark:border-white dark:border-opacity-25">
-        ฝากชื่อและเบอร์ติดต่อ ทีมงาน V-Autocar จะโทรกลับพร้อมคำแนะนำในการเตรียมข้อมูลรถและนัดหมายตรวจสภาพ.
+        ฝากชื่อและเบอร์ติดต่อ ทีมงาน CheckKub จะโทรกลับพร้อมคำแนะนำในการเตรียมข้อมูลรถและนัดหมายตรวจสภาพ.
       </p>
       <div>
         <input

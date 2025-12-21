@@ -45,7 +45,7 @@ const Footer = () => {
               <Link href="/" className="mb-6 inline-block">
                   <Image
                   src={getImagePath("/images/logo/checkkub.png")}
-                  alt="V-AUTOCAR Logo"
+                  alt="CheckKub Logo"
                   width={120}
                   height={48}
                   className="h-auto max-w-[120px] w-auto"

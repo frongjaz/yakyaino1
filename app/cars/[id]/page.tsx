@@ -7,7 +7,7 @@ import RelatedCars from "@/components/CarDetail/RelatedCars";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "รายละเอียดรถ | V-Autocar",
+  title: "รายละเอียดรถ | CheckKub",
   description: "ดูรายละเอียดรถยนต์",
 };
 

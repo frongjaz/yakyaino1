@@ -40,7 +40,7 @@ const AboutSectionTwo = () => {
                   ข้อเสนอโปร่งใสด้วยข้อมูลราคาแบบเรียลไทม์
                 </h3>
                 <p className="text-base font-medium leading-relaxed text-body-color sm:text-lg sm:leading-relaxed">
-                  ข้อเสนอของ V-Autocar อ้างอิงข้อมูลตลาด มือสอง และสถานะรถจริง พร้อมแจกแจงค่าใช้จ่ายและขั้นตอนอย่างละเอียดก่อนเซ็นสัญญา.
+                  ข้อเสนอของ CheckKub อ้างอิงข้อมูลตลาด มือสอง และสถานะรถจริง พร้อมแจกแจงค่าใช้จ่ายและขั้นตอนอย่างละเอียดก่อนเซ็นสัญญา.
                 </p>
               </div>
               <div className="mb-1">

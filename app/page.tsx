@@ -10,9 +10,9 @@ import Script from "next/script";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://v-autocar.co.th"),
-  title: "V-Autocar | ศูนย์กลางรับซื้อรถจำนวนมากทั่วประเทศ",
+  title: "Check-Kub | ศูนย์กลางรับซื้อรถจำนวนมากทั่วประเทศ",
   description:
-    "V-Autocar รับซื้อรถจำนวนมาก รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไวภายใน 1-3 วัน.",
+    "CheckKub รับซื้อรถจำนวนมาก รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไวภายใน 1-3 วัน.",
   keywords: [
     "รับซื้อรถจำนวนมาก",
     "รับซื้อรถมือสอง",
@@ -26,17 +26,17 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "V-Autocar | บริการรับซื้อรถจำนวนมาก ครบวงจร",
+    title: "CheckKub | บริการรับซื้อรถจำนวนมาก ครบวงจร",
     description:
       "ปิดดีลรถหลายคันภายในไม่กี่วัน พร้อมทีมตรวจสภาพ เอกสารนิติบุคคล และการชำระเงินที่เชื่อถือได้ทั่วประเทศ.",
     url: "https://v-autocar.co.th/",
-    siteName: "V-Autocar",
+    siteName: "CheckKub",
     images: [
       {
         url: "https://v-autocar.co.th/images/video/car2.jpg",
         width: 1200,
         height: 630,
-        alt: "V-Autocar รับซื้อรถจำนวนมาก",
+        alt: "CheckKub รับซื้อรถจำนวนมาก",
       },
     ],
     locale: "th_TH",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "V-Autocar | รับซื้อรถจำนวนมาก ปิดดีลไว",
+    title: "CheckKub | รับซื้อรถจำนวนมาก ปิดดีลไว",
     description:
       "บริการรับซื้อรถมือสอง รถบริษัท และฟลีตครบวงจร ประเมินรวดเร็ว ติดต่อทีมผู้เชี่ยวชาญได้ทันที.",
     images: ["https://v-autocar.co.th/images/video/car2.jpg"],
@@ -56,13 +56,13 @@ export default function Home() {
     {
       "@context": "https://schema.org",
       "@type": "AutoDealer",
-      name: "V-Autocar",
+      name: "CheckKub",
       image: "https://v-autocar.co.th/images/video/car2.jpg",
       url: "https://v-autocar.co.th/",
       telephone: "+66-2-123-4567",
       email: "sales@v-autocar.com",
       description:
-        "V-Autocar รับซื้อรถจำนวนมาก รถบ้าน รถบริษัท และฟลีตองค์กรทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไว.",
+        "CheckKub รับซื้อรถจำนวนมาก รถบ้าน รถบริษัท และฟลีตองค์กรทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไว.",
       address: {
         "@type": "PostalAddress",
         streetAddress: "123 ถนนสุขุมวิท",
@@ -133,11 +133,11 @@ export default function Home() {
       mainEntity: [
         {
           "@type": "Question",
-          name: "ทำไมควรขายรถจำนวนมากให้ V-Autocar?",
+          name: "ทำไมควรขายรถจำนวนมากให้ CheckKub?",
           acceptedAnswer: {
             "@type": "Answer",
             text:
-              "V-Autocar มีทีมประเมินราคามืออาชีพ จัดทีมตรวจสภาพทั่วประเทศ และดูแลเอกสารโอนกรรมสิทธิ์ครบ ทำให้ปิดดีลได้รวดเร็วและโปร่งใส.",
+              "CheckKub มีทีมประเมินราคามืออาชีพ จัดทีมตรวจสภาพทั่วประเทศ และดูแลเอกสารโอนกรรมสิทธิ์ครบ ทำให้ปิดดีลได้รวดเร็วและโปร่งใส.",
           },
         },
         {
@@ -172,7 +172,7 @@ export default function Home() {
       <SellBanner />
       <SocialVideos />
       <Script
-        id="v-autocar-structured-data"
+        id="checkkub-structured-data"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />

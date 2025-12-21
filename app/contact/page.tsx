@@ -4,9 +4,9 @@ import Contact from "@/components/Contact";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ติดต่อ V-Autocar | ส่งรายละเอียดรถเพื่อรับข้อเสนอ",
+  title: "ติดต่อ CheckKub | ส่งรายละเอียดรถเพื่อรับข้อเสนอ",
   description:
-    "กรอกข้อมูลรถหรือโทรหาเราเพื่อรับข้อเสนอรับซื้อรถจำนวนมากจากทีม V-Autocar ได้ทันที.",
+    "กรอกข้อมูลรถหรือโทรหาเราเพื่อรับข้อเสนอรับซื้อรถจำนวนมากจากทีม CheckKub ได้ทันที.",
 };
 
 const ContactPage = () => {
