@@ -52,7 +52,7 @@ const Header = () => {
               >
                 <div className="flex items-center gap-2">
                   <Image
-                    src="/images/logo/V auto car logo-02.png"
+                    src={getImagePath("/images/logo/V auto car logo-02.png")}
                     alt="V-AUTOCAR Premium Used Cars"
                     width={150}
                     height={60}

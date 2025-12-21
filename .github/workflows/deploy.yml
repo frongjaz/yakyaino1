@@ -21,7 +21,7 @@ jobs:
       - run: npm ci
 
       - name: Build project
-        run: npm run build:prod
+        run: npm run build:root
 
       - name: Deploy to HostAtom via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -30,4 +30,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: dist/
-          server-dir: /domains/checkkub.com/public_html/
+          server-dir: domains/checkkub.com/public_html/
