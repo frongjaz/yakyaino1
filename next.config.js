@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Static export for static hosting
+  // output: 'export', // Comment out for Node.js hosting (uncomment for static export)
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
   distDir: 'dist',

@@ -1,12 +1,19 @@
-# .htaccess สำหรับ Next.js
+# .htaccess สำหรับ Next.js with Node.js (PM2) Reverse Proxy
 
 # Enable Rewrite Engine
 RewriteEngine On
 
-# Handle Next.js routing - redirect to index.html for client-side routing
+# Proxy API routes และ dynamic pages ไปยัง Node.js server (port 3000)
+# ใช้เมื่อรัน Next.js ด้วย PM2
+RewriteCond %{REQUEST_URI} ^/api/ [OR]
+RewriteCond %{REQUEST_URI} ^/admin/
+RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+
+# Handle Next.js static routing - redirect to index.html for client-side routing
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} !^/admin/
 RewriteRule ^(.*)$ /index.html [L]
 
 # Prevent directory listing
