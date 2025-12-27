@@ -35,3 +35,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# temporary build files
+.api_backup

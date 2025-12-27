@@ -23,8 +23,8 @@ jobs:
       - name: Temporarily move API routes
         run: |
           if [ -d "app/api" ]; then
-            mv app/api app/api.backup
-            echo "API routes moved to app/api.backup"
+            mv app/api .api_backup
+            echo "API routes moved to .api_backup"
           fi
 
       - name: Build project
@@ -32,8 +32,8 @@ jobs:
 
       - name: Restore API routes
         run: |
-          if [ -d "app/api.backup" ]; then
-            mv app/api.backup app/api
+          if [ -d ".api_backup" ]; then
+            mv .api_backup app/api
             echo "API routes restored"
           fi
 
