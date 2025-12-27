@@ -39,6 +39,12 @@ jobs:
             echo "Test DB page moved to .test_db_backup"
           fi
 
+      - name: Enable static export in next.config.js
+        run: |
+          # Enable output: 'export' for static build
+          sed -i 's|// output: '\''export'\'',|output: '\''export'\'',|g' next.config.js
+          echo "✅ Static export enabled"
+
       - name: Build project
         run: npm run build:root
 
@@ -58,6 +64,9 @@ jobs:
             mv .test_db_backup app/test-db
             echo "Test DB page restored"
           fi
+          # Restore next.config.js
+          sed -i 's|output: '\''export'\'',|// output: '\''export'\'',|g' next.config.js
+          echo "✅ next.config.js restored"
 
       - name: Verify build output
         run: |
@@ -87,3 +96,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: dist/
           server-dir: domains/checkkub.com/public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.DS_Store

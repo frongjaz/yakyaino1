@@ -1,36 +1,44 @@
-# .htaccess สำหรับ Next.js with Node.js (PM2) Reverse Proxy
+# .htaccess สำหรับ Next.js Static Export
+# ใช้เมื่อ deploy ผ่าน GitHub Actions (static files)
 
 # Enable Rewrite Engine
 RewriteEngine On
 
-# Enable Proxy (ต้องมี mod_proxy และ mod_proxy_http)
-# ถ้าไม่มี ให้ comment บรรทัด Proxy ออก
-<IfModule mod_proxy.c>
-    # Proxy API routes และ dynamic pages ไปยัง Node.js server (port 3000)
-    RewriteCond %{REQUEST_URI} ^/api/ [OR]
-    RewriteCond %{REQUEST_URI} ^/admin/
-    RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+# Allow all access (แก้ปัญหา Forbidden)
+# สำหรับ Apache 2.4+
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+# สำหรับ Apache 2.2 หรือเก่ากว่า
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
 </IfModule>
 
 # Handle Next.js static routing - redirect to index.html for client-side routing
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/api/
-RewriteCond %{REQUEST_URI} !^/admin/
 RewriteRule ^(.*)$ /index.html [L]
 
 # Prevent directory listing
 Options -Indexes
 
-# Allow access to all files (แก้ปัญหา Forbidden)
-<Files "*">
-    Order allow,deny
-    Allow from all
-</Files>
-
 # Allow access to static files
-<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|css|js|woff|woff2|ttf|eot|json|html|htm)$">
-    Order allow,deny
-    Allow from all
+<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|css|js|woff|woff2|ttf|eot|json|html|htm|xml|txt)$">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Allow from all
+    </IfModule>
 </FilesMatch>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
 
