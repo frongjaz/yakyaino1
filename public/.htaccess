@@ -1,32 +1,20 @@
-# .htaccess สำหรับ Next.js Static Export
+# .htaccess สำหรับ Next.js
 
 # Enable Rewrite Engine
 RewriteEngine On
 
-# Handle Next.js routing
+# Handle Next.js routing - redirect to index.html for client-side routing
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
 RewriteRule ^(.*)$ /index.html [L]
-
-# Security Headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
-</IfModule>
-
-# Prevent access to sensitive files
-<FilesMatch "^\.">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# Allow access to public files
-<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|css|js|woff|woff2|ttf|eot)$">
-    Order allow,deny
-    Allow from all
-</FilesMatch>
 
 # Prevent directory listing
 Options -Indexes
+
+# Allow access to static files
+<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|css|js|woff|woff2|ttf|eot|json)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
 
