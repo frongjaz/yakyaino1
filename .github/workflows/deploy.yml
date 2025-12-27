@@ -20,8 +20,22 @@ jobs:
 
       - run: npm ci
 
+      - name: Temporarily move API routes
+        run: |
+          if [ -d "app/api" ]; then
+            mv app/api app/api.backup
+            echo "API routes moved to app/api.backup"
+          fi
+
       - name: Build project
         run: npm run build:root
+
+      - name: Restore API routes
+        run: |
+          if [ -d "app/api.backup" ]; then
+            mv app/api.backup app/api
+            echo "API routes restored"
+          fi
 
       - name: Verify build output
         run: |
