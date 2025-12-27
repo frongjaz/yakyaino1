@@ -14,25 +14,40 @@ const dbConfig = {
   queueLimit: 0,
 };
 
-// Validate required environment variables in production
-if (process.env.NODE_ENV === 'production') {
-  const requiredVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
-  const missingVars = requiredVars.filter(varName => !process.env[varName]);
-  
-  if (missingVars.length > 0) {
-    throw new Error(
-      `Missing required environment variables: ${missingVars.join(', ')}`
-    );
+// Validate required environment variables at runtime (not build time)
+// This function will be called when actually connecting to the database
+function validateDbConfig() {
+  // Only validate in production runtime, not during build
+  if (typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+    const requiredVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+    const missingVars = requiredVars.filter(varName => !process.env[varName]);
+    
+    if (missingVars.length > 0) {
+      throw new Error(
+        `Missing required environment variables: ${missingVars.join(', ')}`
+      );
+    }
   }
 }
 
-// Create connection pool
-const pool = mysql.createPool(dbConfig);
+// Create connection pool (lazy initialization)
+// Pool will be created when first accessed, not at module load time
+let pool: mysql.Pool | null = null;
+
+function getPool(): mysql.Pool {
+  if (!pool) {
+    // Validate config before creating pool
+    validateDbConfig();
+    pool = mysql.createPool(dbConfig);
+  }
+  return pool;
+}
 
 // Test database connection
 export async function testConnection(): Promise<boolean> {
   try {
-    const connection = await pool.getConnection();
+    const connectionPool = getPool();
+    const connection = await connectionPool.getConnection();
     console.log('✅ Database connected successfully');
     connection.release();
     return true;
@@ -45,7 +60,8 @@ export async function testConnection(): Promise<boolean> {
 // Execute a query
 export async function query(sql: string, params?: any[]): Promise<any> {
   try {
-    const [results] = await pool.execute(sql, params);
+    const connectionPool = getPool();
+    const [results] = await connectionPool.execute(sql, params);
     return results;
   } catch (error) {
     console.error('Database query error:', error);
@@ -55,12 +71,13 @@ export async function query(sql: string, params?: any[]): Promise<any> {
 
 // Get a single connection (for transactions)
 export async function getConnection() {
-  return await pool.getConnection();
+  const connectionPool = getPool();
+  return await connectionPool.getConnection();
 }
 
-// Export the pool for advanced usage
-export { pool };
+// Export the pool getter for advanced usage
+export { getPool as pool };
 
 // Export default connection function
-export default pool;
+export default getPool;
 
