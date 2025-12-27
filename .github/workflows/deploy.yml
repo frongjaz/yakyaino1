@@ -27,10 +27,11 @@ jobs:
             mv app/api .api_backup
             echo "API routes moved to .api_backup"
           fi
-          # Move admin pages (require server-side)
-          if [ -d "app/admin" ]; then
-            mv app/admin .admin_backup
-            echo "Admin pages moved to .admin_backup"
+          # Move only admin/dashboard (server-side), keep admin/login (client-side)
+          if [ -d "app/admin/dashboard" ]; then
+            mkdir -p .admin_backup
+            mv app/admin/dashboard .admin_backup/dashboard
+            echo "Admin dashboard moved to .admin_backup"
           fi
           # Move test-db page (require server-side)
           if [ -d "app/test-db" ]; then
@@ -48,8 +49,10 @@ jobs:
             echo "API routes restored"
           fi
           if [ -d ".admin_backup" ]; then
-            mv .admin_backup app/admin
-            echo "Admin pages restored"
+            mkdir -p app/admin
+            mv .admin_backup/dashboard app/admin/dashboard
+            rmdir .admin_backup
+            echo "Admin dashboard restored"
           fi
           if [ -d ".test_db_backup" ]; then
             mv .test_db_backup app/test-db
@@ -62,6 +65,10 @@ jobs:
           ls -la dist/ || true
           echo "Checking for index.html:"
           ls -la dist/index.html || echo "index.html not found!"
+          echo "Checking for admin/login:"
+          ls -la dist/admin/login/ || echo "admin/login not found!"
+          echo "Checking dist structure:"
+          find dist -name "*.html" | head -20
 
       - name: Copy .htaccess to dist
         run: |
