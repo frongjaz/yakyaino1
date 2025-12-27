@@ -90,7 +90,7 @@ import { query } from '@/lib/db';
 
 export default async function HomePage() {
   const data = await query('SELECT * FROM your_table');
-  return <div>{/* render data */}</div>;
+  return <div>{ render data here }</div>;
 }
 */
 

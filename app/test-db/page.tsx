@@ -126,7 +126,7 @@ export default async function TestDbPage() {
         {/* Instructions */}
         <div className="mt-6 bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
           <p className="text-sm text-yellow-800">
-            <strong>หมายเหตุ:</strong> หากโปรเจกต์ใช้ static export (output: 'export') 
+            <strong>หมายเหตุ:</strong> หากโปรเจกต์ใช้ static export (output: &apos;export&apos;) 
             หน้านี้อาจไม่ทำงานใน production ควรใช้ script สำหรับทดสอบแทน
           </p>
         </div>

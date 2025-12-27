@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 interface Car {
   id: number;
@@ -111,14 +112,18 @@ export default function CarsList() {
           {cars.map((car) => (
             <tr key={car.id} className="hover:bg-gray-50">
               <td className="px-4 py-3 whitespace-nowrap">
-                <img
-                  src={car.image}
-                  alt={`${car.brand} ${car.model}`}
-                  className="h-16 w-24 object-cover rounded"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/images/404.svg';
-                  }}
-                />
+                <div className="relative h-16 w-24 rounded overflow-hidden">
+                  <Image
+                    src={car.image}
+                    alt={`${car.brand} ${car.model}`}
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/images/404.svg';
+                    }}
+                    unoptimized
+                  />
+                </div>
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">

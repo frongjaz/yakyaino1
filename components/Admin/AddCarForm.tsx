@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function AddCarForm() {
   const router = useRouter();
@@ -333,14 +334,16 @@ export default function AddCarForm() {
             />
           </div>
           {formData.image && (
-            <div className="mt-3">
-              <img
+            <div className="mt-3 relative h-32 w-full rounded-lg overflow-hidden border border-stroke dark:border-stroke-dark">
+              <Image
                 src={formData.image}
                 alt="Preview"
-                className="h-32 w-full rounded-lg object-cover border border-stroke dark:border-stroke-dark"
+                fill
+                className="object-cover"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
+                unoptimized
               />
             </div>
           )}
