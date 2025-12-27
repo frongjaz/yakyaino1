@@ -23,6 +23,12 @@ jobs:
       - name: Build project
         run: npm run build:root
 
+      - name: Copy .htaccess to dist
+        run: |
+          if [ -f public/.htaccess ]; then
+            cp public/.htaccess dist/.htaccess
+          fi
+
       - name: Deploy to HostAtom via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
