@@ -23,10 +23,20 @@ jobs:
       - name: Build project
         run: npm run build:root
 
+      - name: Verify build output
+        run: |
+          echo "Checking dist folder contents:"
+          ls -la dist/ || true
+          echo "Checking for index.html:"
+          ls -la dist/index.html || echo "index.html not found!"
+
       - name: Copy .htaccess to dist
         run: |
           if [ -f public/.htaccess ]; then
             cp public/.htaccess dist/.htaccess
+            echo ".htaccess copied successfully"
+          else
+            echo "Warning: public/.htaccess not found"
           fi
 
       - name: Deploy to HostAtom via FTP
