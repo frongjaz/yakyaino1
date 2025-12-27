@@ -3,11 +3,14 @@
 # Enable Rewrite Engine
 RewriteEngine On
 
-# Proxy API routes และ dynamic pages ไปยัง Node.js server (port 3000)
-# ใช้เมื่อรัน Next.js ด้วย PM2
-RewriteCond %{REQUEST_URI} ^/api/ [OR]
-RewriteCond %{REQUEST_URI} ^/admin/
-RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+# Enable Proxy (ต้องมี mod_proxy และ mod_proxy_http)
+# ถ้าไม่มี ให้ comment บรรทัด Proxy ออก
+<IfModule mod_proxy.c>
+    # Proxy API routes และ dynamic pages ไปยัง Node.js server (port 3000)
+    RewriteCond %{REQUEST_URI} ^/api/ [OR]
+    RewriteCond %{REQUEST_URI} ^/admin/
+    RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+</IfModule>
 
 # Handle Next.js static routing - redirect to index.html for client-side routing
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -19,8 +22,14 @@ RewriteRule ^(.*)$ /index.html [L]
 # Prevent directory listing
 Options -Indexes
 
+# Allow access to all files (แก้ปัญหา Forbidden)
+<Files "*">
+    Order allow,deny
+    Allow from all
+</Files>
+
 # Allow access to static files
-<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|css|js|woff|woff2|ttf|eot|json)$">
+<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|css|js|woff|woff2|ttf|eot|json|html|htm)$">
     Order allow,deny
     Allow from all
 </FilesMatch>
