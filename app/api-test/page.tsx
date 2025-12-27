@@ -21,6 +21,25 @@ export default function ApiTestPage() {
       }
 
       const response = await fetch(endpoint, options);
+      const contentType = response.headers.get('content-type');
+      
+      // ตรวจสอบว่า response เป็น HTML หรือไม่ (แสดงว่า API ไม่ทำงาน)
+      if (contentType && contentType.includes('text/html')) {
+        const text = await response.text();
+        setResults({
+          ...results,
+          [endpoint]: {
+            status: response.status,
+            statusText: response.statusText,
+            error: 'API ไม่ทำงาน - ได้ HTML กลับมาแทน JSON (Static hosting ไม่รองรับ API routes)',
+            receivedHtml: text.substring(0, 200) + '...',
+            timestamp: new Date().toLocaleString(),
+            solution: 'ต้องใช้ Node.js hosting เพื่อให้ API routes ทำงาน',
+          },
+        });
+        return;
+      }
+
       const data = await response.json();
       
       setResults({
@@ -33,13 +52,26 @@ export default function ApiTestPage() {
         },
       });
     } catch (error: any) {
-      setResults({
-        ...results,
-        [endpoint]: {
-          error: error.message,
-          timestamp: new Date().toLocaleString(),
-        },
-      });
+      // ตรวจสอบว่า error เกิดจาก HTML response หรือไม่
+      if (error.message.includes('Unexpected token') || error.message.includes('DOCTYPE')) {
+        setResults({
+          ...results,
+          [endpoint]: {
+            error: 'API ไม่ทำงาน - Static hosting ไม่รองรับ API routes',
+            details: 'เมื่อเรียก API จะได้ HTML (index.html) กลับมาแทน JSON response',
+            timestamp: new Date().toLocaleString(),
+            solution: 'ต้องใช้ Node.js hosting (DirectAdmin Node.js Selector) เพื่อให้ API routes ทำงาน',
+          },
+        });
+      } else {
+        setResults({
+          ...results,
+          [endpoint]: {
+            error: error.message,
+            timestamp: new Date().toLocaleString(),
+          },
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -99,10 +131,35 @@ export default function ApiTestPage() {
                   <div className="text-sm">
                     {result.error ? (
                       <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded">
-                        <p className="text-red-600 dark:text-red-400">
+                        <p className="text-red-600 dark:text-red-400 font-semibold">
                           ❌ Error: {result.error}
                         </p>
-                        <p className="text-gray-500 mt-1">เวลา: {result.timestamp}</p>
+                        {result.details && (
+                          <p className="text-red-500 dark:text-red-300 mt-2 text-xs">
+                            {result.details}
+                          </p>
+                        )}
+                        {result.solution && (
+                          <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                            <p className="text-blue-700 dark:text-blue-300 text-xs font-semibold">
+                              💡 วิธีแก้ไข:
+                            </p>
+                            <p className="text-blue-600 dark:text-blue-400 text-xs mt-1">
+                              {result.solution}
+                            </p>
+                          </div>
+                        )}
+                        {result.receivedHtml && (
+                          <details className="mt-2">
+                            <summary className="text-xs text-gray-600 dark:text-gray-400 cursor-pointer">
+                              ดู HTML ที่ได้รับ
+                            </summary>
+                            <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-auto max-h-32">
+                              {result.receivedHtml}
+                            </pre>
+                          </details>
+                        )}
+                        <p className="text-gray-500 mt-2 text-xs">เวลา: {result.timestamp}</p>
                       </div>
                     ) : (
                       <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded">
