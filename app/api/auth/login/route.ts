@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { query } from '@/lib/db';
+import bcrypt from 'bcryptjs';
+
+export const dynamic = 'force-dynamic';
+
+export async function POST(request: NextRequest) {
+  try {
+    const { username, password } = await request.json();
+
+    if (!username || !password) {
+      return NextResponse.json(
+        { success: false, message: 'กรุณากรอก username และ password' },
+        { status: 400 }
+      );
+    }
+
+    // ค้นหา user จากฐานข้อมูล
+    const users = await query(
+      'SELECT * FROM users WHERE username = ? AND status = ?',
+      [username, 'active']
+    );
+
+    const usersArray = Array.isArray(users) ? users : [];
+    
+    if (usersArray.length === 0) {
+      return NextResponse.json(
+        { success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' },
+        { status: 401 }
+      );
+    }
+
+    const user = usersArray[0] as any;
+
+    // ตรวจสอบ password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return NextResponse.json(
+        { success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' },
+        { status: 401 }
+      );
+    }
+
+    // ตรวจสอบว่าเป็น admin หรือไม่
+    if (user.role !== 'admin') {
+      return NextResponse.json(
+        { success: false, message: 'คุณไม่มีสิทธิ์เข้าถึง' },
+        { status: 403 }
+      );
+    }
+
+    // อัพเดท last_login
+    await query(
+      'UPDATE users SET last_login = NOW() WHERE id = ?',
+      [user.id]
+    );
+
+    // สร้าง response และ set cookie
+    const response = NextResponse.json({
+      success: true,
+      message: 'เข้าสู่ระบบสำเร็จ',
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+    });
+
+    // Set cookie สำหรับ session (ใช้ 7 วัน)
+    response.cookies.set('admin_session', JSON.stringify({
+      userId: user.id,
+      username: user.username,
+      role: user.role,
+    }), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+      // domain: process.env.COOKIE_DOMAIN, // Set if using custom domain
+    });
+
+    return response;
+  } catch (error: any) {
+    console.error('Login error:', error);
+    return NextResponse.json(
+      { success: false, message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ', error: error.message },
+      { status: 500 }
+    );
+  }
+}
+

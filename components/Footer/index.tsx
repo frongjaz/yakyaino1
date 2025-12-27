@@ -52,8 +52,7 @@ const Footer = () => {
                   />
                 </Link>
               <p className="mb-6 text-sm leading-relaxed text-white">
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry.
+               
               </p>
               <p className="text-sm text-[#EF4444]">
                 Copyright © 2025. All rights reserved.

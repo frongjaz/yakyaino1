@@ -167,9 +167,10 @@ export default function Home() {
       <ScrollUp />
       <Hero />
       <CarCarousel />
+      <SellBanner />
       <HowToSell />
       <AboutUs />
-      <SellBanner />
+      
       <SocialVideos />
       <Script
         id="checkkub-structured-data"

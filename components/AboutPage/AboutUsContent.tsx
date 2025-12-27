@@ -25,10 +25,7 @@ const AboutUsContent = () => {
           เกี่ยวกับเรา
         </h2>
         <p className="mx-auto mb-8 max-w-3xl text-center text-base leading-relaxed text-gray-700 md:text-lg">
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever
-          since the 1500s, when an unknown printer took a galley of type and
-          scrambled it to make a type specimen book.
+        
         </p>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

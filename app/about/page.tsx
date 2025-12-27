@@ -18,8 +18,8 @@ const AboutPage = () => {
       <AboutHero />
       <AboutUsContent />
       <HistorySection />
-      <TikTokVideos />
-      <CustomerReviews />
+      {/* <TikTokVideos /> */}
+      {/* <CustomerReviews /> */}
     </>
   );
 };

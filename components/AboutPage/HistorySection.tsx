@@ -13,16 +13,10 @@ const HistorySection = () => {
               ประวัติคุณชัย
             </h2>
             <p className="mb-4 text-base leading-relaxed text-white md:text-lg">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever
-              since the 1500s, when an unknown printer took a galley of type and
-              scrambled it to make a type specimen book.
+              Founder of CheckKub, บริษัทที่รับซื้อรถจำนวนมากทั่วประเทศ
             </p>
             <p className="text-base leading-relaxed text-white md:text-lg">
-              It has survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised in the 1960s with the release of Letraset sheets
-              containing Lorem Ipsum passages.
+              CheckKub รับซื้อรถจำนวนมากทั่วประเทศ รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไว
             </p>
           </div>
 

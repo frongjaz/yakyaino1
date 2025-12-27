@@ -23,8 +23,7 @@ const SellBanner = () => {
               ขายรถกับทางเรา
             </h2>
             <p className="mb-4 text-sm leading-relaxed text-white/90 md:text-base">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry.
+             
             </p>
             <div className="flex items-center justify-center gap-4 lg:justify-start">
               <Link
