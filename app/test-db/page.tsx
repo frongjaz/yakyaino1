@@ -1,7 +1,8 @@
 import { testConnection, query } from '@/lib/db';
 import { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+// Note: dynamic = 'force-dynamic' removed for static export compatibility
+// This page will not work in static export - requires Node.js hosting
 
 export const metadata: Metadata = {
   title: 'ทดสอบการเชื่อมต่อฐานข้อมูล',

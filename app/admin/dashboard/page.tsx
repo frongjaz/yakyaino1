@@ -4,7 +4,8 @@ import AddCarForm from '@/components/Admin/AddCarForm';
 import CarsList from '@/components/Admin/CarsList';
 import LogoutButton from '@/components/Admin/LogoutButton';
 
-export const dynamic = 'force-dynamic';
+// Note: dynamic = 'force-dynamic' removed for static export compatibility
+// This page will not work in static export - requires Node.js hosting
 
 export default async function AdminDashboardPage() {
   let session;

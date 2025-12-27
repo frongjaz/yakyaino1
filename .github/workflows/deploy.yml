@@ -20,21 +20,40 @@ jobs:
 
       - run: npm ci
 
-      - name: Temporarily move API routes
+      - name: Temporarily move API routes and dynamic pages
         run: |
+          # Move API routes
           if [ -d "app/api" ]; then
             mv app/api .api_backup
             echo "API routes moved to .api_backup"
+          fi
+          # Move admin pages (require server-side)
+          if [ -d "app/admin" ]; then
+            mv app/admin .admin_backup
+            echo "Admin pages moved to .admin_backup"
+          fi
+          # Move test-db page (require server-side)
+          if [ -d "app/test-db" ]; then
+            mv app/test-db .test_db_backup
+            echo "Test DB page moved to .test_db_backup"
           fi
 
       - name: Build project
         run: npm run build:root
 
-      - name: Restore API routes
+      - name: Restore moved files
         run: |
           if [ -d ".api_backup" ]; then
             mv .api_backup app/api
             echo "API routes restored"
+          fi
+          if [ -d ".admin_backup" ]; then
+            mv .admin_backup app/admin
+            echo "Admin pages restored"
+          fi
+          if [ -d ".test_db_backup" ]; then
+            mv .test_db_backup app/test-db
+            echo "Test DB page restored"
           fi
 
       - name: Verify build output
