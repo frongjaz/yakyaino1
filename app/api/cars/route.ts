@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
+import { checkAuth } from '@/lib/auth-api';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,38 +16,6 @@ export async function OPTIONS(request: NextRequest) {
   });
 }
 
-// ตรวจสอบ authentication
-async function checkAuth(request: NextRequest): Promise<{ authenticated: boolean; user?: any }> {
-  try {
-    // Try to get session from cookie first (for same-domain)
-    const sessionCookie = request.cookies.get('admin_session');
-    
-    // Also try to get from Authorization header (for cross-domain)
-    const authHeader = request.headers.get('authorization');
-    let session: any = null;
-    
-    if (sessionCookie) {
-      // Same-domain: use cookie
-      session = JSON.parse(sessionCookie.value);
-    } else if (authHeader && authHeader.startsWith('Bearer ')) {
-      // Cross-domain: use Authorization header
-      try {
-        const token = authHeader.replace('Bearer ', '');
-        session = JSON.parse(decodeURIComponent(token));
-      } catch {
-        // Invalid token
-      }
-    }
-    
-    if (!session || session.role !== 'admin') {
-      return { authenticated: false };
-    }
-
-    return { authenticated: true, user: session };
-  } catch {
-    return { authenticated: false };
-  }
-}
 
 // GET - ดึงรายการรถทั้งหมด
 export async function GET(request: NextRequest) {
