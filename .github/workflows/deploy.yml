@@ -83,11 +83,16 @@ jobs:
 
       - name: Copy .htaccess to dist
         run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ Error: dist directory does not exist!"
+            exit 1
+          fi
           if [ -f public/.htaccess ]; then
             cp public/.htaccess dist/.htaccess
-            echo ".htaccess copied successfully"
+            echo "✅ .htaccess copied successfully"
+            ls -la dist/.htaccess
           else
-            echo "Warning: public/.htaccess not found"
+            echo "⚠️ Warning: public/.htaccess not found"
           fi
 
       - name: Deploy to HostAtom via FTP
