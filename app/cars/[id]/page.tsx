@@ -10,12 +10,6 @@ import CarContactSection from "@/components/CarDetail/CarContactSection";
 import RelatedCars from "@/components/CarDetail/RelatedCars";
 import { apiGet } from '@/lib/api';
 
-// Required for static export - return empty array to make it fully dynamic (client-side only)
-// This allows the page to work with static export without pre-generating pages
-export async function generateStaticParams() {
-  return [];
-}
-
 interface CarData {
   id: number;
   brand: string;
