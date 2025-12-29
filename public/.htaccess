@@ -17,6 +17,7 @@ RewriteEngine On
 </IfModule>
 
 # Handle Next.js static routing - redirect to index.html for client-side routing
+# This allows Next.js client-side routing to handle dynamic routes like /cars/[id]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ /index.html [L]

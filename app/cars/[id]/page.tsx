@@ -10,6 +10,12 @@ import CarContactSection from "@/components/CarDetail/CarContactSection";
 import RelatedCars from "@/components/CarDetail/RelatedCars";
 import { apiGet } from '@/lib/api';
 
+// Required for static export - return empty array to make it fully dynamic (client-side only)
+// This allows the page to work with static export without pre-generating pages
+export async function generateStaticParams() {
+  return [];
+}
+
 interface CarData {
   id: number;
   brand: string;
@@ -35,8 +41,14 @@ export default function CarDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (params.id) {
-      fetchCarData(params.id as string);
+    // Get ID from params or from URL path
+    const carId = params.id || window.location.pathname.split('/cars/')[1]?.split('/')[0];
+    
+    if (carId) {
+      fetchCarData(carId as string);
+    } else {
+      setError('ไม่พบ ID รถ');
+      setLoading(false);
     }
   }, [params.id]);
 
