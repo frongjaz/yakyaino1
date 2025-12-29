@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCorsHeaders } from '@/lib/cors';
 import { Client } from 'basic-ftp';
 import { checkAuth } from '@/lib/auth-api';
+import { Readable } from 'stream';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,9 +86,12 @@ export async function POST(request: NextRequest) {
 
     // Upload to FTP
     const client = new Client();
-    client.ftp.verbose = false; // Set to true for debugging
+    client.ftp.verbose = process.env.NODE_ENV === 'development'; // Enable verbose in development
+    client.ftp.timeout = 30000; // 30 seconds timeout
 
     try {
+      console.log('Connecting to FTP:', { host: ftpHost, path: ftpPath });
+      
       await client.access({
         host: ftpHost,
         user: ftpUser,
@@ -95,11 +99,20 @@ export async function POST(request: NextRequest) {
         secure: false, // Set to true for FTPS
       });
 
+      console.log('FTP connected, ensuring directory exists:', ftpPath);
+      
       // Ensure directory exists
       await client.ensureDir(ftpPath);
 
+      console.log('Uploading file:', remotePath, 'Size:', buffer.length);
+      
+      // Convert buffer to Readable stream
+      const stream = Readable.from(buffer);
+      
       // Upload file
-      await client.uploadFrom(buffer, remotePath);
+      await client.uploadFrom(stream, remotePath);
+
+      console.log('File uploaded successfully');
 
       // Close connection
       client.close();
@@ -121,10 +134,39 @@ export async function POST(request: NextRequest) {
         headers: corsHeaders,
       });
     } catch (ftpError: any) {
-      client.close();
-      console.error('FTP upload error:', ftpError);
+      try {
+        client.close();
+      } catch (closeError) {
+        // Ignore close errors
+      }
+      
+      console.error('FTP upload error:', {
+        message: ftpError.message,
+        code: ftpError.code,
+        stack: ftpError.stack,
+      });
+
+      // Provide more specific error messages
+      let errorMessage = 'เกิดข้อผิดพลาดในการอัพโหลดไฟล์';
+      if (ftpError.message) {
+        if (ftpError.message.includes('ECONNREFUSED') || ftpError.message.includes('ETIMEDOUT')) {
+          errorMessage = 'ไม่สามารถเชื่อมต่อกับ FTP server ได้ กรุณาตรวจสอบ FTP_HOST';
+        } else if (ftpError.message.includes('530') || ftpError.message.includes('Login')) {
+          errorMessage = 'FTP credentials ไม่ถูกต้อง กรุณาตรวจสอบ FTP_USER และ FTP_PASSWORD';
+        } else if (ftpError.message.includes('550') || ftpError.message.includes('directory')) {
+          errorMessage = 'Directory ไม่มีอยู่หรือไม่มีสิทธิ์เข้าถึง กรุณาตรวจสอบ FTP_PATH';
+        } else {
+          errorMessage = `FTP Error: ${ftpError.message}`;
+        }
+      }
+
       return NextResponse.json(
-        { success: false, message: 'เกิดข้อผิดพลาดในการอัพโหลดไฟล์', error: ftpError.message },
+        { 
+          success: false, 
+          message: errorMessage,
+          error: ftpError.message,
+          code: ftpError.code,
+        },
         { status: 500, headers: corsHeaders }
       );
     }

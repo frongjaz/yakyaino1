@@ -83,6 +83,17 @@ export default function AddCarForm() {
         headers,
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+        }
+        throw new Error(errorData.message || errorData.error || 'เกิดข้อผิดพลาดในการอัพโหลด');
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -90,11 +101,16 @@ export default function AddCarForm() {
         setFormData((prev) => ({ ...prev, image: data.url }));
         setMessage({ type: 'success', text: 'อัพโหลดรูปภาพสำเร็จ' });
       } else {
-        setMessage({ type: 'error', text: data.message || 'เกิดข้อผิดพลาดในการอัพโหลด' });
+        const errorMsg = data.error 
+          ? `${data.message || 'เกิดข้อผิดพลาด'}: ${data.error}`
+          : data.message || 'เกิดข้อผิดพลาดในการอัพโหลด';
+        setMessage({ type: 'error', text: errorMsg });
         setImagePreview(null);
       }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการอัพโหลด' });
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      const errorMsg = error.message || 'เกิดข้อผิดพลาดในการอัพโหลด กรุณาตรวจสอบการเชื่อมต่อหรือลองใหม่อีกครั้ง';
+      setMessage({ type: 'error', text: errorMsg });
       setImagePreview(null);
     } finally {
       setUploading(false);
