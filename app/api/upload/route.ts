@@ -6,6 +6,9 @@ import { Readable } from 'stream';
 
 export const dynamic = 'force-dynamic';
 
+// Set max duration for Vercel (60 seconds for Pro plan, 10 seconds for Hobby)
+export const maxDuration = 60;
+
 // Handle OPTIONS request for CORS
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
@@ -89,14 +92,25 @@ export async function POST(request: NextRequest) {
     client.ftp.verbose = process.env.NODE_ENV === 'development'; // Enable verbose in development
 
     try {
-      console.log('Connecting to FTP:', { host: ftpHost, path: ftpPath });
-      
-      await client.access({
-        host: ftpHost,
-        user: ftpUser,
-        password: ftpPassword,
-        secure: false, // Set to true for FTPS
+      console.log('Connecting to FTP:', { 
+        host: ftpHost, 
+        path: ftpPath,
+        fileSize: file.size,
+        fileName: file.name,
       });
+      
+      // Connect with timeout
+      await Promise.race([
+        client.access({
+          host: ftpHost,
+          user: ftpUser,
+          password: ftpPassword,
+          secure: false, // Set to true for FTPS
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('FTP connection timeout')), 15000)
+        ),
+      ]);
 
       console.log('FTP connected, ensuring directory exists:', ftpPath);
       
@@ -108,8 +122,13 @@ export async function POST(request: NextRequest) {
       // Convert buffer to Readable stream
       const stream = Readable.from(buffer);
       
-      // Upload file
-      await client.uploadFrom(stream, remotePath);
+      // Upload file with timeout
+      await Promise.race([
+        client.uploadFrom(stream, remotePath),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('FTP upload timeout')), 45000)
+        ),
+      ]);
 
       console.log('File uploaded successfully');
 
@@ -148,8 +167,8 @@ export async function POST(request: NextRequest) {
       // Provide more specific error messages
       let errorMessage = 'เกิดข้อผิดพลาดในการอัพโหลดไฟล์';
       if (ftpError.message) {
-        if (ftpError.message.includes('ECONNREFUSED') || ftpError.message.includes('ETIMEDOUT')) {
-          errorMessage = 'ไม่สามารถเชื่อมต่อกับ FTP server ได้ กรุณาตรวจสอบ FTP_HOST';
+        if (ftpError.message.includes('ECONNREFUSED') || ftpError.message.includes('ETIMEDOUT') || ftpError.message.includes('timeout')) {
+          errorMessage = 'ไม่สามารถเชื่อมต่อกับ FTP server ได้ กรุณาตรวจสอบ FTP_HOST และ network connection';
         } else if (ftpError.message.includes('530') || ftpError.message.includes('Login')) {
           errorMessage = 'FTP credentials ไม่ถูกต้อง กรุณาตรวจสอบ FTP_USER และ FTP_PASSWORD';
         } else if (ftpError.message.includes('550') || ftpError.message.includes('directory')) {
@@ -158,6 +177,15 @@ export async function POST(request: NextRequest) {
           errorMessage = `FTP Error: ${ftpError.message}`;
         }
       }
+      
+      // Log detailed error for debugging
+      console.error('FTP Error Details:', {
+        message: ftpError.message,
+        code: ftpError.code,
+        host: ftpHost,
+        path: ftpPath,
+        fileSize: file.size,
+      });
 
       return NextResponse.json(
         { 
