@@ -362,12 +362,12 @@ export default function AddCarForm() {
                 name="image"
                 value={formData.image}
                 onChange={handleChange}
-                disabled={!!imageBase64}
+                disabled={uploading || !!imagePreview}
                 className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] pl-10 pr-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="/images/hero/main1.png หรือ https://example.com/image.jpg"
               />
             </div>
-            {!imageBase64 && formData.image && (
+            {!imagePreview && formData.image && (
               <div className="mt-3 relative h-32 w-full rounded-lg overflow-hidden border border-stroke dark:border-stroke-dark">
                 <Image
                   src={formData.image}
