@@ -32,22 +32,44 @@ export async function GET(request: NextRequest) {
     
     // Add search condition if query exists
     if (searchQuery.trim()) {
-      const searchTerm = `%${searchQuery.trim()}%`;
+      const searchTerm = searchQuery.trim();
+      const searchLower = searchTerm.toLowerCase();
+      const containsTerm = `%${searchLower}%`;
+      
+      // Focus search on brand and model primarily
+      // Only search in other fields if brand/model don't match
       sql += ` AND (
-        brand LIKE ? OR 
-        model LIKE ? OR 
-        description LIKE ? OR
-        color LIKE ? OR
-        transmission LIKE ? OR
-        fuel_type LIKE ? OR
-        engine_size LIKE ? OR
-        license_plate LIKE ?
+        LOWER(brand) = ? OR
+        LOWER(brand) LIKE ? OR
+        LOWER(model) LIKE ? OR
+        LOWER(CONCAT(brand, ' ', model)) LIKE ?
       )`;
-      // Add search term for each field
-      params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
+      
+      // Parameters for brand/model search
+      const exactBrand = searchLower;
+      const brandStartsWith = `${searchLower}%`;
+      
+      params.push(
+        exactBrand,        // 1. LOWER(brand) = ? (exact match)
+        brandStartsWith,   // 2. LOWER(brand) LIKE ? (starts with)
+        containsTerm,      // 3. LOWER(model) LIKE ? (contains)
+        containsTerm       // 4. LOWER(CONCAT(brand, ' ', model)) LIKE ? (full name contains)
+      );
+      
+      // Order by relevance: exact brand matches first, then brand starts with, then model
+      sql += ` ORDER BY 
+        CASE 
+          WHEN LOWER(brand) = ? THEN 1
+          WHEN LOWER(brand) LIKE ? THEN 2
+          WHEN LOWER(model) LIKE ? THEN 3
+          WHEN LOWER(CONCAT(brand, ' ', model)) LIKE ? THEN 4
+          ELSE 5
+        END,
+        created_at DESC`;
+      params.push(exactBrand, brandStartsWith, containsTerm, containsTerm);
+    } else {
+      sql += ' ORDER BY created_at DESC';
     }
-    
-    sql += ' ORDER BY created_at DESC';
     
     const cars = await query(sql, params);
 

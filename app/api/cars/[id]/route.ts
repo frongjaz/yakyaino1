@@ -19,33 +19,57 @@ export async function OPTIONS(request: NextRequest) {
 // GET - ดึงข้อมูลรถตาม ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   const origin = request.headers.get('origin');
   const corsHeaders = getCorsHeaders(origin);
   
   try {
-    const encodedId = params.id;
+    // Handle both Promise and direct params (Next.js 13+ vs 15+)
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const encodedId = resolvedParams.id;
     
-    // Try to decode if it's an encoded ID, otherwise use as-is
-    let carId: string;
-    const decodedId = decodeCarId(encodedId);
-    
-    if (decodedId) {
-      carId = decodedId;
-    } else if (/^\d+$/.test(encodedId)) {
-      // Fallback: support plain numeric IDs for backward compatibility
-      carId = encodedId;
-    } else {
+    if (!encodedId) {
+      console.error('Missing car ID parameter');
       return NextResponse.json(
         { success: false, message: 'ID ไม่ถูกต้อง' },
         { status: 400, headers: corsHeaders }
       );
     }
+    
+    // Try to decode if it's an encoded ID, otherwise use as-is
+    let carId: string | null = null;
+    
+    try {
+      const decodedId = decodeCarId(encodedId);
+      if (decodedId) {
+        carId = decodedId;
+        console.log(`Decoded ID: ${encodedId} -> ${carId}`);
+      }
+    } catch (decodeError: any) {
+      console.error('Error decoding car ID:', decodeError);
+      console.error('Encoded ID:', encodedId);
+    }
+    
+    // If decode failed, try plain numeric ID
+    if (!carId) {
+      if (/^\d+$/.test(encodedId)) {
+        // Fallback: support plain numeric IDs for backward compatibility
+        carId = encodedId;
+        console.log(`Using plain numeric ID: ${carId}`);
+      } else {
+        console.error('Invalid car ID format:', encodedId);
+        return NextResponse.json(
+          { success: false, message: 'ID ไม่ถูกต้อง', debug: { encodedId, decodedId: null } },
+          { status: 400, headers: corsHeaders }
+        );
+      }
+    }
 
     if (!carId || isNaN(Number(carId))) {
+      console.error('Invalid car ID after processing:', carId);
       return NextResponse.json(
-        { success: false, message: 'ID ไม่ถูกต้อง' },
+        { success: false, message: 'ID ไม่ถูกต้อง', debug: { encodedId, carId } },
         { status: 400, headers: corsHeaders }
       );
     }
