@@ -65,8 +65,8 @@ export default function AddCarForm() {
     setMessage(null);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
 
       const uploadUrl = getApiUrl('/api/upload');
       const sessionToken = localStorage.getItem('admin_session');
@@ -78,7 +78,7 @@ export default function AddCarForm() {
 
       const response = await fetch(uploadUrl, {
         method: 'POST',
-        body: formData,
+        body: uploadFormData,
         credentials: 'include',
         headers,
       });
@@ -86,7 +86,8 @@ export default function AddCarForm() {
       const data = await response.json();
 
       if (data.success) {
-        setFormData({ ...formData, image: data.url });
+        // Use functional update to avoid stale closure
+        setFormData((prev) => ({ ...prev, image: data.url }));
         setMessage({ type: 'success', text: 'อัพโหลดรูปภาพสำเร็จ' });
       } else {
         setMessage({ type: 'error', text: data.message || 'เกิดข้อผิดพลาดในการอัพโหลด' });
