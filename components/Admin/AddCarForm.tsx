@@ -12,6 +12,7 @@ export default function AddCarForm() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
   const [formData, setFormData] = useState({
     brand: '',
@@ -36,7 +37,7 @@ export default function AddCarForm() {
     });
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -52,6 +53,10 @@ export default function AddCarForm() {
       return;
     }
 
+    // Store file for later upload
+    setSelectedFile(file);
+    setMessage(null);
+
     // Show preview immediately
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -59,67 +64,54 @@ export default function AddCarForm() {
       setImagePreview(base64String);
     };
     reader.readAsDataURL(file);
+  };
 
-    // Upload to FTP
-    setUploading(true);
-    setMessage(null);
+  const uploadImageToFTP = async (file: File): Promise<string> => {
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
 
-    try {
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
-
-      const uploadUrl = getApiUrl('/api/upload');
-      const sessionToken = localStorage.getItem('admin_session');
-      
-      const headers: HeadersInit = {};
-      if (sessionToken) {
-        headers['Authorization'] = `Bearer ${encodeURIComponent(sessionToken)}`;
-      }
-
-      const response = await fetch(uploadUrl, {
-        method: 'POST',
-        body: uploadFormData,
-        credentials: 'include',
-        headers,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorData;
-        try {
-          errorData = JSON.parse(errorText);
-        } catch {
-          errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
-        }
-        throw new Error(errorData.message || errorData.error || 'เกิดข้อผิดพลาดในการอัพโหลด');
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Use functional update to avoid stale closure
-        setFormData((prev) => ({ ...prev, image: data.url }));
-        setMessage({ type: 'success', text: 'อัพโหลดรูปภาพสำเร็จ' });
-      } else {
-        const errorMsg = data.error 
-          ? `${data.message || 'เกิดข้อผิดพลาด'}: ${data.error}`
-          : data.message || 'เกิดข้อผิดพลาดในการอัพโหลด';
-        setMessage({ type: 'error', text: errorMsg });
-        setImagePreview(null);
-      }
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      const errorMsg = error.message || 'เกิดข้อผิดพลาดในการอัพโหลด กรุณาตรวจสอบการเชื่อมต่อหรือลองใหม่อีกครั้ง';
-      setMessage({ type: 'error', text: errorMsg });
-      setImagePreview(null);
-    } finally {
-      setUploading(false);
+    const uploadUrl = getApiUrl('/api/upload');
+    const sessionToken = localStorage.getItem('admin_session');
+    
+    const headers: HeadersInit = {};
+    if (sessionToken) {
+      headers['Authorization'] = `Bearer ${encodeURIComponent(sessionToken)}`;
     }
+
+    const response = await fetch(uploadUrl, {
+      method: 'POST',
+      body: uploadFormData,
+      credentials: 'include',
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+      }
+      throw new Error(errorData.message || errorData.error || 'เกิดข้อผิดพลาดในการอัพโหลด');
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      const errorMsg = data.error 
+        ? `${data.message || 'เกิดข้อผิดพลาด'}: ${data.error}`
+        : data.message || 'เกิดข้อผิดพลาดในการอัพโหลด';
+      throw new Error(errorMsg);
+    }
+
+    return data.url;
   };
 
   const handleRemoveImage = () => {
     setImagePreview(null);
-    setFormData({ ...formData, image: '' });
+    setSelectedFile(null);
+    setFormData((prev) => ({ ...prev, image: '' }));
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -131,13 +123,37 @@ export default function AddCarForm() {
     setMessage(null);
 
     try {
+      // Validate that we have a file selected
+      if (!selectedFile) {
+        setMessage({ type: 'error', text: 'กรุณาเลือกรูปภาพ' });
+        setLoading(false);
+        return;
+      }
+
+      // Upload image to FTP
+      setUploading(true);
+      let imageUrl: string;
+      
+      try {
+        imageUrl = await uploadImageToFTP(selectedFile);
+        setMessage({ type: 'success', text: 'อัพโหลดรูปภาพสำเร็จ กำลังบันทึกข้อมูล...' });
+      } catch (uploadError: any) {
+        setMessage({ type: 'error', text: uploadError.message || 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ' });
+        setUploading(false);
+        setLoading(false);
+        return;
+      } finally {
+        setUploading(false);
+      }
+
+      // Save car data
       const data = await apiPost('/api/cars', {
         ...formData,
         year: parseInt(formData.year),
         price: parseFloat(formData.price),
         photo_count: parseInt(formData.photo_count) || 0,
         mileage: formData.mileage ? parseInt(formData.mileage) : null,
-        image: formData.image, // Use URL from FTP upload
+        image: imageUrl, // Use URL from FTP upload or existing URL
       });
 
       if (data.success) {
@@ -158,6 +174,7 @@ export default function AddCarForm() {
           status: 'available',
         });
         setImagePreview(null);
+        setSelectedFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -249,8 +266,8 @@ export default function AddCarForm() {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                onChange={handleImageUpload}
-                disabled={uploading}
+                onChange={handleImageSelect}
+                disabled={uploading || loading}
                 className="hidden"
                 id="image-upload"
               />
@@ -319,85 +336,35 @@ export default function AddCarForm() {
                   unoptimized
                 />
               </div>
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="absolute top-2 right-2 flex gap-2">
+                {selectedFile && (
+                  <div className="px-3 py-1 bg-blue-500 text-white text-xs rounded-full">
+                    รออัพโหลดเมื่อบันทึก
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Or use URL */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-stroke dark:border-stroke-dark"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-dark text-body-color dark:text-body-color-dark">
-                หรือ
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              URL รูปภาพ
-            </label>
-            <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <svg
-                  className="h-5 w-5 text-body-color dark:text-body-color-dark"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                  />
-                </svg>
-              </div>
-              <input
-                type="text"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                disabled={uploading || !!imagePreview}
-                className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] pl-10 pr-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="/images/hero/main1.png หรือ https://example.com/image.jpg"
-              />
-            </div>
-            {!imagePreview && formData.image && (
-              <div className="mt-3 relative h-32 w-full rounded-lg overflow-hidden border border-stroke dark:border-stroke-dark">
-                <Image
-                  src={formData.image}
-                  alt="Preview"
-                  fill
-                  className="object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                  unoptimized
-                />
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
@@ -434,7 +401,7 @@ export default function AddCarForm() {
               value={formData.brand}
               onChange={handleChange}
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="เช่น TOYOTA, HONDA"
+              placeholder="กรุณากรอกยี่ห้อ"
             />
           </div>
 
@@ -449,7 +416,7 @@ export default function AddCarForm() {
               value={formData.model}
               onChange={handleChange}
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="เช่น Corolla Altis"
+              placeholder="กรุณากรอกรุ่น"
             />
           </div>
 
@@ -466,7 +433,7 @@ export default function AddCarForm() {
               min="1900"
               max="2099"
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="2023"
+              placeholder="กรุณากรอกปี"
             />
           </div>
 
@@ -483,7 +450,7 @@ export default function AddCarForm() {
               min="0"
               step="1000"
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="699000"
+              placeholder="กรุณากรอกราคา"
             />
           </div>
         </div>
@@ -522,7 +489,7 @@ export default function AddCarForm() {
               onChange={handleChange}
               min="0"
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="50000"
+              placeholder="กรุณากรอกไมล์"
             />
           </div>
 
@@ -536,7 +503,7 @@ export default function AddCarForm() {
               value={formData.color}
               onChange={handleChange}
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="ดำ, แดง, ขาว"
+              placeholder="กรุณากรอกสี"
             />
           </div>
 
@@ -550,7 +517,7 @@ export default function AddCarForm() {
               value={formData.transmission}
               onChange={handleChange}
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="AT, MT"
+              placeholder="กรุณากรอกเกียร์"
             />
           </div>
 
@@ -564,7 +531,7 @@ export default function AddCarForm() {
               value={formData.fuel_type}
               onChange={handleChange}
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="เบนซิน, ดีเซล"
+              placeholder="กรุณากรอกประเภทเชื้อเพลิง"
             />
           </div>
 
@@ -578,7 +545,7 @@ export default function AddCarForm() {
               value={formData.engine_size}
               onChange={handleChange}
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="2000 CC"
+              placeholder="กรุณากรอกขนาดเครื่องยนต์"
             />
           </div>
 
@@ -631,7 +598,7 @@ export default function AddCarForm() {
             onChange={handleChange}
             rows={4}
             className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none resize-none"
-            placeholder="รายละเอียดเพิ่มเติมเกี่ยวกับรถ..."
+            placeholder="กรุณากรอกคำอธิบาย"
           />
         </div>
       </div>
@@ -643,7 +610,7 @@ export default function AddCarForm() {
           disabled={loading || uploading}
           className="w-full flex items-center justify-center rounded-lg bg-primary px-6 py-4 text-base font-semibold text-white shadow-lg hover:bg-primary/90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
         >
-          {loading ? (
+          {uploading ? (
             <>
               <svg
                 className="mr-2 h-5 w-5 animate-spin"
@@ -665,7 +632,31 @@ export default function AddCarForm() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-              กำลังบันทึก...
+              กำลังอัพโหลดรูปภาพ...
+            </>
+          ) : loading ? (
+            <>
+              <svg
+                className="mr-2 h-5 w-5 animate-spin"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              กำลังบันทึกข้อมูล...
             </>
           ) : (
             <>
