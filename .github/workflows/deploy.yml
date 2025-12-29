@@ -33,6 +33,15 @@ jobs:
             mv app/test-db .test_db_backup
             echo "Test DB page moved to .test_db_backup"
           fi
+          # Move cars/[id] dynamic route (client component but needs to be excluded from static export)
+          if [ -d "app/cars" ]; then
+            # Create backup directory structure
+            mkdir -p .cars_backup
+            if [ -d "app/cars/[id]" ]; then
+              mv app/cars/\[id\] .cars_backup/
+              echo "Cars [id] page moved to .cars_backup"
+            fi
+          fi
 
       - name: Enable static export in next.config.js
         run: |
@@ -59,6 +68,13 @@ jobs:
             mv .test_db_backup app/test-db
             echo "Test DB page restored"
           fi
+          # Restore cars/[id] dynamic route
+          if [ -d ".cars_backup/[id]" ]; then
+            mv .cars_backup/\[id\] app/cars/
+            echo "Cars [id] page restored"
+          fi
+          # Clean up backup directory
+          rm -rf .cars_backup
           # Restore next.config.js
           sed -i 's|output: '\''export'\'',|// output: '\''export'\'',|g' next.config.js
           echo "✅ next.config.js restored"

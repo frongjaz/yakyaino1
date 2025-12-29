@@ -144,6 +144,7 @@ async function importMockData() {
         }
 
         // Insert car data
+        // Use empty string instead of null for image2-5 if columns don't allow null
         const [result] = await connection.execute(
           `INSERT INTO cars (
             brand, model, year, price, image, image2, image3, image4, image5, 
@@ -156,10 +157,10 @@ async function importMockData() {
             car.year,
             car.price,
             car.image,
-            null, // image2
-            null, // image3
-            null, // image4
-            null, // image5
+            '', // image2 - use empty string if column doesn't allow null
+            '', // image3
+            '', // image4
+            '', // image5
             car.photo_count,
             null, // description
             null, // mileage
