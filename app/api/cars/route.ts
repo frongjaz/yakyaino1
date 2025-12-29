@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
       transmission,
       fuel_type,
       engine_size,
+      license_plate,
       status = 'available',
     } = body;
 
@@ -94,8 +95,8 @@ export async function POST(request: NextRequest) {
     const result = await query(
       `INSERT INTO cars (
         brand, model, year, price, image, image2, image3, image4, image5, photo_count, description,
-        mileage, color, transmission, fuel_type, engine_size, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        mileage, color, transmission, fuel_type, engine_size, license_plate, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         brand,
         model,
@@ -113,6 +114,7 @@ export async function POST(request: NextRequest) {
         transmission || null,
         fuel_type || null,
         engine_size || null,
+        license_plate || null,
         status,
       ]
     );

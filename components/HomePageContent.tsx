@@ -1,50 +1,39 @@
-import { Metadata } from "next";
-import HomePageContent from "@/components/HomePageContent";
+'use client';
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://v-autocar.co.th"),
-  title: "Check-Kub | ศูนย์กลางรับซื้อรถจำนวนมากทั่วประเทศ",
-  description:
-    "CheckKub รับซื้อรถจำนวนมาก รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไวภายใน 1-3 วัน.",
-  keywords: [
-    "รับซื้อรถจำนวนมาก",
-    "รับซื้อรถมือสอง",
-    "รับซื้อรถบริษัท",
-    "ขายรถฟลีต",
-    "รับซื้อรถทั่วประเทศ",
-    "ขายรถให้บริษัท",
-    "รับซื้อรถขนส่ง",
-  ],
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "CheckKub | บริการรับซื้อรถจำนวนมาก ครบวงจร",
-    description:
-      "ปิดดีลรถหลายคันภายในไม่กี่วัน พร้อมทีมตรวจสภาพ เอกสารนิติบุคคล และการชำระเงินที่เชื่อถือได้ทั่วประเทศ.",
-    url: "https://v-autocar.co.th/",
-    siteName: "CheckKub",
-    images: [
-      {
-        url: "https://v-autocar.co.th/images/video/car2.jpg",
-        width: 1200,
-        height: 630,
-        alt: "CheckKub รับซื้อรถจำนวนมาก",
-      },
-    ],
-    locale: "th_TH",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "CheckKub | รับซื้อรถจำนวนมาก ปิดดีลไว",
-    description:
-      "บริการรับซื้อรถมือสอง รถบริษัท และฟลีตครบวงจร ประเมินรวดเร็ว ติดต่อทีมผู้เชี่ยวชาญได้ทันที.",
-    images: ["https://v-autocar.co.th/images/video/car2.jpg"],
-  },
-};
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import AboutUs from "@/components/AboutUs";
+import CarCarousel from "@/components/CarCarousel";
+import HowToSell from "@/components/HowToSell";
+import ScrollUp from "@/components/Common/ScrollUp";
+import Hero from "@/components/Hero";
+import SellBanner from "@/components/SellBanner";
+import SocialVideos from "@/components/SocialVideos";
+import Script from "next/script";
+import CarDetailContent from '@/components/CarDetail/CarDetailContent';
 
-export default function Home() {
+export default function HomePageContent() {
+  const pathname = usePathname();
+  const [isCarDetailPage, setIsCarDetailPage] = useState(false);
+
+  useEffect(() => {
+    // Check if current path is a car detail page (/cars/[id])
+    if (pathname && pathname.match(/^\/cars\/\d+\/?$/)) {
+      setIsCarDetailPage(true);
+    } else {
+      setIsCarDetailPage(false);
+    }
+  }, [pathname]);
+
+  // If it's a car detail page, render the detail page component
+  if (isCarDetailPage && pathname) {
+    const carId = pathname.match(/^\/cars\/(\d+)\/?$/)?.[1];
+    if (carId) {
+      return <CarDetailContent carId={carId} />;
+    }
+  }
+
+  // Otherwise, render the home page
   const structuredData = [
     {
       "@context": "https://schema.org",
@@ -155,5 +144,22 @@ export default function Home() {
     },
   ];
 
-  return <HomePageContent />;
+  return (
+    <>
+      <ScrollUp />
+      <Hero />
+      <CarCarousel />
+      <SellBanner />
+      <HowToSell />
+      <AboutUs />
+      
+      <SocialVideos />
+      <Script
+        id="checkkub-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+    </>
+  );
 }
+

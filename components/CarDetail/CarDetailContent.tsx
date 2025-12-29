@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import CarDetailBreadcrumb from "@/components/CarDetail/CarDetailBreadcrumb";
 import CarImageGallery from "@/components/CarDetail/CarImageGallery";
 import CarSpecifications from "@/components/CarDetail/CarSpecifications";
@@ -32,24 +32,21 @@ interface CarData {
   status?: string;
 }
 
-export default function CarDetailPage() {
-  const params = useParams();
+interface CarDetailContentProps {
+  carId: string;
+}
+
+export default function CarDetailContent({ carId }: CarDetailContentProps) {
   const router = useRouter();
   const [car, setCar] = useState<CarData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get ID from params or from URL path
-    const carId = params.id || window.location.pathname.split('/cars/')[1]?.split('/')[0];
-    
     if (carId) {
-      fetchCarData(carId as string);
-    } else {
-      setError('ไม่พบ ID รถ');
-      setLoading(false);
+      fetchCarData(carId);
     }
-  }, [params.id]);
+  }, [carId]);
 
   const fetchCarData = async (id: string) => {
     try {
@@ -195,3 +192,4 @@ export default function CarDetailPage() {
     </>
   );
 }
+

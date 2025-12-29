@@ -37,6 +37,7 @@ export default function AddCarForm() {
     transmission: '',
     fuel_type: '',
     engine_size: '',
+    license_plate: '',
     status: 'available',
   });
 
@@ -221,6 +222,7 @@ export default function AddCarForm() {
           transmission: '',
           fuel_type: '',
           engine_size: '',
+          license_plate: '',
           status: 'available',
         });
         setImagePreviews([null, null, null, null, null]);
@@ -530,6 +532,20 @@ export default function AddCarForm() {
               onChange={handleChange}
               className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
               placeholder="กรุณากรอกสี"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+              ทะเบียน
+            </label>
+            <input
+              type="text"
+              name="license_plate"
+              value={formData.license_plate}
+              onChange={handleChange}
+              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
+              placeholder="กรุณากรอกทะเบียน"
             />
           </div>
 
