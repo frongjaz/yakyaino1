@@ -22,7 +22,13 @@ export default function ApiTestPage() {
       }
 
       const apiEndpoint = getApiUrl(endpoint);
-      const response = await fetch(apiEndpoint, options);
+      console.log('Calling API:', apiEndpoint);
+      
+      const response = await fetch(apiEndpoint, {
+        ...options,
+        mode: 'cors',
+        credentials: 'include',
+      });
       const contentType = response.headers.get('content-type');
       
       // ตรวจสอบว่า response เป็น HTML หรือไม่ (แสดงว่า API ไม่ทำงาน)
@@ -54,26 +60,31 @@ export default function ApiTestPage() {
         },
       });
     } catch (error: any) {
-      // ตรวจสอบว่า error เกิดจาก HTML response หรือไม่
-      if (error.message.includes('Unexpected token') || error.message.includes('DOCTYPE')) {
-        setResults({
-          ...results,
-          [endpoint]: {
-            error: 'API ไม่ทำงาน - Static hosting ไม่รองรับ API routes',
-            details: 'เมื่อเรียก API จะได้ HTML (index.html) กลับมาแทน JSON response',
-            timestamp: new Date().toLocaleString(),
-            solution: 'ต้องใช้ Node.js hosting (DirectAdmin Node.js Selector) เพื่อให้ API routes ทำงาน',
-          },
-        });
-      } else {
-        setResults({
-          ...results,
-          [endpoint]: {
-            error: error.message,
-            timestamp: new Date().toLocaleString(),
-          },
-        });
+      // ตรวจสอบ error type
+      let errorMessage = error.message || 'Unknown error';
+      let errorDetails = '';
+      let solution = '';
+      
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        errorMessage = 'Failed to fetch - ไม่สามารถเชื่อมต่อกับ API';
+        errorDetails = 'อาจเกิดจาก CORS error หรือ API URL ไม่ถูกต้อง';
+        solution = 'ตรวจสอบว่า NEXT_PUBLIC_API_URL ถูกตั้งค่าใน build time และ Vercel API อนุญาต CORS';
+      } else if (error.message.includes('Unexpected token') || error.message.includes('DOCTYPE')) {
+        errorMessage = 'API ไม่ทำงาน - Static hosting ไม่รองรับ API routes';
+        errorDetails = 'เมื่อเรียก API จะได้ HTML (index.html) กลับมาแทน JSON response';
+        solution = 'ต้องใช้ Node.js hosting (DirectAdmin Node.js Selector) เพื่อให้ API routes ทำงาน';
       }
+      
+      setResults({
+        ...results,
+        [endpoint]: {
+          error: errorMessage,
+          details: errorDetails,
+          solution: solution,
+          apiUrl: getApiUrl(endpoint),
+          timestamp: new Date().toLocaleString(),
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -160,6 +171,11 @@ export default function ApiTestPage() {
                               {result.receivedHtml}
                             </pre>
                           </details>
+                        )}
+                        {result.apiUrl && (
+                          <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                            <strong>API URL:</strong> {result.apiUrl}
+                          </div>
                         )}
                         <p className="text-gray-500 mt-2 text-xs">เวลา: {result.timestamp}</p>
                       </div>

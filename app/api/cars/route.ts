@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { getCorsHeaders } from '@/lib/cors';
 
 export const dynamic = 'force-dynamic';
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const headers = getCorsHeaders(origin);
+  
+  return new NextResponse(null, {
+    status: 200,
+    headers,
+  });
+}
 
 // ตรวจสอบ authentication
 async function checkAuth(request: NextRequest): Promise<{ authenticated: boolean; user?: any }> {
@@ -26,13 +38,16 @@ async function checkAuth(request: NextRequest): Promise<{ authenticated: boolean
 
 // GET - ดึงรายการรถทั้งหมด
 export async function GET(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+  
   try {
     const auth = await checkAuth(request);
     
     if (!auth.authenticated) {
       return NextResponse.json(
         { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -45,25 +60,30 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: carsArray,
+    }, {
+      headers: corsHeaders,
     });
   } catch (error: any) {
     console.error('Get cars error:', error);
     return NextResponse.json(
       { success: false, message: 'เกิดข้อผิดพลาด', error: error.message },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
 // POST - เพิ่มรถใหม่
 export async function POST(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+  
   try {
     const auth = await checkAuth(request);
     
     if (!auth.authenticated) {
       return NextResponse.json(
         { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -88,7 +108,7 @@ export async function POST(request: NextRequest) {
     if (!brand || !model || !year || !price || !image) {
       return NextResponse.json(
         { success: false, message: 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -123,12 +143,14 @@ export async function POST(request: NextRequest) {
       data: {
         id: insertResult.insertId,
       },
+    }, {
+      headers: corsHeaders,
     });
   } catch (error: any) {
     console.error('Add car error:', error);
     return NextResponse.json(
       { success: false, message: 'เกิดข้อผิดพลาด', error: error.message },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

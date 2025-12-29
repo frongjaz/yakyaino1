@@ -1,10 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { getCorsHeaders } from '@/lib/cors';
 
 export const dynamic = 'force-dynamic';
 
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const headers = getCorsHeaders(origin);
+  
+  return new NextResponse(null, {
+    status: 200,
+    headers,
+  });
+}
+
 export async function POST(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
   try {
     const { username, password } = await request.json();
 
@@ -65,6 +79,8 @@ export async function POST(request: NextRequest) {
         username: user.username,
         role: user.role,
       },
+    }, {
+      headers: corsHeaders,
     });
 
     // Set cookie สำหรับ session (ใช้ 7 วัน)
@@ -84,9 +100,12 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error: any) {
     console.error('Login error:', error);
+    const origin = request.headers.get('origin');
+    const corsHeaders = getCorsHeaders(origin);
+    
     return NextResponse.json(
       { success: false, message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ', error: error.message },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
