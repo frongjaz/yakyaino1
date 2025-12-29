@@ -47,6 +47,8 @@ jobs:
 
       - name: Build project
         run: npm run build:root
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.VERCEL_API_URL || 'https://yakyaino1.vercel.app' }}
 
       - name: Restore moved files
         run: |

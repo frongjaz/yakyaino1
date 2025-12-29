@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { apiGet } from '@/lib/api';
 
 export default function DebugEnvPage() {
   const [result, setResult] = useState<any>(null);
@@ -9,8 +10,7 @@ export default function DebugEnvPage() {
   const checkEnv = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/debug-env');
-      const data = await response.json();
+      const data = await apiGet('/api/debug-env');
       setResult(data);
     } catch (error: any) {
       setResult({

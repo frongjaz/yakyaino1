@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { apiPost } from '@/lib/api';
 
 export default function AddCarForm() {
   const router = useRouter();
@@ -38,21 +39,13 @@ export default function AddCarForm() {
     setMessage(null);
 
     try {
-      const response = await fetch('/api/cars', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          year: parseInt(formData.year),
-          price: parseFloat(formData.price),
-          photo_count: parseInt(formData.photo_count) || 0,
-          mileage: formData.mileage ? parseInt(formData.mileage) : null,
-        }),
+      const data = await apiPost('/api/cars', {
+        ...formData,
+        year: parseInt(formData.year),
+        price: parseFloat(formData.price),
+        photo_count: parseInt(formData.photo_count) || 0,
+        mileage: formData.mileage ? parseInt(formData.mileage) : null,
       });
-
-      const data = await response.json();
 
       if (data.success) {
         setMessage({ type: 'success', text: 'เพิ่มข้อมูลรถสำเร็จ!' });

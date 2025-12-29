@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiPost } from '@/lib/api';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -17,15 +18,7 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
+      const data = await apiPost('/api/auth/login', { username, password });
 
       if (data.success) {
         router.push('/admin/dashboard');

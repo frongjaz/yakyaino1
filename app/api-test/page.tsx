@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getApiUrl } from '@/lib/api';
 
 export default function ApiTestPage() {
   const [results, setResults] = useState<any>({});
@@ -20,7 +21,8 @@ export default function ApiTestPage() {
         options.body = JSON.stringify(body);
       }
 
-      const response = await fetch(endpoint, options);
+      const apiEndpoint = getApiUrl(endpoint);
+      const response = await fetch(apiEndpoint, options);
       const contentType = response.headers.get('content-type');
       
       // ตรวจสอบว่า response เป็น HTML หรือไม่ (แสดงว่า API ไม่ทำงาน)

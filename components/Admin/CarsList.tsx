@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { apiGet } from '@/lib/api';
 
 interface Car {
   id: number;
@@ -26,8 +27,7 @@ export default function CarsList() {
   const fetchCars = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/cars');
-      const data = await response.json();
+      const data = await apiGet('/api/cars');
 
       if (data.success) {
         setCars(data.data || []);
