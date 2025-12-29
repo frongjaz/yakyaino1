@@ -25,22 +25,42 @@ jobs:
           # Move API routes
           if [ -d "app/api" ]; then
             mv app/api .api_backup
-            echo "API routes moved to .api_backup"
+            echo "✅ API routes moved to .api_backup"
           fi
           # Note: admin/dashboard is now a client component, no need to move
           # Move test-db page (require server-side)
           if [ -d "app/test-db" ]; then
             mv app/test-db .test_db_backup
-            echo "Test DB page moved to .test_db_backup"
+            echo "✅ Test DB page moved to .test_db_backup"
           fi
           # Move cars/[id] dynamic route (cannot use generateStaticParams with 'use client')
           # Will be handled by client-side routing via .htaccess redirect to index.html
           if [ -d "app/cars" ]; then
             mkdir -p .cars_backup
-            if [ -d "app/cars/\[id\]" ]; then
-              mv app/cars/\[id\] .cars_backup/
-              echo "Cars [id] page moved to .cars_backup"
+            # Use find to locate the [id] directory (handles brackets correctly)
+            if find app/cars -type d -name '[id]' | grep -q .; then
+              find app/cars -type d -name '[id]' -exec mv {} .cars_backup/ \;
+              echo "✅ Cars [id] page moved to .cars_backup"
+            else
+              # Alternative: try direct path with quotes
+              if [ -d "app/cars/[id]" ]; then
+                mv "app/cars/[id]" .cars_backup/
+                echo "✅ Cars [id] page moved to .cars_backup (direct path)"
+              else
+                echo "⚠️  Cars [id] directory not found, listing app/cars:"
+                ls -la app/cars/ || echo "app/cars directory not found or empty"
+              fi
             fi
+          fi
+          # Verify files are moved
+          echo ""
+          echo "📋 Verification:"
+          echo "  - app/api exists: $([ -d "app/api" ] && echo 'YES ❌' || echo 'NO ✅')"
+          echo "  - app/test-db exists: $([ -d "app/test-db" ] && echo 'YES ❌' || echo 'NO ✅')"
+          if find app/cars -type d -name '[id]' 2>/dev/null | grep -q .; then
+            echo "  - app/cars/[id] exists: YES ❌"
+          else
+            echo "  - app/cars/[id] exists: NO ✅"
           fi
 
       - name: Enable static export in next.config.js
@@ -69,12 +89,17 @@ jobs:
             echo "Test DB page restored"
           fi
           # Restore cars/[id] dynamic route
-          if [ -d ".cars_backup/[id]" ]; then
-            mv .cars_backup/\[id\] app/cars/
-            echo "Cars [id] page restored"
+          if [ -d ".cars_backup" ]; then
+            if find .cars_backup -type d -name '[id]' | grep -q .; then
+              find .cars_backup -type d -name '[id]' -exec mv {} app/cars/ \;
+              echo "✅ Cars [id] page restored"
+            elif [ -d ".cars_backup/[id]" ]; then
+              mv ".cars_backup/[id]" app/cars/
+              echo "✅ Cars [id] page restored (direct path)"
+            fi
+            # Clean up backup directory
+            rm -rf .cars_backup
           fi
-          # Clean up backup directory
-          rm -rf .cars_backup
           # Restore next.config.js
           sed -i 's|output: '\''export'\'',|// output: '\''export'\'',|g' next.config.js
           echo "✅ next.config.js restored"
