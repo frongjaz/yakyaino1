@@ -1,19 +1,60 @@
-import { redirect } from 'next/navigation';
-import { requireAuth } from '@/lib/auth';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { apiGet } from '@/lib/api';
 import AddCarForm from '@/components/Admin/AddCarForm';
 import CarsList from '@/components/Admin/CarsList';
 import LogoutButton from '@/components/Admin/LogoutButton';
 
-// Note: dynamic = 'force-dynamic' removed for static export compatibility
-// This page will not work in static export - requires Node.js hosting
+interface Session {
+  userId: number;
+  username: string;
+  role: string;
+}
 
-export default async function AdminDashboardPage() {
-  let session;
-  
-  try {
-    session = await requireAuth();
-  } catch {
-    redirect('/admin/login');
+export default function AdminDashboardPage() {
+  const router = useRouter();
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const data = await apiGet<{ success: boolean; authenticated: boolean; user?: Session }>('/api/auth/check');
+      
+      if (data.success && data.authenticated && data.user) {
+        setSession(data.user);
+      } else {
+        // Not authenticated, redirect to login
+        router.push('/admin/login');
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      router.push('/admin/login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-dark dark:via-gray-dark dark:to-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-body-color dark:text-body-color-dark">กำลังตรวจสอบสิทธิ์...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If no session, don't render (will redirect)
+  if (!session) {
+    return null;
   }
 
   return (

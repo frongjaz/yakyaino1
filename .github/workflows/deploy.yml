@@ -27,12 +27,7 @@ jobs:
             mv app/api .api_backup
             echo "API routes moved to .api_backup"
           fi
-          # Move only admin/dashboard (server-side), keep admin/login (client-side)
-          if [ -d "app/admin/dashboard" ]; then
-            mkdir -p .admin_backup
-            mv app/admin/dashboard .admin_backup/dashboard
-            echo "Admin dashboard moved to .admin_backup"
-          fi
+          # Note: admin/dashboard is now a client component, no need to move
           # Move test-db page (require server-side)
           if [ -d "app/test-db" ]; then
             mv app/test-db .test_db_backup
@@ -59,12 +54,7 @@ jobs:
             mv .api_backup app/api
             echo "API routes restored"
           fi
-          if [ -d ".admin_backup" ]; then
-            mkdir -p app/admin
-            mv .admin_backup/dashboard app/admin/dashboard
-            rmdir .admin_backup
-            echo "Admin dashboard restored"
-          fi
+          # Note: admin/dashboard is now a client component, no need to restore
           if [ -d ".test_db_backup" ]; then
             mv .test_db_backup app/test-db
             echo "Test DB page restored"
