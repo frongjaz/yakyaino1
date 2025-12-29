@@ -43,6 +43,8 @@ jobs:
         run: |
           # Enable output: 'export' for static build
           sed -i 's|// output: '\''export'\'',|output: '\''export'\'',|g' next.config.js
+          # When using output: 'export', Next.js outputs to 'out/' directory, not 'dist/'
+          # So we need to set distDir to 'out' or copy after build
           echo "✅ Static export enabled"
 
       - name: Build project
@@ -72,14 +74,36 @@ jobs:
 
       - name: Verify build output
         run: |
-          echo "Checking dist folder contents:"
-          ls -la dist/ || true
-          echo "Checking for index.html:"
-          ls -la dist/index.html || echo "index.html not found!"
-          echo "Checking for admin/login:"
-          ls -la dist/admin/login/ || echo "admin/login not found!"
-          echo "Checking dist structure:"
-          find dist -name "*.html" | head -20
+          echo "Checking build output directories:"
+          echo "out/ directory:"
+          ls -la out/ 2>/dev/null || echo "out/ not found"
+          echo "dist/ directory:"
+          ls -la dist/ 2>/dev/null || echo "dist/ not found"
+          echo ""
+          echo "Checking for index.html in out/:"
+          ls -la out/index.html 2>/dev/null || echo "index.html not found in out/"
+          echo "Checking for index.html in dist/:"
+          ls -la dist/index.html 2>/dev/null || echo "index.html not found in dist/"
+          echo ""
+          echo "Build output structure:"
+          find out -name "*.html" 2>/dev/null | head -20 || find dist -name "*.html" 2>/dev/null | head -20 || echo "No HTML files found"
+
+      - name: Prepare dist directory
+        run: |
+          # When using output: 'export', Next.js outputs to 'out/' directory
+          # Copy from out/ to dist/ for deployment
+          if [ -d "out" ]; then
+            echo "✅ Found out/ directory, copying to dist/"
+            mkdir -p dist
+            cp -r out/* dist/
+            echo "✅ Files copied to dist/"
+          elif [ -d "dist" ]; then
+            echo "✅ Using existing dist/ directory"
+          else
+            echo "❌ Error: Neither out/ nor dist/ directory found!"
+            echo "Build may have failed. Checking build logs..."
+            exit 1
+          fi
 
       - name: Copy .htaccess to dist
         run: |
