@@ -87,7 +87,6 @@ export async function POST(request: NextRequest) {
     // Upload to FTP
     const client = new Client();
     client.ftp.verbose = process.env.NODE_ENV === 'development'; // Enable verbose in development
-    client.ftp.timeout = 30000; // 30 seconds timeout
 
     try {
       console.log('Connecting to FTP:', { host: ftpHost, path: ftpPath });
