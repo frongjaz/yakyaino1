@@ -16,7 +16,9 @@ export function getApiUrl(endpoint: string): string {
   
   if (API_URL) {
     // Use external API
-    return `${API_URL}/${cleanEndpoint}`;
+    // Remove trailing slash from API_URL if present
+    const cleanApiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+    return `${cleanApiUrl}/${cleanEndpoint}`;
   }
   
   // Use relative path (local development or same domain)
@@ -32,13 +34,27 @@ export async function apiFetch(
 ): Promise<Response> {
   const url = getApiUrl(endpoint);
   
-  return fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      mode: 'cors',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+    });
+    
+    return response;
+  } catch (error: any) {
+    // Log error for debugging
+    console.error('API Fetch Error:', {
+      url,
+      endpoint,
+      error: error.message,
+    });
+    throw error;
+  }
 }
 
 /**
