@@ -103,7 +103,7 @@ export default function DebugEnvPage() {
 
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded">
                   <p className="text-yellow-800 dark:text-yellow-300 text-sm">
-                    <strong>หมายเหตุ:</strong> ถ้าเห็น "ไม่พบ" แสดงว่า environment variable นั้นไม่ได้ถูกโหลด
+                    <strong>หมายเหตุ:</strong> ถ้าเห็น &quot;ไม่พบ&quot; แสดงว่า environment variable นั้นไม่ได้ถูกโหลด
                   </p>
                 </div>
 
