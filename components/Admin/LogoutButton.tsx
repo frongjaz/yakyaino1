@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { clearSession } from '@/lib/auth-client';
+import { apiPost } from '@/lib/api';
 
 export default function LogoutButton() {
   const router = useRouter();
@@ -10,16 +12,24 @@ export default function LogoutButton() {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        router.push('/admin/login');
-        router.refresh();
+      // Clear localStorage session
+      clearSession();
+      
+      // Call logout API (optional, for server-side cleanup)
+      try {
+        await apiPost('/api/auth/logout', {});
+      } catch (error) {
+        // Ignore API errors, we've already cleared local session
+        console.error('Logout API error:', error);
       }
+      
+      router.push('/admin/login');
+      router.refresh();
     } catch (error) {
       console.error('Logout error:', error);
+      // Still redirect even if there's an error
+      clearSession();
+      router.push('/admin/login');
     } finally {
       setLoading(false);
     }

@@ -18,15 +18,27 @@ export async function OPTIONS(request: NextRequest) {
 // ตรวจสอบ authentication
 async function checkAuth(request: NextRequest): Promise<{ authenticated: boolean; user?: any }> {
   try {
+    // Try to get session from cookie first (for same-domain)
     const sessionCookie = request.cookies.get('admin_session');
     
-    if (!sessionCookie) {
-      return { authenticated: false };
-    }
-
-    const session = JSON.parse(sessionCookie.value);
+    // Also try to get from Authorization header (for cross-domain)
+    const authHeader = request.headers.get('authorization');
+    let session: any = null;
     
-    if (session.role !== 'admin') {
+    if (sessionCookie) {
+      // Same-domain: use cookie
+      session = JSON.parse(sessionCookie.value);
+    } else if (authHeader && authHeader.startsWith('Bearer ')) {
+      // Cross-domain: use Authorization header
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        session = JSON.parse(decodeURIComponent(token));
+      } catch {
+        // Invalid token
+      }
+    }
+    
+    if (!session || session.role !== 'admin') {
       return { authenticated: false };
     }
 

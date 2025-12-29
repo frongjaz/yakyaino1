@@ -70,8 +70,15 @@ export async function POST(request: NextRequest) {
       [user.id]
     );
 
-    // สร้าง response และ set cookie
-    const response = NextResponse.json({
+    // สร้าง response และ return session data (ใช้ localStorage แทน cookies สำหรับ cross-domain)
+    const sessionData = {
+      userId: user.id,
+      username: user.username,
+      role: user.role,
+    };
+
+    // Return session data in response body (client will store in localStorage)
+    return NextResponse.json({
       success: true,
       message: 'เข้าสู่ระบบสำเร็จ',
       user: {
@@ -79,25 +86,10 @@ export async function POST(request: NextRequest) {
         username: user.username,
         role: user.role,
       },
+      session: sessionData, // Include session data for client-side storage
     }, {
       headers: corsHeaders,
     });
-
-    // Set cookie สำหรับ session (ใช้ 7 วัน)
-    response.cookies.set('admin_session', JSON.stringify({
-      userId: user.id,
-      username: user.username,
-      role: user.role,
-    }), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-      // domain: process.env.COOKIE_DOMAIN, // Set if using custom domain
-    });
-
-    return response;
   } catch (error: any) {
     console.error('Login error:', error);
     const origin = request.headers.get('origin');

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiGet } from '@/lib/api';
+import { getSession, clearSession } from '@/lib/auth-client';
 import AddCarForm from '@/components/Admin/AddCarForm';
 import CarsList from '@/components/Admin/CarsList';
 import LogoutButton from '@/components/Admin/LogoutButton';
@@ -23,21 +24,32 @@ export default function AdminDashboardPage() {
   }, []);
 
   const checkAuth = async () => {
-    try {
-      const data = await apiGet<{ success: boolean; authenticated: boolean; user?: Session }>('/api/auth/check');
-      
-      if (data.success && data.authenticated && data.user) {
-        setSession(data.user);
-      } else {
-        // Not authenticated, redirect to login
-        router.push('/admin/login');
+    // First check localStorage
+    const localSession = getSession();
+    
+    if (localSession) {
+      // Verify with API
+      try {
+        const data = await apiGet<{ success: boolean; authenticated: boolean; user?: Session }>('/api/auth/check');
+        
+        if (data.success && data.authenticated && data.user) {
+          setSession(data.user);
+        } else {
+          // API says not authenticated, clear local session
+          clearSession();
+          router.push('/admin/login');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        // On error, try to use local session (offline mode)
+        setSession(localSession);
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
+    } else {
+      // No local session, redirect to login
       router.push('/admin/login');
-    } finally {
-      setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   // Show loading state while checking auth

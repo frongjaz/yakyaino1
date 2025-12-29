@@ -26,6 +26,27 @@ export function getApiUrl(endpoint: string): string {
 }
 
 /**
+ * Get session token from localStorage
+ */
+function getSessionToken(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  
+  try {
+    const sessionStr = localStorage.getItem('admin_session');
+    if (!sessionStr) {
+      return null;
+    }
+    
+    // Encode session as token for Authorization header
+    return encodeURIComponent(sessionStr);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Fetch API helper
  */
 export async function apiFetch(
@@ -34,15 +55,25 @@ export async function apiFetch(
 ): Promise<Response> {
   const url = getApiUrl(endpoint);
   
+  // Get session token for Authorization header (cross-domain support)
+  const sessionToken = getSessionToken();
+  
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options?.headers,
+  };
+  
+  // Add Authorization header if session exists
+  if (sessionToken) {
+    headers['Authorization'] = `Bearer ${sessionToken}`;
+  }
+  
   try {
     const response = await fetch(url, {
       ...options,
       mode: 'cors',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      credentials: 'include', // Still include credentials for cookies (if same-domain)
+      headers,
     });
     
     return response;
