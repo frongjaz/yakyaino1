@@ -42,14 +42,16 @@ export default function CarDetailPage() {
 
   useEffect(() => {
     // Get ID from params or from URL path
-    const encodedId = params.id || window.location.pathname.split('/cars/')[1]?.split('/')[0];
+    // Handle both string and string[] (Next.js can return array for catch-all routes)
+    const rawId = params.id;
+    const encodedId = Array.isArray(rawId) ? rawId[0] : rawId || window.location.pathname.split('/cars/')[1]?.split('/')[0];
     
-    if (encodedId) {
+    if (encodedId && typeof encodedId === 'string') {
       // Decode the encoded ID
-      const decodedId = decodeCarId(encodedId as string);
+      const decodedId = decodeCarId(encodedId);
       const carId = decodedId || encodedId; // Fallback to original if decode fails
       
-      if (carId) {
+      if (carId && typeof carId === 'string') {
         fetchCarData(carId);
       } else {
         setError('ไม่พบ ID รถ');

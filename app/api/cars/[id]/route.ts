@@ -40,25 +40,85 @@ export async function GET(
     // Try to decode if it's an encoded ID, otherwise use as-is
     let carId: string | null = null;
     
+    console.log(`[API] Received encoded ID: ${encodedId}`);
+    
+    // First try: Use decodeCarId function
     try {
       const decodedId = decodeCarId(encodedId);
       if (decodedId) {
         carId = decodedId;
-        console.log(`Decoded ID: ${encodedId} -> ${carId}`);
+        console.log(`[API] Decoded ID successfully: ${encodedId} -> ${carId}`);
+      } else {
+        console.log(`[API] decodeCarId returned null for: ${encodedId}`);
       }
     } catch (decodeError: any) {
-      console.error('Error decoding car ID:', decodeError);
-      console.error('Encoded ID:', encodedId);
+      console.error('[API] Error decoding car ID:', decodeError);
+      console.error('[API] Encoded ID:', encodedId);
+      console.error('[API] Error stack:', decodeError.stack);
     }
     
-    // If decode failed, try plain numeric ID
+    // Second try: Manual decode if decodeCarId failed
+    if (!carId) {
+      try {
+        const SALT = 'checkkub';
+        let base64 = encodedId.replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4) {
+          base64 += '=';
+        }
+        
+        let decoded: string;
+        if (typeof Buffer !== 'undefined') {
+          // Node.js environment
+          decoded = Buffer.from(base64, 'base64').toString('utf-8');
+        } else if (typeof atob !== 'undefined') {
+          // Browser environment
+          decoded = atob(base64);
+        } else {
+          // Fallback: manual base64 decode
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+          let output = '';
+          let i = 0;
+          base64 = base64.replace(/[^A-Za-z0-9\+\/\=]/g, '');
+          while (i < base64.length) {
+            const enc1 = chars.indexOf(base64.charAt(i++));
+            const enc2 = chars.indexOf(base64.charAt(i++));
+            const enc3 = chars.indexOf(base64.charAt(i++));
+            const enc4 = chars.indexOf(base64.charAt(i++));
+            const chr1 = (enc1 << 2) | (enc2 >> 4);
+            const chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+            const chr3 = ((enc3 & 3) << 6) | enc4;
+            output += String.fromCharCode(chr1);
+            if (enc3 !== 64) output += String.fromCharCode(chr2);
+            if (enc4 !== 64) output += String.fromCharCode(chr3);
+          }
+          decoded = output;
+        }
+        
+        if (decoded && decoded.startsWith(SALT)) {
+          const manualDecodedId = decoded.substring(SALT.length);
+          if (/^\d+$/.test(manualDecodedId)) {
+            carId = manualDecodedId;
+            console.log(`[API] Manual decode successful: ${encodedId} -> ${carId}`);
+          } else {
+            console.error('[API] Manual decoded ID is not a number:', manualDecodedId);
+          }
+        } else {
+          console.error('[API] Manual decoded string does not start with salt:', decoded);
+        }
+      } catch (manualError: any) {
+        console.error('[API] Manual decode failed:', manualError);
+        console.error('[API] Manual decode error stack:', manualError.stack);
+      }
+    }
+    
+    // Third try: Plain numeric ID fallback
     if (!carId) {
       if (/^\d+$/.test(encodedId)) {
         // Fallback: support plain numeric IDs for backward compatibility
         carId = encodedId;
-        console.log(`Using plain numeric ID: ${carId}`);
+        console.log(`[API] Using plain numeric ID: ${carId}`);
       } else {
-        console.error('Invalid car ID format:', encodedId);
+        console.error('[API] Invalid car ID format:', encodedId);
         return NextResponse.json(
           { success: false, message: 'ID ไม่ถูกต้อง', debug: { encodedId, decodedId: null } },
           { status: 400, headers: corsHeaders }
