@@ -3,24 +3,46 @@ import mysql from 'mysql2/promise';
 // Database connection configuration
 // IMPORTANT: In production, all values must come from environment variables
 // Never hardcode credentials in production code
-const dbConfig = {
-  host: process.env.DB_HOST,
+
+// Support both TCP and Unix Socket connections
+// For DirectAdmin localhost: use socketPath for better performance
+// For remote: use host and port
+const dbConfig: any = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT || '3306'),
   database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  // Serverless-friendly settings
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
+  // Timeout settings
+  connectTimeout: 10000, // 10 seconds
+  acquireTimeout: 10000,
 };
+
+// Use Unix Socket if DB_SOCKET_PATH is provided (DirectAdmin localhost)
+if (process.env.DB_SOCKET_PATH) {
+  dbConfig.socketPath = process.env.DB_SOCKET_PATH;
+} else {
+  // Use TCP connection (host + port)
+  dbConfig.host = process.env.DB_HOST;
+  dbConfig.port = parseInt(process.env.DB_PORT || '3306');
+}
 
 // Validate required environment variables at runtime (not build time)
 // This function will be called when actually connecting to the database
 function validateDbConfig() {
   // Only validate in production runtime, not during build
   if (typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
-    const requiredVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+    const requiredVars = ['DB_USER', 'DB_PASSWORD', 'DB_NAME'];
     const missingVars = requiredVars.filter(varName => !process.env[varName]);
+    
+    // DB_HOST is only required if not using socket
+    if (!process.env.DB_SOCKET_PATH && !process.env.DB_HOST) {
+      missingVars.push('DB_HOST');
+    }
     
     if (missingVars.length > 0) {
       throw new Error(
