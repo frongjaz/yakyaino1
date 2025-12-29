@@ -14,7 +14,8 @@
     "deploy": "npm run build:prod && touch dist/.nojekyll",
     "deploy:root": "npm run build:root && touch dist/.nojekyll",
     "test:db": "node scripts/test-db-connection.js",
-    "create:admin": "node scripts/create-admin.js"
+    "create:admin": "node scripts/create-admin.js",
+    "import:mock": "ts-node scripts/import-mock-data.ts"
   },
   "dependencies": {
     "basic-ftp": "^5.1.0",

@@ -7,12 +7,18 @@ import { apiPost, getApiUrl } from '@/lib/api';
 
 export default function AddCarForm() {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([null, null, null, null, null]);
+  const [selectedFiles, setSelectedFiles] = useState<(File | null)[]>([null, null, null, null, null]);
   
   const [formData, setFormData] = useState({
     brand: '',
@@ -20,6 +26,10 @@ export default function AddCarForm() {
     year: '',
     price: '',
     image: '',
+    image2: '',
+    image3: '',
+    image4: '',
+    image5: '',
     photo_count: '0',
     description: '',
     mileage: '',
@@ -37,7 +47,7 @@ export default function AddCarForm() {
     });
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -54,16 +64,42 @@ export default function AddCarForm() {
     }
 
     // Store file for later upload
-    setSelectedFile(file);
+    const newFiles = [...selectedFiles];
+    newFiles[index] = file;
+    setSelectedFiles(newFiles);
     setMessage(null);
 
     // Show preview immediately
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      setImagePreview(base64String);
+      const newPreviews = [...imagePreviews];
+      newPreviews[index] = base64String;
+      setImagePreviews(newPreviews);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const newFiles = [...selectedFiles];
+    newFiles[index] = null;
+    setSelectedFiles(newFiles);
+    
+    const newPreviews = [...imagePreviews];
+    newPreviews[index] = null;
+    setImagePreviews(newPreviews);
+    
+    const newFormData = { ...formData };
+    if (index === 0) newFormData.image = '';
+    else if (index === 1) newFormData.image2 = '';
+    else if (index === 2) newFormData.image3 = '';
+    else if (index === 3) newFormData.image4 = '';
+    else if (index === 4) newFormData.image5 = '';
+    setFormData(newFormData);
+    
+    if (fileInputRefs[index].current) {
+      fileInputRefs[index].current!.value = '';
+    }
   };
 
   const uploadImageToFTP = async (file: File): Promise<string> => {
@@ -108,14 +144,6 @@ export default function AddCarForm() {
     return data.url;
   };
 
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setSelectedFile(null);
-    setFormData((prev) => ({ ...prev, image: '' }));
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,20 +151,39 @@ export default function AddCarForm() {
     setMessage(null);
 
     try {
-      // Validate that we have a file selected
-      if (!selectedFile) {
-        setMessage({ type: 'error', text: 'กรุณาเลือกรูปภาพ' });
+      // Validate that we have at least one file selected
+      const hasFile = selectedFiles.some(file => file !== null);
+      if (!hasFile) {
+        setMessage({ type: 'error', text: 'กรุณาเลือกรูปภาพอย่างน้อย 1 รูป' });
         setLoading(false);
         return;
       }
 
-      // Upload image to FTP
+      // Upload all images to FTP
       setUploading(true);
-      let imageUrl: string;
+      const imageFields = ['image', 'image2', 'image3', 'image4', 'image5'];
+      const uploadPromises: Promise<{ index: number; url: string }>[] = [];
+      
+      for (let i = 0; i < selectedFiles.length; i++) {
+        if (selectedFiles[i]) {
+          uploadPromises.push(
+            uploadImageToFTP(selectedFiles[i]!).then(url => ({ index: i, url }))
+          );
+        }
+      }
+
+      let updatedFormData = { ...formData };
       
       try {
-        imageUrl = await uploadImageToFTP(selectedFile);
-        setMessage({ type: 'success', text: 'อัพโหลดรูปภาพสำเร็จ กำลังบันทึกข้อมูล...' });
+        const uploadResults = await Promise.all(uploadPromises);
+        
+        // Update formData with uploaded URLs
+        uploadResults.forEach(({ index, url }) => {
+          updatedFormData[imageFields[index] as keyof typeof updatedFormData] = url;
+        });
+        setFormData(updatedFormData);
+        
+        setMessage({ type: 'success', text: `อัพโหลดรูปภาพสำเร็จ (${uploadResults.length} รูป) กำลังบันทึกข้อมูล...` });
       } catch (uploadError: any) {
         setMessage({ type: 'error', text: uploadError.message || 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ' });
         setUploading(false);
@@ -148,12 +195,11 @@ export default function AddCarForm() {
 
       // Save car data
       const data = await apiPost('/api/cars', {
-        ...formData,
-        year: parseInt(formData.year),
-        price: parseFloat(formData.price),
-        photo_count: parseInt(formData.photo_count) || 0,
-        mileage: formData.mileage ? parseInt(formData.mileage) : null,
-        image: imageUrl, // Use URL from FTP upload or existing URL
+        ...updatedFormData,
+        year: parseInt(updatedFormData.year),
+        price: parseFloat(updatedFormData.price),
+        photo_count: parseInt(updatedFormData.photo_count) || selectedFiles.filter(f => f !== null).length,
+        mileage: updatedFormData.mileage ? parseInt(updatedFormData.mileage) : null,
       });
 
       if (data.success) {
@@ -164,6 +210,10 @@ export default function AddCarForm() {
           year: '',
           price: '',
           image: '',
+          image2: '',
+          image3: '',
+          image4: '',
+          image5: '',
           photo_count: '0',
           description: '',
           mileage: '',
@@ -173,11 +223,11 @@ export default function AddCarForm() {
           engine_size: '',
           status: 'available',
         });
-        setImagePreview(null);
-        setSelectedFile(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
+        setImagePreviews([null, null, null, null, null]);
+        setSelectedFiles([null, null, null, null, null]);
+        fileInputRefs.forEach(ref => {
+          if (ref.current) ref.current.value = '';
+        });
         router.refresh();
       } else {
         setMessage({ type: 'error', text: data.message || 'เกิดข้อผิดพลาด' });
@@ -253,118 +303,94 @@ export default function AddCarForm() {
         </div>
 
         <div className="space-y-4">
-          {/* Image Upload */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              อัพโหลดรูปภาพ <span className="text-red-500">*</span>
-              {uploading && (
-                <span className="ml-2 text-xs text-primary">กำลังอัพโหลด...</span>
-              )}
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                disabled={uploading || loading}
-                className="hidden"
-                id="image-upload"
-              />
-              <label
-                htmlFor="image-upload"
-                className={`flex-1 cursor-pointer rounded-lg border-2 border-dashed border-stroke dark:border-stroke-dark bg-gray-50 dark:bg-gray-800/50 p-6 text-center hover:border-primary transition-colors ${
-                  uploading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                <div className="flex flex-col items-center gap-2">
-                  {uploading ? (
-                    <svg
-                      className="h-10 w-10 text-primary animate-spin"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  ) : (
-                    <svg
-                      className="h-10 w-10 text-body-color dark:text-body-color-dark"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      />
-                    </svg>
-                  )}
-                  <p className="text-sm text-body-color dark:text-body-color-dark">
-                    <span className="font-semibold text-primary">คลิกเพื่ออัพโหลด</span> หรือลากไฟล์มาวาง
-                  </p>
-                  <p className="text-xs text-body-color dark:text-body-color-dark">
-                    PNG, JPG, GIF สูงสุด 10MB
-                  </p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          {/* Image Preview */}
-          {imagePreview && (
-            <div className="relative">
-              <div className="relative h-64 w-full rounded-lg overflow-hidden border border-stroke dark:border-stroke-dark bg-gray-100 dark:bg-gray-800">
-                <Image
-                  src={imagePreview}
-                  alt="Preview"
-                  fill
-                  className="object-contain"
-                  unoptimized
-                />
-              </div>
-              <div className="absolute top-2 right-2 flex gap-2">
-                {selectedFile && (
-                  <div className="px-3 py-1 bg-blue-500 text-white text-xs rounded-full">
-                    รออัพโหลดเมื่อบันทึก
-                  </div>
+          {/* Image Upload Fields */}
+          {[0, 1, 2, 3, 4].map((index) => (
+            <div key={index}>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+                รูปภาพ {index === 0 ? 'หลัก' : index + 1} {index === 0 && <span className="text-red-500">*</span>}
+                {uploading && selectedFiles[index] && (
+                  <span className="ml-2 text-xs text-primary">กำลังอัพโหลด...</span>
                 )}
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  ref={fileInputRefs[index]}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect(index)}
+                  disabled={uploading || loading}
+                  className="hidden"
+                  id={`image-upload-${index}`}
+                />
+                <label
+                  htmlFor={`image-upload-${index}`}
+                  className={`flex-1 cursor-pointer rounded-lg border-2 border-dashed border-stroke dark:border-stroke-dark bg-gray-50 dark:bg-gray-800/50 p-4 text-center hover:border-primary transition-colors ${
+                    uploading || loading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+                  <div className="flex flex-col items-center gap-2">
+                    {imagePreviews[index] ? (
+                      <div className="relative w-full h-32 rounded overflow-hidden border border-stroke dark:border-stroke-dark">
+                        <Image
+                          src={imagePreviews[index]!}
+                          alt={`Preview ${index + 1}`}
+                          fill
+                          className="object-contain"
+                          unoptimized
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleRemoveImage(index);
+                          }}
+                          className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                        >
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                        {selectedFiles[index] && (
+                          <div className="absolute bottom-1 left-1 px-2 py-1 bg-blue-500 text-white text-xs rounded">
+                            รออัพโหลด
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <svg
+                          className="h-8 w-8 text-body-color dark:text-body-color-dark"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
+                        </svg>
+                        <p className="text-xs text-body-color dark:text-body-color-dark">
+                          คลิกเพื่ออัพโหลด
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </label>
               </div>
             </div>
-          )}
-
+          ))}
         </div>
       </div>
 

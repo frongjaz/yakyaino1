@@ -1,7 +1,9 @@
 "use client";
+import { useEffect, useState } from "react";
 import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { apiGet } from "@/lib/api";
 
 type CarListing = {
   id: string | number;
@@ -10,98 +12,91 @@ type CarListing = {
   year: number;
   price: number;
   image: string;
-  photoCount: number;
+  photo_count: number;
+  status?: string;
 };
 
 const CarListingsGrid = () => {
-  // Sample data - will be replaced with database data
-  const cars: CarListing[] = [
-    {
-      id: 1,
-      brand: "Benz",
-      model: "GLA200",
-      year: 2022,
-      price: 1199000,
-      image: "/images/hero/main1.png",
-      photoCount: 4,
-    },
-    {
-      id: 2,
-      brand: "BENZ",
-      model: "CLS 250",
-      year: 2016,
-      price: 1090000,
-      image: "/images/hero/main11.jpg",
-      photoCount: 3,
-    },
-    {
-      id: 3,
-      brand: "TOYOTA",
-      model: "Corolla Altis",
-      year: 2023,
-      price: 699000,
-      image: "/images/hero/main21.jpg",
-      photoCount: 5,
-    },
-    {
-      id: 4,
-      brand: "HONDA",
-      model: "ACCORD",
-      year: 2022,
-      price: 899000,
-      image: "/images/hero/main31.jpg",
-      photoCount: 4,
-    },
-    {
-      id: 5,
-      brand: "TOYOTA",
-      model: "Harrier",
-      year: 2014,
-      price: 699000,
-      image: "/images/hero/main41.jpg",
-      photoCount: 6,
-    },
-    {
-      id: 6,
-      brand: "BMW",
-      model: "530E",
-      year: 2020,
-      price: 799000,
-      image: "/images/hero/main51.jpg",
-      photoCount: 3,
-    },
-    {
-      id: 7,
-      brand: "TOYOTA",
-      model: "Alphard",
-      year: 2023,
-      price: 2459000,
-      image: "/images/hero/main61.jpg",
-      photoCount: 5,
-    },
-    {
-      id: 8,
-      brand: "Benz",
-      model: "SLK200",
-      year: 2013,
-      price: 899000,
-      image: "/images/hero/main71.jpg",
-      photoCount: 4,
-    },
-    {
-      id: 9,
-      brand: "BMW",
-      model: "740LI",
-      year: 2017,
-      price: 1269000,
-      image: "/images/hero/main81.jpg",
-      photoCount: 6,
-    },
-  ];
+  const [cars, setCars] = useState<CarListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchCars();
+  }, []);
+
+  const fetchCars = async () => {
+    try {
+      setLoading(true);
+      const data = await apiGet<{ success: boolean; data: CarListing[] }>('/api/cars');
+      
+      if (data.success && data.data) {
+        // Filter only available cars
+        const availableCars = data.data.filter((car: CarListing) => 
+          car.status === 'available' || !car.status
+        );
+        setCars(availableCars);
+      } else {
+        setError('ไม่สามารถโหลดข้อมูลรถได้');
+      }
+    } catch (err: any) {
+      console.error('Error fetching cars:', err);
+      setError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("th-TH").format(price);
   };
+
+  if (loading) {
+    return (
+      <section className="bg-[#2C2C2C] py-12 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+              <p className="text-white">กำลังโหลดข้อมูล...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="bg-[#2C2C2C] py-12 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <p className="text-red-400 mb-4">{error}</p>
+              <button
+                onClick={fetchCars}
+                className="px-4 py-2 bg-[#EF4444] text-white rounded hover:bg-[#DC2626] transition"
+              >
+                ลองอีกครั้ง
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (cars.length === 0) {
+    return (
+      <section className="bg-[#2C2C2C] py-12 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center py-12">
+            <p className="text-white text-lg">ยังไม่มีข้อมูลรถ</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-[#2C2C2C] py-12 md:py-16">
@@ -115,11 +110,15 @@ const CarListingsGrid = () => {
               {/* Car Image */}
               <div className="relative aspect-[4/3] w-full overflow-hidden">
                 <Image
-                  src={getImagePath(car.image)}
+                  src={car.image || '/images/placeholder.jpg'}
                   alt={`${car.brand} ${car.model}`}
                   fill
                   className="object-contain transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                  }}
+                  unoptimized
                 />
                 
                 {/* Photo Count Badge - White circle with black border */}
@@ -144,7 +143,7 @@ const CarListingsGrid = () => {
                     />
                   </svg>
                   <span className="text-xs font-semibold text-black">
-                    {car.photoCount}
+                    {car.photo_count || 0}
                   </span>
                 </div>
 

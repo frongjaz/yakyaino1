@@ -1,285 +1,126 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import CarDetailBreadcrumb from "@/components/CarDetail/CarDetailBreadcrumb";
 import CarImageGallery from "@/components/CarDetail/CarImageGallery";
 import CarSpecifications from "@/components/CarDetail/CarSpecifications";
 import CarPricing from "@/components/CarDetail/CarPricing";
 import CarContactSection from "@/components/CarDetail/CarContactSection";
 import RelatedCars from "@/components/CarDetail/RelatedCars";
-import { Metadata } from "next";
+import { apiGet } from '@/lib/api';
 
-export const metadata: Metadata = {
-  title: "รายละเอียดรถ | CheckKub",
-  description: "ดูรายละเอียดรถยนต์",
-};
-
-// Generate static params for static export
-export async function generateStaticParams() {
-  // Sample car IDs - replace with actual database fetch
-  // This would normally fetch all car IDs from database
-  const carIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
-  
-  return carIds.map((id) => ({
-    id: id,
-  }));
+interface CarData {
+  id: number;
+  brand: string;
+  model: string;
+  year: number;
+  price: number;
+  image: string;
+  photo_count: number;
+  description?: string;
+  mileage?: number | null;
+  color?: string | null;
+  transmission?: string | null;
+  fuel_type?: string | null;
+  engine_size?: string | null;
+  status?: string;
 }
 
-// This would normally fetch from database
-async function getCarData(id: string) {
-  // Mockup data - different data based on car ID
-  if (id === "2") {
-    // Benz CLS 250
-    return {
-      id,
-      brand: "BENZ",
-      model: "CLS 250",
-      grade: "2.0 AMG",
-      year: 2016,
-      engine: "2000 CC",
-      type: "ดีเซล",
-      gearbox: "AT",
-      color: "เทา",
-      mileage: "14x,xxx",
-      licensePlate: "5กค-8551",
-      location: "กทม",
-      price: 1090000,
-      monthlyPayment: 19000,
-      mainImage: "/images/hero/main11.jpg",
-      images: [
-        "/images/hero/main12.jpg",
-        "/images/hero/main13.jpg",
-        "/images/hero/main14.jpg",
-      ],
-      totalPhotos: 3,
-    };
-  }
-  
-  if (id === "3") {
-    // Toyota Corolla Altis
-    return {
-      id,
-      brand: "TOYOTA",
-      model: "Corolla Altis",
-      grade: "1.8 GR SPORT",
-      year: 2023,
-      engine: "1800 CC",
-      type: "เบนซิน",
-      gearbox: "AT",
-      color: "แดง",
-      mileage: "67,XXX",
-      licensePlate: "4ขณ-8326",
-      location: "กรุงเทพ",
-      price: 699000,
-      monthlyPayment: 12000,
-      mainImage: "/images/hero/main21.jpg",
-      images: [
-        "/images/hero/main22.jpg",
-        "/images/hero/main23.jpg",
-        "/images/hero/main24.jpg",
-      ],
-      totalPhotos: 5,
-    };
-  }
-  
-  if (id === "4") {
-    // Honda Accord
-    return {
-      id,
-      brand: "HONDA",
-      model: "ACCORD",
-      grade: "2.0 HYBRID TECH",
-      year: 2022,
-      engine: "2000 CC",
-      type: "เบนซิน-ไฟฟ้า",
-      gearbox: "AT",
-      color: "ดำ",
-      mileage: "9x,xxx",
-      licensePlate: "2ขบ-274",
-      location: "กรุงเทพ",
-      price: 899000,
-      monthlyPayment: 16000,
-      mainImage: "/images/hero/main31.jpg",
-      images: [
-        "/images/hero/main32.jpg",
-        "/images/hero/main33.jpg",
-        "/images/hero/main34.jpg",
-      ],
-      totalPhotos: 4,
-    };
-  }
-  
-  if (id === "5") {
-    // Toyota Harrier
-    return {
-      id,
-      brand: "TOYOTA",
-      model: "Harrier",
-      grade: "Hybrid",
-      year: 2014,
-      engine: "2500 CC",
-      type: "เบนซิน-ไฟฟ้า",
-      gearbox: "AT",
-      color: "น้ำตาล",
-      mileage: "8x,XXX",
-      licensePlate: "ขย-899",
-      location: "ชลบุรี",
-      price: 699000,
-      monthlyPayment: 12000,
-      mainImage: "/images/hero/main41.jpg",
-      images: [
-        "/images/hero/main42.jpg",
-        "/images/hero/main43.jpg",
-        "/images/hero/main44.jpg",
-      ],
-      totalPhotos: 6,
-    };
-  }
-  
-  if (id === "6") {
-    // BMW 530E
-    return {
-      id,
-      brand: "BMW",
-      model: "530E",
-      grade: "2.0 ELITE",
-      year: 2020,
-      engine: "2000 CC",
-      type: "เบนซิน+ไฟฟ้า",
-      gearbox: "AT",
-      color: "ดำ",
-      mileage: "78,xxx",
-      licensePlate: "5ขง-2353",
-      location: "กทม",
-      price: 799000,
-      monthlyPayment: 14000,
-      mainImage: "/images/hero/main51.jpg",
-      images: [
-        "/images/hero/main52.jpg",
-        "/images/hero/main53.jpg",
-        "/images/hero/main54.jpg",
-      ],
-      totalPhotos: 3,
-    };
-  }
-  
-  if (id === "7") {
-    // Toyota Alphard
-    return {
-      id,
-      brand: "TOYOTA",
-      model: "Alphard",
-      grade: "2.5 Hybrid SCR Package",
-      year: 2023,
-      engine: "2500 CC",
-      type: "เบนซิน-ไฟฟ้า",
-      gearbox: "AT",
-      color: "แดง",
-      mileage: "38,XXX",
-      licensePlate: "6ขฎ-2563",
-      location: "กรุงเทพ",
-      price: 2459000,
-      monthlyPayment: 44000,
-      mainImage: "/images/hero/main61.jpg",
-      images: [
-        "/images/hero/main62.jpg",
-        "/images/hero/main63.jpg",
-        "/images/hero/main64.jpg",
-      ],
-      totalPhotos: 5,
-    };
-  }
-  
-  if (id === "8") {
-    // Benz SLK200
-    return {
-      id,
-      brand: "Benz",
-      model: "SLK200",
-      grade: "Roadster",
-      year: 2013,
-      engine: "1800 CC",
-      type: "เบนซิน",
-      gearbox: "AT",
-      color: "ขาว",
-      mileage: "8X,XXX",
-      licensePlate: "3กค-38",
-      location: "กรุงเทพ",
-      price: 899000,
-      monthlyPayment: 16000,
-      mainImage: "/images/hero/main71.jpg",
-      images: [
-        "/images/hero/main72.jpg",
-        "/images/hero/main73.jpg",
-        "/images/hero/main74.jpg",
-      ],
-      totalPhotos: 4,
-    };
-  }
-  
-  if (id === "9") {
-    // BMW 740LI
-    return {
-      id,
-      brand: "BMW",
-      model: "740LI",
-      grade: "Limousine RHD",
-      year: 2017,
-      engine: "3000 CC",
-      type: "เบนซิน",
-      gearbox: "AT",
-      color: "ขาว",
-      mileage: "14X,XXX",
-      licensePlate: "จษ-606",
-      location: "เชียงใหม่",
-      price: 1269000,
-      monthlyPayment: 22000,
-      mainImage: "/images/hero/main81.jpg",
-      images: [
-        "/images/hero/main82.jpg",
-        "/images/hero/main83.jpg",
-        "/images/hero/main84.jpg",
-      ],
-      totalPhotos: 6,
-    };
-  }
-  
-  // Default: Benz GLA200
-  return {
-    id,
-    brand: "Benz",
-    model: "GLA200",
-    grade: "PROGRESSIVE",
-    year: 2022,
-    engine: "1300 CC",
-    type: "เบนซิน",
-    gearbox: "AT",
-    color: "ดำ",
-    mileage: "60,XXX",
-    licensePlate: "3ขร-8954",
-    location: "กรุงเทพ",
-    price: 1199000,
-    monthlyPayment: 21000,
-    mainImage: "/images/hero/main1.png",
-    images: [
-      "/images/hero/main2.png",
-      "/images/hero/main3.png",
-      "/images/hero/main4.png",
-    ],
-    totalPhotos: 6,
+export default function CarDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const [car, setCar] = useState<CarData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (params.id) {
+      fetchCarData(params.id as string);
+    }
+  }, [params.id]);
+
+  const fetchCarData = async (id: string) => {
+    try {
+      setLoading(true);
+      const data = await apiGet<{ success: boolean; data: CarData }>(`/api/cars/${id}`);
+      
+      if (data.success && data.data) {
+        setCar(data.data);
+      } else {
+        setError('ไม่พบข้อมูลรถ');
+      }
+    } catch (err: any) {
+      console.error('Error fetching car:', err);
+      setError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+    } finally {
+      setLoading(false);
+    }
   };
-}
 
-export default async function CarDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const car = await getCarData(params.id);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EF4444] mx-auto mb-4"></div>
+          <p className="text-gray-600">กำลังโหลดข้อมูล...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !car) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error || 'ไม่พบข้อมูลรถ'}</p>
+          <button
+            onClick={() => router.push('/cars')}
+            className="px-4 py-2 bg-[#EF4444] text-white rounded hover:bg-[#DC2626] transition"
+          >
+            กลับไปหน้ารายการรถ
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Format mileage
+  const formatMileage = (mileage: number | null | undefined): string => {
+    if (!mileage) return 'N/A';
+    return new Intl.NumberFormat('th-TH').format(mileage);
+  };
+
+  // Calculate monthly payment (rough estimate: 3% of price)
+  const monthlyPayment = Math.round(car.price * 0.03);
+
+  // Prepare car data for components
+  const carData = {
+    id: car.id.toString(),
+    brand: car.brand,
+    model: car.model,
+    grade: car.engine_size || '',
+    year: car.year,
+    engine: car.engine_size || 'N/A',
+    type: car.fuel_type || 'N/A',
+    gearbox: car.transmission || 'N/A',
+    color: car.color || 'N/A',
+    mileage: formatMileage(car.mileage),
+    licensePlate: '-', // Not in database
+    location: '-', // Not in database
+    price: car.price,
+    monthlyPayment: monthlyPayment,
+    mainImage: car.image,
+    images: [car.image], // Use same image for now
+    totalPhotos: car.photo_count || 1,
+  };
 
   return (
     <>
       <CarDetailBreadcrumb
-        brand={car.brand}
-        model={car.model}
-        year={car.year}
+        brand={carData.brand}
+        model={carData.model}
+        year={carData.year}
       />
       <br /><br /><br />
       <section className="bg-white py-8">
@@ -287,9 +128,9 @@ export default async function CarDetailPage({
           <div className="space-y-6">
             {/* Images - Full Width */}
             <CarImageGallery
-              mainImage={car.mainImage}
-              images={car.images}
-              totalPhotos={car.totalPhotos}
+              mainImage={carData.mainImage}
+              images={carData.images}
+              totalPhotos={carData.totalPhotos}
             />
             
             {/* Specs and Contact - 2 Columns */}
@@ -297,22 +138,28 @@ export default async function CarDetailPage({
               {/* Left Column - Specs and Pricing */}
               <div className="space-y-6">
                 <CarSpecifications
-                  brand={car.brand}
-                  model={car.model}
-                  grade={car.grade}
-                  year={car.year}
-                  engine={car.engine}
-                  type={car.type}
-                  gearbox={car.gearbox}
-                  color={car.color}
-                  mileage={car.mileage}
-                  licensePlate={car.licensePlate}
-                  location={car.location}
+                  brand={carData.brand}
+                  model={carData.model}
+                  grade={carData.grade}
+                  year={carData.year}
+                  engine={carData.engine}
+                  type={carData.type}
+                  gearbox={carData.gearbox}
+                  color={carData.color}
+                  mileage={carData.mileage}
+                  licensePlate={carData.licensePlate}
+                  location={carData.location}
                 />
                 <CarPricing
-                  price={car.price}
-                  monthlyPayment={car.monthlyPayment}
+                  price={carData.price}
+                  monthlyPayment={carData.monthlyPayment}
                 />
+                {car.description && (
+                  <div className="mt-6">
+                    <h3 className="mb-3 text-xl font-bold text-gray-900">คำอธิบาย</h3>
+                    <p className="text-gray-700 whitespace-pre-line">{car.description}</p>
+                  </div>
+                )}
               </div>
 
               {/* Right Column - Contact Section */}
@@ -324,8 +171,7 @@ export default async function CarDetailPage({
         </div>
       </section>
 
-      <RelatedCars currentCarId={car.id} />
+      <RelatedCars currentCarId={carData.id} />
     </>
   );
 }
-

@@ -17,23 +17,16 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 
-// GET - ดึงรายการรถทั้งหมด
+// GET - ดึงรายการรถทั้งหมด (ไม่ต้อง authentication - แสดงให้ทุกคนเห็น)
 export async function GET(request: NextRequest) {
   const origin = request.headers.get('origin');
   const corsHeaders = getCorsHeaders(origin);
   
   try {
-    const auth = await checkAuth(request);
-    
-    if (!auth.authenticated) {
-      return NextResponse.json(
-        { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' },
-        { status: 401, headers: corsHeaders }
-      );
-    }
-
+    // Filter only available cars for public view
     const cars = await query(
-      'SELECT * FROM cars ORDER BY created_at DESC'
+      'SELECT * FROM cars WHERE status = ? OR status IS NULL ORDER BY created_at DESC',
+      ['available']
     );
 
     const carsArray = Array.isArray(cars) ? cars : [];
@@ -75,6 +68,10 @@ export async function POST(request: NextRequest) {
       year,
       price,
       image,
+      image2,
+      image3,
+      image4,
+      image5,
       photo_count,
       description,
       mileage,
@@ -88,7 +85,7 @@ export async function POST(request: NextRequest) {
     // ตรวจสอบข้อมูลที่จำเป็น
     if (!brand || !model || !year || !price || !image) {
       return NextResponse.json(
-        { success: false, message: 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน' },
+        { success: false, message: 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (ยี่ห้อ, รุ่น, ปี, ราคา, รูปภาพหลัก)' },
         { status: 400, headers: corsHeaders }
       );
     }
@@ -96,15 +93,19 @@ export async function POST(request: NextRequest) {
     // เพิ่มข้อมูลรถ
     const result = await query(
       `INSERT INTO cars (
-        brand, model, year, price, image, photo_count, description,
+        brand, model, year, price, image, image2, image3, image4, image5, photo_count, description,
         mileage, color, transmission, fuel_type, engine_size, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         brand,
         model,
         year,
         price,
         image,
+        image2 || null,
+        image3 || null,
+        image4 || null,
+        image5 || null,
         photo_count || 0,
         description || null,
         mileage || null,
