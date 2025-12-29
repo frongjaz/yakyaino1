@@ -9,6 +9,7 @@ import CarPricing from "@/components/CarDetail/CarPricing";
 import CarContactSection from "@/components/CarDetail/CarContactSection";
 import RelatedCars from "@/components/CarDetail/RelatedCars";
 import { apiGet } from '@/lib/api';
+import { decodeCarId, encodeCarId } from '@/lib/id-encoder';
 
 interface CarData {
   id: number;
@@ -44,14 +45,28 @@ export default function CarDetailContent({ carId }: CarDetailContentProps) {
 
   useEffect(() => {
     if (carId) {
-      fetchCarData(carId);
+      // Decode the encoded ID if needed
+      const decodedId = decodeCarId(carId);
+      const actualId = decodedId || carId; // Fallback to original if decode fails
+      
+      if (actualId) {
+        fetchCarData(actualId);
+      } else {
+        setError('ไม่พบ ID รถ');
+        setLoading(false);
+      }
+    } else {
+      setError('ไม่พบ ID รถ');
+      setLoading(false);
     }
   }, [carId]);
 
   const fetchCarData = async (id: string) => {
     try {
       setLoading(true);
-      const data = await apiGet<{ success: boolean; data: CarData }>(`/api/cars/${id}`);
+      // Encode ID before sending to API
+      const encodedId = encodeCarId(id);
+      const data = await apiGet<{ success: boolean; data: CarData }>(`/api/cars/${encodedId}`);
       
       if (data.success && data.data) {
         setCar(data.data);

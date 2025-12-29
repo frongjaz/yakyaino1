@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
+import { decodeCarId } from '@/lib/id-encoder';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,23 @@ export async function GET(
   const corsHeaders = getCorsHeaders(origin);
   
   try {
-    const carId = params.id;
+    const encodedId = params.id;
+    
+    // Try to decode if it's an encoded ID, otherwise use as-is
+    let carId: string;
+    const decodedId = decodeCarId(encodedId);
+    
+    if (decodedId) {
+      carId = decodedId;
+    } else if (/^\d+$/.test(encodedId)) {
+      // Fallback: support plain numeric IDs for backward compatibility
+      carId = encodedId;
+    } else {
+      return NextResponse.json(
+        { success: false, message: 'ID ไม่ถูกต้อง' },
+        { status: 400, headers: corsHeaders }
+      );
+    }
 
     if (!carId || isNaN(Number(carId))) {
       return NextResponse.json(

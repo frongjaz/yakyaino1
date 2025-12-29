@@ -3,6 +3,7 @@ import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { encodeCarId } from "@/lib/id-encoder";
 
 type RelatedCar = {
   id: string | number;
@@ -216,7 +217,7 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
                 </div>
                 <div className="mb-3 h-px bg-gray-700"></div>
                 <Link
-                  href={`/cars/${car.id}`}
+                  href={`/cars/${encodeCarId(car.id)}`}
                   className="flex items-center justify-between text-sm text-white transition hover:text-gray-300"
                 >
                   <span>ดูทั้งหมด</span>

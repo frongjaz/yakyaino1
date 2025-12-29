@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { apiGet } from "@/lib/api";
+import { encodeCarId } from "@/lib/id-encoder";
 
 type CarListing = {
   id: string | number;
@@ -17,18 +19,23 @@ type CarListing = {
 };
 
 const CarListingsGrid = () => {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
   const [cars, setCars] = useState<CarListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCars();
-  }, []);
+  }, [searchQuery]);
 
   const fetchCars = async () => {
     try {
       setLoading(true);
-      const data = await apiGet<{ success: boolean; data: CarListing[] }>('/api/cars');
+      const url = searchQuery 
+        ? `/api/cars?q=${encodeURIComponent(searchQuery)}`
+        : '/api/cars';
+      const data = await apiGet<{ success: boolean; data: CarListing[] }>(url);
       
       if (data.success && data.data) {
         // Filter only available cars
@@ -178,7 +185,7 @@ const CarListingsGrid = () => {
                 
                 {/* View All Link */}
                 <Link
-                  href={`/cars/${car.id}`}
+                  href={`/cars/${encodeCarId(car.id)}`}
                   className="flex items-center justify-between text-sm text-white transition hover:text-gray-300"
                 >
                   <span>ดูทั้งหมด</span>

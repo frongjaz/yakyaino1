@@ -18,7 +18,8 @@ export default function HomePageContent() {
 
   useEffect(() => {
     // Check if current path is a car detail page (/cars/[id])
-    if (pathname && pathname.match(/^\/cars\/\d+\/?$/)) {
+    // Support both encoded IDs and plain numeric IDs
+    if (pathname && pathname.match(/^\/cars\/[A-Za-z0-9_-]+\/?$/)) {
       setIsCarDetailPage(true);
     } else {
       setIsCarDetailPage(false);
@@ -27,7 +28,9 @@ export default function HomePageContent() {
 
   // If it's a car detail page, render the detail page component
   if (isCarDetailPage && pathname) {
-    const carId = pathname.match(/^\/cars\/(\d+)\/?$/)?.[1];
+    // Extract the ID (can be encoded or plain number)
+    const match = pathname.match(/^\/cars\/([A-Za-z0-9_-]+)\/?$/);
+    const carId = match?.[1];
     if (carId) {
       return <CarDetailContent carId={carId} />;
     }

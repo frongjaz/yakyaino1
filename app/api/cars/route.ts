@@ -23,11 +23,33 @@ export async function GET(request: NextRequest) {
   const corsHeaders = getCorsHeaders(origin);
   
   try {
-    // Filter only available cars for public view
-    const cars = await query(
-      'SELECT * FROM cars WHERE status = ? OR status IS NULL ORDER BY created_at DESC',
-      ['available']
-    );
+    // Get search query from URL parameters
+    const { searchParams } = new URL(request.url);
+    const searchQuery = searchParams.get('q') || '';
+    
+    let sql = 'SELECT * FROM cars WHERE (status = ? OR status IS NULL)';
+    const params: any[] = ['available'];
+    
+    // Add search condition if query exists
+    if (searchQuery.trim()) {
+      const searchTerm = `%${searchQuery.trim()}%`;
+      sql += ` AND (
+        brand LIKE ? OR 
+        model LIKE ? OR 
+        description LIKE ? OR
+        color LIKE ? OR
+        transmission LIKE ? OR
+        fuel_type LIKE ? OR
+        engine_size LIKE ? OR
+        license_plate LIKE ?
+      )`;
+      // Add search term for each field
+      params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
+    }
+    
+    sql += ' ORDER BY created_at DESC';
+    
+    const cars = await query(sql, params);
 
     const carsArray = Array.isArray(cars) ? cars : [];
 
