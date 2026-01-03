@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiGet } from '@/lib/api';
 import { getSession, clearSession } from '@/lib/auth-client';
 import AddCarForm from '@/components/Admin/AddCarForm';
+import AddBlogForm from '@/components/Admin/AddBlogForm';
 import LogoutButton from '@/components/Admin/LogoutButton';
 
 interface Session {
@@ -13,10 +14,13 @@ interface Session {
   role: string;
 }
 
+type TabType = 'car' | 'blog';
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabType>('car');
 
   useEffect(() => {
     checkAuth();
@@ -24,35 +28,28 @@ export default function AdminDashboardPage() {
   }, []);
 
   const checkAuth = async () => {
-    // First check localStorage
     const localSession = getSession();
     
     if (localSession) {
-      // Verify with API
       try {
         const data = await apiGet<{ success: boolean; authenticated: boolean; user?: Session }>('/api/auth/check');
         
         if (data.success && data.authenticated && data.user) {
           setSession(data.user);
         } else {
-          // API says not authenticated, clear local session
           clearSession();
           router.push('/admin/login');
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
-        // On error, try to use local session (offline mode)
         setSession(localSession);
       }
     } else {
-      // No local session, redirect to login
       router.push('/admin/login');
     }
     
     setLoading(false);
   };
 
-  // Show loading state while checking auth
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 dark:from-dark dark:via-gray-dark dark:to-black flex items-center justify-center">
@@ -64,7 +61,6 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // If no session, don't render (will redirect)
   if (!session) {
     return null;
   }
@@ -96,7 +92,7 @@ export default function AdminDashboardPage() {
                   Admin Dashboard
                 </h1>
                 <p className="text-sm text-body-color dark:text-body-color-dark">
-                  จัดการข้อมูลรถยนต์
+                  จัดการข้อมูลระบบ
                 </p>
               </div>
             </div>
@@ -117,33 +113,131 @@ export default function AdminDashboardPage() {
 
       {/* Main Content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white dark:bg-dark rounded-lg shadow-three dark:shadow-two p-8 border border-stroke dark:border-stroke-dark">
-          <div className="flex items-center gap-3 mb-8 pb-4 border-b border-stroke dark:border-stroke-dark">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <svg
-                className="h-7 w-7 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <div className="bg-white dark:bg-dark rounded-lg shadow-three dark:shadow-two border border-stroke dark:border-stroke-dark">
+          {/* Tab Navigation */}
+          <div className="border-b border-stroke dark:border-stroke-dark">
+            <nav className="flex -mb-px" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab('car')}
+                className={`
+                  flex-1 px-6 py-4 text-sm font-medium text-center border-b-2 transition-colors
+                  ${activeTab === 'car'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-body-color dark:text-body-color-dark hover:text-primary hover:border-gray-300 dark:hover:border-gray-600'
+                  }
+                `}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-dark dark:text-white">
-                เพิ่มข้อมูลรถยนต์
-              </h2>
-              <p className="text-sm text-body-color dark:text-body-color-dark mt-1">
-                กรอกข้อมูลรถยนต์ที่ต้องการเพิ่มลงในระบบ
-              </p>
-            </div>
+                <div className="flex items-center justify-center gap-2">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <span>เพิ่มข้อมูลรถยนต์</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('blog')}
+                className={`
+                  flex-1 px-6 py-4 text-sm font-medium text-center border-b-2 transition-colors
+                  ${activeTab === 'blog'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-body-color dark:text-body-color-dark hover:text-primary hover:border-gray-300 dark:hover:border-gray-600'
+                  }
+                `}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  <span>เพิ่มบทความ</span>
+                </div>
+              </button>
+            </nav>
           </div>
-          <AddCarForm />
+
+          {/* Tab Content */}
+          <div className="p-8">
+            {activeTab === 'car' && (
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <svg
+                      className="h-6 w-6 text-primary"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-dark dark:text-white">
+                      เพิ่มข้อมูลรถยนต์
+                    </h2>
+                    <p className="text-sm text-body-color dark:text-body-color-dark">
+                      กรอกข้อมูลรถยนต์ที่ต้องการเพิ่มลงในระบบ
+                    </p>
+                  </div>
+                </div>
+                <AddCarForm />
+              </div>
+            )}
+
+            {activeTab === 'blog' && (
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <svg
+                      className="h-6 w-6 text-primary"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-dark dark:text-white">
+                      เพิ่มบทความ
+                    </h2>
+                    <p className="text-sm text-body-color dark:text-body-color-dark">
+                      สร้างบทความใหม่สำหรับเว็บไซต์
+                    </p>
+                  </div>
+                </div>
+                <AddBlogForm />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

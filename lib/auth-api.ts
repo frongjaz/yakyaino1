@@ -25,21 +25,29 @@ export async function checkAuth(request: NextRequest): Promise<AuthResult> {
     
     if (sessionCookie) {
       // Same-domain: use cookie
-      session = JSON.parse(sessionCookie.value);
+      try {
+        session = JSON.parse(sessionCookie.value);
+      } catch (e) {
+        console.error('[checkAuth] Error parsing cookie:', e);
+      }
     } else if (authHeader && authHeader.startsWith('Bearer ')) {
       // Cross-domain: use Authorization header
       try {
         const token = authHeader.replace('Bearer ', '');
-        session = JSON.parse(decodeURIComponent(token));
-      } catch {
-        // Invalid token
+        const decodedToken = decodeURIComponent(token);
+        session = JSON.parse(decodedToken);
+      } catch (e) {
+        console.error('[checkAuth] Error parsing Authorization header:', e);
       }
     }
     
-    if (!session || session.role !== 'admin') {
+    if (!session) {
       return { authenticated: false };
     }
-
+    
+    if (session.role !== 'admin') {
+      return { authenticated: false };
+    }
     return { 
       authenticated: true, 
       user: {
@@ -48,7 +56,8 @@ export async function checkAuth(request: NextRequest): Promise<AuthResult> {
         role: session.role,
       }
     };
-  } catch {
+  } catch (error: any) {
+    console.error('[checkAuth] Error:', error);
     return { authenticated: false };
   }
 }

@@ -41,21 +41,14 @@ export async function GET(
     // Try to decode if it's an encoded ID, otherwise use as-is
     let carId: string | null = null;
     
-    console.log(`[API] Received encoded ID: ${encodedId}`);
-    
     // First try: Use decodeCarId function
     try {
       const decodedId = decodeCarId(encodedId);
       if (decodedId) {
         carId = decodedId;
-        console.log(`[API] Decoded ID successfully: ${encodedId} -> ${carId}`);
-      } else {
-        console.log(`[API] decodeCarId returned null for: ${encodedId}`);
       }
     } catch (decodeError: any) {
       console.error('[API] Error decoding car ID:', decodeError);
-      console.error('[API] Encoded ID:', encodedId);
-      console.error('[API] Error stack:', decodeError.stack);
     }
     
     // Second try: Manual decode if decodeCarId failed
@@ -69,13 +62,10 @@ export async function GET(
         
         let decoded: string;
         if (typeof Buffer !== 'undefined') {
-          // Node.js environment
           decoded = Buffer.from(base64, 'base64').toString('utf-8');
         } else if (typeof atob !== 'undefined') {
-          // Browser environment
           decoded = atob(base64);
         } else {
-          // Fallback: manual base64 decode
           const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
           let output = '';
           let i = 0;
@@ -99,25 +89,17 @@ export async function GET(
           const manualDecodedId = decoded.substring(SALT.length);
           if (/^\d+$/.test(manualDecodedId)) {
             carId = manualDecodedId;
-            console.log(`[API] Manual decode successful: ${encodedId} -> ${carId}`);
-          } else {
-            console.error('[API] Manual decoded ID is not a number:', manualDecodedId);
           }
-        } else {
-          console.error('[API] Manual decoded string does not start with salt:', decoded);
         }
       } catch (manualError: any) {
         console.error('[API] Manual decode failed:', manualError);
-        console.error('[API] Manual decode error stack:', manualError.stack);
       }
     }
     
     // Third try: Plain numeric ID fallback
     if (!carId) {
       if (/^\d+$/.test(encodedId)) {
-        // Fallback: support plain numeric IDs for backward compatibility
         carId = encodedId;
-        console.log(`[API] Using plain numeric ID: ${carId}`);
       } else {
         console.error('[API] Invalid car ID format:', encodedId);
         return NextResponse.json(

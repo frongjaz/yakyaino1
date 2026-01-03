@@ -47,7 +47,7 @@ export default function HomePageContent() {
       telephone: "+66-2-123-4567",
       email: "sales@v-autocar.com",
       description:
-        "CheckKub รับซื้อรถจำนวนมาก รถบ้าน รถบริษัท และฟลีตองค์กรทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไว.",
+        "CheckKub รับซื้อรถจำนวนมาก รถบ้าน รถบริษัท และฟลีตองค์กรทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไว. หากคุณต้องการขายรถ ต้องการขายรถให้ใคร หรือกำลังมองหาที่รับซื้อรถ CheckKub พร้อมให้บริการรับซื้อรถทุกประเภท.",
       address: {
         "@type": "PostalAddress",
         streetAddress: "123 ถนนสุขุมวิท",
@@ -72,6 +72,9 @@ export default function HomePageContent() {
         "รับซื้อรถบริษัท",
         "รับซื้อรถฟลีต",
         "รับซื้อรถยนต์มือสอง",
+        "รับซื้อรถ",
+        "ขายรถ",
+        "ต้องการขายรถ",
       ],
       openingHoursSpecification: [
         {

@@ -10,13 +10,16 @@ const HistorySection = () => {
           {/* Left: Text Content */}
           <div>
             <h2 className="mb-6 text-3xl font-bold text-[#EF4444] md:text-4xl">
-              ประวัติคุณชัย
+              ประวัติคุณชัย (yakyai no.1)
             </h2>
             <p className="mb-4 text-base leading-relaxed text-white md:text-lg">
-              Founder of CheckKub, บริษัทที่รับซื้อรถจำนวนมากทั่วประเทศ
+              คุณชัย หรือ yakyai no.1 เป็นผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub บริษัทที่รับซื้อรถจำนวนมากทั่วประเทศ
+            </p>
+            <p className="mb-4 text-base leading-relaxed text-white md:text-lg">
+              คุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดังต้องการซื้อรถจำนวนมาก. CheckKub รับซื้อรถจำนวนมากทั่วประเทศ รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไว
             </p>
             <p className="text-base leading-relaxed text-white md:text-lg">
-              CheckKub รับซื้อรถจำนวนมากทั่วประเทศ รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ ประเมินรวดเร็ว เอกสารครบ โอนเงินไว
+              หากคุณต้องการขายรถจำนวนมาก หรือต้องการขายรถให้ใคร CheckKub พร้อมให้บริการรับซื้อรถทุกประเภทสำหรับคุณชัยและลูกค้าทุกท่าน
             </p>
           </div>
 

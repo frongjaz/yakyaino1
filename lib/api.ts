@@ -27,8 +27,9 @@ export function getApiUrl(endpoint: string): string {
 
 /**
  * Get session token from localStorage
+ * Exported for use in components that need to send Authorization header directly
  */
-function getSessionToken(): string | null {
+export function getSessionToken(): string | null {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -114,7 +115,17 @@ export async function apiPost<T = any>(
   });
   
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    // Try to parse error message from response
+    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+    try {
+      const errorData = await response.json();
+      if (errorData.message) {
+        errorMessage = errorData.message;
+      }
+    } catch {
+      // If can't parse JSON, use default message
+    }
+    throw new Error(errorMessage);
   }
   
   return response.json();

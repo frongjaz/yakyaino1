@@ -26,12 +26,20 @@ export async function POST(request: NextRequest) {
   const corsHeaders = getCorsHeaders(origin);
   
   try {
+    // Debug: Log authentication headers
     // Check authentication
     const auth = await checkAuth(request);
     
     if (!auth.authenticated) {
       return NextResponse.json(
-        { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' },
+        { 
+          success: false, 
+          message: 'ไม่มีสิทธิ์เข้าถึง',
+          debug: process.env.NODE_ENV === 'development' ? {
+            hasAuthHeader: !!authHeader,
+            hasCookie: !!sessionCookie,
+          } : undefined
+        },
         { status: 401, headers: corsHeaders }
       );
     }
@@ -92,7 +100,7 @@ export async function POST(request: NextRequest) {
     client.ftp.verbose = process.env.NODE_ENV === 'development'; // Enable verbose in development
 
     try {
-      console.log('Connecting to FTP:', { 
+      // Connect to FTP
         host: ftpHost, 
         path: ftpPath,
         fileSize: file.size,
@@ -112,12 +120,8 @@ export async function POST(request: NextRequest) {
         ),
       ]);
 
-      console.log('FTP connected, ensuring directory exists:', ftpPath);
-      
       // Ensure directory exists
       await client.ensureDir(ftpPath);
-
-      console.log('Uploading file:', remotePath, 'Size:', buffer.length);
       
       // Convert buffer to Readable stream
       const stream = Readable.from(buffer);
@@ -129,8 +133,6 @@ export async function POST(request: NextRequest) {
           setTimeout(() => reject(new Error('FTP upload timeout')), 45000)
         ),
       ]);
-
-      console.log('File uploaded successfully');
 
       // Close connection
       client.close();
