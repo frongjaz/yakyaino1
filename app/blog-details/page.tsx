@@ -2,19 +2,87 @@ import SharePost from "@/components/Blog/SharePost";
 import TagButton from "@/components/Blog/TagButton";
 import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
+import Script from "next/script";
 
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Blog Details Page | Free Next.js Template for Startup and SaaS",
-  description: "This is Blog Details Page for Startup Nextjs Template",
-  // other metadata
+  title: "บทความ CheckKub | ข้อมูลตลาดรถและเคล็ดลับการขาย",
+  description:
+    "อ่านบทความล่าสุดจาก CheckKub เกี่ยวกับราคาตลาดรถ เทคนิคการขายรถ และเคล็ดลับการเตรียมรถให้พร้อมขาย",
+  keywords: [
+    "บทความรถยนต์",
+    "ราคาตลาดรถ",
+    "เคล็ดลับขายรถ",
+    "ขายรถฟลีต",
+    "รับซื้อรถจำนวนมาก",
+  ],
+  openGraph: {
+    title: "บทความ CheckKub | ข้อมูลตลาดรถและเคล็ดลับการขาย",
+    description:
+      "อ่านบทความล่าสุดจาก CheckKub เกี่ยวกับราคาตลาดรถ เทคนิคการขายรถ และเคล็ดลับการเตรียมรถให้พร้อมขาย",
+    type: "article",
+  },
 };
 
 const BlogDetailsPage = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+  
+  // Sample blog data - in production, this should come from API or props
+  const blogData = {
+    title: "อัปเดตราคาตลาดรถ SUV 2025 ก่อนปล่อยขาย",
+    description:
+      "สำรวจเรตราคาล่าสุดของรถ SUV ยอดนิยม วิเคราะห์ปัจจัยที่ทำให้ราคาปรับขึ้น-ลง และวิธีเตรียมรถเพื่อให้ได้ข้อเสนอที่ดีที่สุด.",
+    image: getImagePath("/images/blog/blog-01.jpg"),
+    author: {
+      name: "ทีมข้อมูลตลาด CheckKub",
+      image: getImagePath("/images/blog/author-01.png"),
+      designation: "Market Analyst",
+    },
+    datePublished: "2025-03-01T00:00:00+07:00",
+    dateModified: "2025-03-01T00:00:00+07:00",
+    tags: ["market", "SUV", "ราคาตลาด"],
+  };
+
+  // Generate Article structured data for GEO
+  const articleStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: blogData.title,
+    description: blogData.description,
+    image: blogData.image,
+    datePublished: blogData.datePublished,
+    dateModified: blogData.dateModified,
+    author: {
+      "@type": "Person",
+      name: blogData.author.name,
+      jobTitle: blogData.author.designation,
+      image: blogData.author.image,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "CheckKub",
+      logo: {
+        "@type": "ImageObject",
+        url: `${baseUrl}/images/logo/logo.svg`,
+      },
+    },
+    articleSection: blogData.tags[0],
+    keywords: blogData.tags.join(", "),
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${baseUrl}/blog-details`,
+    },
+  };
+
   return (
     <>
-      <section className="pb-[120px] pt-[150px]">
+      <Script
+        id="article-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleStructuredData) }}
+      />
+      <section className="bg-white py-16 md:py-20">
         <div className="container">
           <div className="-mx-4 flex flex-wrap justify-center">
             <div className="w-full px-4 lg:w-8/12">

@@ -7,6 +7,12 @@
   "functions": {
     "app/api/upload/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/cars/**": {
+      "maxDuration": 30
+    },
+    "app/api/cars/[id]/route.ts": {
+      "maxDuration": 30
     }
   }
 }

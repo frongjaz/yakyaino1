@@ -1,6 +1,8 @@
 import { getImagePath } from "@/lib/utils";
 import { Blog } from "@/types/blog";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+
 const getBlogData = (): Blog[] => [
   {
     id: 1,
@@ -13,8 +15,11 @@ const getBlogData = (): Blog[] => [
       image: getImagePath("/images/blog/author-01.png"),
       designation: "Market Analyst",
     },
-    tags: ["market"],
+    tags: ["market", "SUV", "ราคาตลาด"],
     publishDate: "มี.ค. 2025",
+    datePublished: "2025-03-01T00:00:00+07:00",
+    dateModified: "2025-03-01T00:00:00+07:00",
+    url: `${baseUrl}/blog-details/1`,
   },
   {
     id: 2,
@@ -27,8 +32,11 @@ const getBlogData = (): Blog[] => [
       image: getImagePath("/images/blog/author-02.png"),
       designation: "Fleet Consultant",
     },
-    tags: ["fleet"],
+    tags: ["fleet", "ฟลีต", "ขายรถจำนวนมาก"],
     publishDate: "ก.พ. 2025",
+    datePublished: "2025-02-01T00:00:00+07:00",
+    dateModified: "2025-02-01T00:00:00+07:00",
+    url: `${baseUrl}/blog-details/2`,
   },
   {
     id: 3,
@@ -41,8 +49,11 @@ const getBlogData = (): Blog[] => [
       image: getImagePath("/images/blog/author-03.png"),
       designation: "Dealer Partner",
     },
-    tags: ["dealer"],
+    tags: ["dealer", "เต็นท์รถ", "ต่อรองราคา"],
     publishDate: "ม.ค. 2025",
+    datePublished: "2025-01-01T00:00:00+07:00",
+    dateModified: "2025-01-01T00:00:00+07:00",
+    url: `${baseUrl}/blog-details/3`,
   },
 ];
 export default getBlogData;

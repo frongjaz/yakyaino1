@@ -4,6 +4,7 @@ import { getCorsHeaders } from '@/lib/cors';
 import { decodeCarId } from '@/lib/id-encoder';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30; // 30 seconds timeout for Vercel
 
 // Handle OPTIONS request for CORS
 export async function OPTIONS(request: NextRequest) {

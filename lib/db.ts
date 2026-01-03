@@ -12,14 +12,16 @@ const dbConfig: any = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 5, // Reduced for serverless (lower is better)
   queueLimit: 0,
   // Serverless-friendly settings
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
-  // Timeout settings
-  connectTimeout: 10000, // 10 seconds
-  acquireTimeout: 10000,
+  // Timeout settings (reduced for faster failure detection)
+  connectTimeout: 5000, // 5 seconds (reduced from 10)
+  acquireTimeout: 5000, // 5 seconds (reduced from 10)
+  // Query timeout
+  timeout: 8000, // 8 seconds for queries
 };
 
 // Use Unix Socket if DB_SOCKET_PATH is provided (DirectAdmin localhost)
@@ -79,16 +81,61 @@ export async function testConnection(): Promise<boolean> {
   }
 }
 
-// Execute a query
-export async function query(sql: string, params?: any[]): Promise<any> {
-  try {
-    const connectionPool = getPool();
-    const [results] = await connectionPool.execute(sql, params);
-    return results;
-  } catch (error) {
-    console.error('Database query error:', error);
-    throw error;
+// Execute a query with retry logic for serverless environments
+export async function query(sql: string, params?: any[], retries = 2): Promise<any> {
+  let lastError: any;
+  
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const connectionPool = getPool();
+      
+      // Execute query directly (connection pool handles connection management)
+      const [results] = await connectionPool.execute(sql, params);
+      return results;
+    } catch (error: any) {
+      lastError = error;
+      console.error(`[DB] Query error (attempt ${attempt}/${retries}):`, error.message || error.code);
+      
+      // Check if it's a connection error that can be retried
+      const isConnectionError = 
+        error.code === 'ECONNREFUSED' ||
+        error.code === 'ETIMEDOUT' ||
+        error.code === 'PROTOCOL_CONNECTION_LOST' ||
+        error.code === 'PROTOCOL_ENQUEUE_AFTER_QUIT' ||
+        error.code === 'ENOTFOUND' ||
+        error.message?.includes('Connection lost') ||
+        error.message?.includes('timeout') ||
+        error.message?.includes('getaddrinfo');
+      
+      if (isConnectionError && attempt < retries) {
+        console.warn(`[DB] Connection error detected, recreating pool and retrying... (${attempt}/${retries})`);
+        
+        // Recreate pool on connection errors
+        if (pool) {
+          try {
+            await pool.end();
+          } catch (e: any) {
+            // Ignore errors when closing dead pool
+            console.warn('[DB] Error closing pool:', e.message);
+          }
+          pool = null;
+        }
+        
+        // Exponential backoff (shorter delays for faster recovery)
+        const delay = 50 * Math.pow(2, attempt - 1); // 50ms, 100ms
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // If not a connection error or last attempt, throw immediately
+      if (!isConnectionError || attempt === retries) {
+        throw error;
+      }
+    }
   }
+  
+  // If all retries failed
+  throw lastError;
 }
 
 // Get a single connection (for transactions)
