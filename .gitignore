@@ -38,3 +38,4 @@ yarn-error.log*
 
 # temporary build files
 .api_backup
+MANUAL.md

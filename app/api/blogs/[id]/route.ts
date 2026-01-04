@@ -59,7 +59,7 @@ export async function GET(
         tags = typeof blog.tags === 'string' ? JSON.parse(blog.tags) : blog.tags;
       }
     } catch (e) {
-      console.error('Error parsing tags:', e);
+      // Ignore tag parsing errors
     }
 
     const transformedBlog = {

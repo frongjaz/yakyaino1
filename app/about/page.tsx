@@ -8,11 +8,13 @@ import Script from "next/script";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://v-autocar.co.th"),
   title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1 Founder ของ CheckKub",
   description:
     "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถจำนวนมาก. คุณชัยต้องการซื้อรถจำนวนมากและพร้อมดูแลคุณตั้งแต่การประเมินจนถึงปิดการขาย.",
   keywords: [
     "เกี่ยวกับ CheckKub",
+    "ขายรถ",
     "รับซื้อรถ",
     "ต้องการขายรถ",
     "บริษัทรับซื้อรถ",
@@ -24,11 +26,22 @@ export const metadata: Metadata = {
     "yakyai no.1 คือใคร",
     "คุณชัยต้องการซื้อรถ",
   ],
+  alternates: {
+    canonical: "/about",
+  },
   openGraph: {
-    title: "เกี่ยวกับ CheckKub | โซลูชันรับซื้อรถสำหรับองค์กร",
+    title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1 Founder ของ CheckKub",
     description:
-      "รู้จักกับทีม CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถจำนวนมาก",
+      "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub",
+    url: "https://v-autocar.co.th/about",
+    siteName: "CheckKub",
     type: "website",
+    locale: "th_TH",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1",
+    description: "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดัง",
   },
 };
 

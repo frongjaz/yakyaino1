@@ -32,8 +32,9 @@ export async function GET(request: NextRequest) {
     let sql = 'SELECT * FROM blogs';
     const params: any[] = [];
     
-    // If not admin, only show published blogs
+    // If not admin, show published blogs, or all if no published blogs exist
     if (!admin) {
+      // First, try to get published blogs
       sql += ' WHERE status = ?';
       params.push('published');
     } else if (status !== 'all') {
@@ -46,6 +47,15 @@ export async function GET(request: NextRequest) {
     const blogs = await query(sql, params);
     const blogsArray = Array.isArray(blogs) ? blogs : [];
     
+    // If no published blogs found and not admin, try to get all blogs (including draft)
+    if (blogsArray.length === 0 && !admin) {
+      const allBlogs = await query('SELECT * FROM blogs ORDER BY created_at DESC', []);
+      const allBlogsArray = Array.isArray(allBlogs) ? allBlogs : [];
+      if (allBlogsArray.length > 0) {
+        blogsArray.push(...allBlogsArray);
+      }
+    }
+    
     // Transform data to match Blog type
     const transformedBlogs = blogsArray.map((blog: any) => {
       // Parse tags from JSON string
@@ -55,7 +65,7 @@ export async function GET(request: NextRequest) {
           tags = typeof blog.tags === 'string' ? JSON.parse(blog.tags) : blog.tags;
         }
       } catch (e) {
-        console.error('Error parsing tags:', e);
+        // Ignore tag parsing errors
       }
       
       return {

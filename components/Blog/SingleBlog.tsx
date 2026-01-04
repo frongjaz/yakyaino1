@@ -3,19 +3,23 @@ import Image from "next/image";
 import Link from "next/link";
 
 const SingleBlog = ({ blog }: { blog: Blog }) => {
-  const { title, image, paragraph, author, tags, publishDate, datePublished, url } = blog;
+  const { id, title, image, paragraph, author, tags, publishDate, datePublished, url } = blog;
+  const blogUrl = url || `/blog-details/${id}`;
+  
   return (
     <>
       <div
         className="group relative overflow-hidden rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-xl"
       >
         <Link
-          href="/blog-details"
+          href={blogUrl}
           className="relative block aspect-[37/22] w-full overflow-hidden"
         >
-          <span className="absolute right-4 top-4 z-20 inline-flex items-center justify-center rounded-full bg-[#EF4444] px-4 py-2 text-sm font-semibold capitalize text-white">
-            {tags[0]}
-          </span>
+          {tags && tags.length > 0 && (
+            <span className="absolute right-4 top-4 z-20 inline-flex items-center justify-center rounded-full bg-[#EF4444] px-4 py-2 text-sm font-semibold capitalize text-white">
+              {tags[0]}
+            </span>
+          )}
           <Image 
             src={image} 
             alt="image" 
@@ -26,7 +30,7 @@ const SingleBlog = ({ blog }: { blog: Blog }) => {
         <div className="p-6">
           <h3>
             <Link
-              href="/blog-details"
+              href={blogUrl}
               className="mb-4 block text-xl font-bold text-gray-900 transition-colors hover:text-[#EF4444] sm:text-2xl"
             >
               {title}
@@ -37,11 +41,13 @@ const SingleBlog = ({ blog }: { blog: Blog }) => {
           </p>
           <div className="flex items-center">
             <div className="mr-5 flex items-center border-r border-gray-200 pr-5">
-              <div className="mr-4">
-                <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                  <Image src={author.image} alt="author" fill className="object-cover" />
+              {author.image && (
+                <div className="mr-4">
+                  <div className="relative h-10 w-10 overflow-hidden rounded-full">
+                    <Image src={author.image} alt={author.name || "author"} fill className="object-cover" />
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="w-full">
                 <h4 className="mb-1 text-sm font-medium text-gray-900">
                   By {author.name}

@@ -10,6 +10,7 @@ import { Blog } from "@/types/blog";
 export default function BlogContent() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
 
   useEffect(() => {
@@ -19,12 +20,15 @@ export default function BlogContent() {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const data = await apiGet<{ success: boolean; data: Blog[] }>('/api/blogs');
+      setError(null);
+      const data = await apiGet<{ success: boolean; data: Blog[]; message?: string }>('/api/blogs');
       if (data.success && data.data) {
         setBlogs(data.data);
+      } else {
+        setError(data.message || 'ไม่สามารถโหลดข้อมูลบทความได้');
       }
-    } catch (error) {
-      console.error('Error fetching blogs:', error);
+    } catch (error: any) {
+      setError(error.message || 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
     } finally {
       setLoading(false);
     }
@@ -90,9 +94,53 @@ export default function BlogContent() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EF4444] mx-auto mb-4"></div>
               <p className="text-gray-600">กำลังโหลดบทความ...</p>
             </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-red-100">
+                <svg
+                  className="h-12 w-12 text-red-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-2 text-2xl font-bold text-gray-900">เกิดข้อผิดพลาด</h3>
+              <p className="mb-4 text-gray-600">{error}</p>
+              <button
+                onClick={fetchBlogs}
+                className="rounded-md bg-[#EF4444] px-6 py-2 text-white hover:bg-[#DC2626]"
+              >
+                ลองใหม่อีกครั้ง
+              </button>
+            </div>
           ) : blogs.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">ยังไม่มีบทความ</p>
+            <div className="text-center py-16">
+              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
+                <svg
+                  className="h-12 w-12 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-2 text-2xl font-bold text-gray-900">ยังไม่มีบทความ</h3>
+              <p className="text-gray-600">
+                บทความจะปรากฏที่นี่เมื่อมีการเพิ่มข้อมูล
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -104,66 +152,6 @@ export default function BlogContent() {
             </div>
           )}
 
-          {/* Pagination */}
-          {blogs.length > 0 && (
-            <div className="mt-12 flex items-center justify-center">
-              <ul className="flex items-center space-x-2">
-                <li>
-                  <a
-                    href="#0"
-                    className="flex h-10 min-w-[40px] items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition hover:bg-[#EF4444] hover:text-white"
-                  >
-                    Prev
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#0"
-                    className="flex h-10 min-w-[40px] items-center justify-center rounded-md bg-[#EF4444] px-4 text-sm font-medium text-white"
-                  >
-                    1
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#0"
-                    className="flex h-10 min-w-[40px] items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition hover:bg-[#EF4444] hover:text-white"
-                  >
-                    2
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#0"
-                    className="flex h-10 min-w-[40px] items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition hover:bg-[#EF4444] hover:text-white"
-                  >
-                    3
-                  </a>
-                </li>
-                <li>
-                  <span className="flex h-10 min-w-[40px] cursor-not-allowed items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-400">
-                    ...
-                  </span>
-                </li>
-                <li>
-                  <a
-                    href="#0"
-                    className="flex h-10 min-w-[40px] items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition hover:bg-[#EF4444] hover:text-white"
-                  >
-                    12
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#0"
-                    className="flex h-10 min-w-[40px] items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition hover:bg-[#EF4444] hover:text-white"
-                  >
-                    Next
-                  </a>
-                </li>
-              </ul>
-            </div>
-          )}
         </div>
       </section>
     </>
