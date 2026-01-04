@@ -8,6 +8,7 @@ export type Blog = {
   id: number;
   title: string;
   paragraph: string;
+  content?: string; // HTML content for blog details
   image: string;
   author: Author;
   tags: string[];
