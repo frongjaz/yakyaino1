@@ -34,19 +34,36 @@ const Hero = () => {
     <>
       <section
         id="home"
-        className=""
+        className="pt-[82px] md:pt-[90px] lg:pt-0"
       >
         <div className="relative w-full max-w-full overflow-hidden">
           {/* Banner image - Responsive with max height */}
-          <div className="relative h-[300px] w-full max-w-full md:h-[400px] lg:h-[500px] xl:max-h-[600px] xl:h-[600px]">
-            <Image
-              src={getImagePath(slides[currentSlide].image)}
-              alt={slides[currentSlide].alt}
-              fill
-              priority
-              className="h-full w-full object-cover object-center"
-              sizes="100vw"
-            />
+          <div className="relative w-full max-w-full">
+            {/* Mobile: Show full image - maintain natural aspect ratio */}
+            <div className="relative block w-full md:hidden">
+              <div className="relative w-full" style={{ paddingBottom: '0' }}>
+                <Image
+                  src={getImagePath(slides[currentSlide].image)}
+                  alt={slides[currentSlide].alt}
+                  width={1200}
+                  height={675}
+                  priority
+                  className="h-auto w-full object-contain object-center"
+                  sizes="100vw"
+                />
+              </div>
+            </div>
+            {/* Desktop: Fixed height with cover */}
+            <div className="hidden md:block relative h-[400px] w-full lg:h-[500px] xl:h-[600px]">
+              <Image
+                src={getImagePath(slides[currentSlide].image)}
+                alt={slides[currentSlide].alt}
+                fill
+                priority
+                className="h-full w-full object-cover object-center"
+                sizes="100vw"
+              />
+            </div>
           </div>
 
           {/* Navigation arrows */}

@@ -34,11 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          message: 'ไม่มีสิทธิ์เข้าถึง',
-          debug: process.env.NODE_ENV === 'development' ? {
-            hasAuthHeader: !!authHeader,
-            hasCookie: !!sessionCookie,
-          } : undefined
+          message: 'ไม่มีสิทธิ์เข้าถึง'
         },
         { status: 401, headers: corsHeaders }
       );
@@ -100,14 +96,7 @@ export async function POST(request: NextRequest) {
     client.ftp.verbose = process.env.NODE_ENV === 'development'; // Enable verbose in development
 
     try {
-      // Connect to FTP
-        host: ftpHost, 
-        path: ftpPath,
-        fileSize: file.size,
-        fileName: file.name,
-      });
-      
-      // Connect with timeout
+      // Connect to FTP with timeout
       await Promise.race([
         client.access({
           host: ftpHost,
