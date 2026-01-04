@@ -5,11 +5,7 @@ import { checkAuth } from '@/lib/auth-api';
 import { Readable } from 'stream';
 
 export const dynamic = 'force-dynamic';
-
-// Set max duration for Vercel (60 seconds for Pro plan, 10 seconds for Hobby)
 export const maxDuration = 60;
-
-// Handle OPTIONS request for CORS
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
   const headers = getCorsHeaders(origin);
@@ -20,13 +16,11 @@ export async function OPTIONS(request: NextRequest) {
   });
 }
 
-// POST - Upload image to FTP
 export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin');
   const corsHeaders = getCorsHeaders(origin);
   
   try {
-    // Debug: Log authentication headers
     // Check authentication
     const auth = await checkAuth(request);
     
@@ -93,7 +87,6 @@ export async function POST(request: NextRequest) {
 
     // Upload to FTP
     const client = new Client();
-    client.ftp.verbose = process.env.NODE_ENV === 'development'; // Enable verbose in development
 
     try {
       // Connect to FTP with timeout
@@ -102,7 +95,7 @@ export async function POST(request: NextRequest) {
           host: ftpHost,
           user: ftpUser,
           password: ftpPassword,
-          secure: false, // Set to true for FTPS
+          secure: false,
         }),
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('FTP connection timeout')), 15000)
@@ -127,9 +120,8 @@ export async function POST(request: NextRequest) {
       client.close();
 
       // Generate public URL
-      // Remove /domains/checkkub.com/public_html from path to get relative path
       const relativePath = ftpPath.replace(/^\/domains\/[^\/]+\/public_html/, '');
-      const publicUrl = `${relativePath}${fileName}`.replace(/\/+/g, '/'); // Remove double slashes
+      const publicUrl = `${relativePath}${fileName}`.replace(/\/+/g, '/');
       const fullUrl = process.env.NEXT_PUBLIC_BASE_URL 
         ? `${process.env.NEXT_PUBLIC_BASE_URL}${publicUrl}`
         : publicUrl;
@@ -168,15 +160,6 @@ export async function POST(request: NextRequest) {
           errorMessage = `FTP Error: ${ftpError.message}`;
         }
       }
-      
-      // Log detailed error for debugging
-      console.error('FTP Error Details:', {
-        message: ftpError.message,
-        code: ftpError.code,
-        host: ftpHost,
-        path: ftpPath,
-        fileSize: file.size,
-      });
 
       return NextResponse.json(
         { 

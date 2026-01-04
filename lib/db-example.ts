@@ -7,10 +7,7 @@ import { query, testConnection, getConnection } from './db';
 
 // Example 1: Test database connection
 export async function testDbConnection() {
-  const isConnected = await testConnection();
-  if (isConnected) {
-    console.log('Database is ready to use');
-  }
+  return await testConnection();
 }
 
 // Example 2: Simple SELECT query
@@ -60,7 +57,6 @@ export async function transferData() {
     await connection.query('UPDATE table2 SET ...');
     
     await connection.commit();
-    console.log('Transaction completed');
   } catch (error) {
     await connection.rollback();
     console.error('Transaction failed, rolled back:', error);

@@ -106,11 +106,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          message: 'ไม่มีสิทธิ์เข้าถึง',
-          debug: process.env.NODE_ENV === 'development' ? {
-            hasAuthHeader: !!authHeader,
-            hasCookie: !!sessionCookie,
-          } : undefined
+          message: 'ไม่มีสิทธิ์เข้าถึง'
         },
         { status: 401, headers: corsHeaders }
       );

@@ -31,7 +31,6 @@ export function encodeCarId(id: number | string): string {
 export function decodeCarId(encodedId: string): string | null {
   try {
     if (!encodedId || typeof encodedId !== 'string') {
-      console.error('Invalid encodedId input:', encodedId);
       return null;
     }
     
@@ -53,13 +52,11 @@ export function decodeCarId(encodedId: string): string | null {
     } else if (typeof atob !== 'undefined') {
       decoded = atob(base64);
     } else {
-      console.error('No base64 decoder available');
       return null;
     }
     
     // Remove salt prefix
     if (!decoded.startsWith(SALT)) {
-      console.error('Decoded string does not start with salt:', decoded, 'Expected:', SALT);
       return null;
     }
     
@@ -67,15 +64,11 @@ export function decodeCarId(encodedId: string): string | null {
     
     // Validate that it's a valid number
     if (!/^\d+$/.test(idStr)) {
-      console.error('Decoded ID is not a valid number:', idStr);
       return null;
     }
     
     return idStr;
   } catch (error: any) {
-    console.error('Error decoding car ID:', error);
-    console.error('Encoded ID:', encodedId);
-    console.error('Error stack:', error.stack);
     return null;
   }
 }

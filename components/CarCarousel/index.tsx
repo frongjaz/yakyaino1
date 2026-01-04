@@ -68,10 +68,7 @@ const CarCarousel = ({ cars: propCars }: CarCarouselProps = { cars: undefined })
         <div className="relative flex items-center gap-4">
           {/* Left Navigation Button */}
           <button
-            onClick={() => {
-              console.log("Prev clicked", { canGoPrev, currentIndex });
-              prevSlide();
-            }}
+            onClick={prevSlide}
             disabled={!canGoPrev}
             className={`flex-shrink-0 rounded-full bg-white border-2 border-black p-3 transition shadow-lg ${
               canGoPrev
@@ -130,10 +127,7 @@ const CarCarousel = ({ cars: propCars }: CarCarouselProps = { cars: undefined })
 
           {/* Right Navigation Button */}
           <button
-            onClick={() => {
-              console.log("Next clicked", { canGoNext, currentIndex, maxIndex });
-              nextSlide();
-            }}
+            onClick={nextSlide}
             disabled={!canGoNext}
             className={`flex-shrink-0 rounded-full bg-white border-2 border-black p-3 transition shadow-lg ${
               canGoNext

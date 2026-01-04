@@ -72,7 +72,6 @@ export async function testConnection(): Promise<boolean> {
   try {
     const connectionPool = getPool();
     const connection = await connectionPool.getConnection();
-    console.log('✅ Database connected successfully');
     connection.release();
     return true;
   } catch (error) {
