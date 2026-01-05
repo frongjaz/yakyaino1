@@ -9,11 +9,11 @@ const AboutUsContent = () => {
       alt: "Car Dealership Showroom 1",
     },
     {
-      src: "/images/about/S__5800061.jpg",
+      src: "/images/about/S__5800062.jpg",
       alt: "Car Dealership Showroom 2",
     },
     {
-      src: "/images/about/S__5800062.jpg",
+      src: "/images/about/S__5800061.jpg",
       alt: "Car Dealership Showroom 3",
     },
   ];
