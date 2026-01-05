@@ -24,21 +24,46 @@ export async function GET(request: NextRequest) {
   const corsHeaders = getCorsHeaders(origin);
   
   try {
-    // Get search query from URL parameters
+    // Get filter parameters from URL
     const { searchParams } = new URL(request.url);
     const searchQuery = searchParams.get('q') || '';
+    const brand = searchParams.get('brand') || '';
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
     
     let sql = 'SELECT * FROM cars WHERE (status = ? OR status IS NULL)';
     const params: any[] = ['available'];
     
-    // Add search condition if query exists
-    if (searchQuery.trim()) {
+    // Add brand filter
+    if (brand && brand !== 'ทั้งหมด') {
+      sql += ' AND LOWER(brand) = ?';
+      params.push(brand.toLowerCase());
+    }
+    
+    // Add price filters
+    if (minPrice) {
+      const min = parseInt(minPrice);
+      if (!isNaN(min)) {
+        sql += ' AND price >= ?';
+        params.push(min);
+      }
+    }
+    
+    if (maxPrice) {
+      const max = parseInt(maxPrice);
+      if (!isNaN(max)) {
+        sql += ' AND price <= ?';
+        params.push(max);
+      }
+    }
+    
+    // Add search condition if query exists (only if no brand filter)
+    if (searchQuery.trim() && !brand) {
       const searchTerm = searchQuery.trim();
       const searchLower = searchTerm.toLowerCase();
       const containsTerm = `%${searchLower}%`;
       
       // Focus search on brand and model primarily
-      // Only search in other fields if brand/model don't match
       sql += ` AND (
         LOWER(brand) = ? OR
         LOWER(brand) LIKE ? OR
@@ -51,10 +76,10 @@ export async function GET(request: NextRequest) {
       const brandStartsWith = `${searchLower}%`;
       
       params.push(
-        exactBrand,        // 1. LOWER(brand) = ? (exact match)
-        brandStartsWith,   // 2. LOWER(brand) LIKE ? (starts with)
-        containsTerm,      // 3. LOWER(model) LIKE ? (contains)
-        containsTerm       // 4. LOWER(CONCAT(brand, ' ', model)) LIKE ? (full name contains)
+        exactBrand,        // LOWER(brand) = ? (exact match)
+        brandStartsWith,   // LOWER(brand) LIKE ? (starts with)
+        containsTerm,      // LOWER(model) LIKE ? (contains)
+        containsTerm       // LOWER(CONCAT(brand, ' ', model)) LIKE ? (full name contains)
       );
       
       // Order by relevance: exact brand matches first, then brand starts with, then model

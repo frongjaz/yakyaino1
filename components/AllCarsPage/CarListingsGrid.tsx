@@ -21,20 +21,33 @@ type CarListing = {
 const CarListingsGrid = () => {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
+  const brand = searchParams.get('brand') || '';
+  const minPrice = searchParams.get('minPrice') || '';
+  const maxPrice = searchParams.get('maxPrice') || '';
+  
   const [cars, setCars] = useState<CarListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCars();
-  }, [searchQuery]);
+  }, [searchQuery, brand, minPrice, maxPrice]);
 
   const fetchCars = async () => {
     try {
       setLoading(true);
-      const url = searchQuery 
-        ? `/api/cars?q=${encodeURIComponent(searchQuery)}`
+      
+      // Build URL with all filter parameters
+      const params = new URLSearchParams();
+      if (searchQuery) params.set('q', searchQuery);
+      if (brand && brand !== 'ทั้งหมด') params.set('brand', brand);
+      if (minPrice) params.set('minPrice', minPrice);
+      if (maxPrice) params.set('maxPrice', maxPrice);
+      
+      const url = params.toString() 
+        ? `/api/cars?${params.toString()}`
         : '/api/cars';
+      
       const data = await apiGet<{ success: boolean; data: CarListing[] }>(url);
       
       if (data.success && data.data) {
