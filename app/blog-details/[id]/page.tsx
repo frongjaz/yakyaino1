@@ -10,6 +10,16 @@ import { apiGet } from "@/lib/api";
 import { Blog } from "@/types/blog";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 
+// Required for static export with dynamic routes
+// Return empty array to indicate this route should be handled dynamically
+export async function generateStaticParams() {
+  // For static export, return empty array
+  // This route will be handled by client-side routing
+  return [];
+}
+
+export const dynamicParams = true; // Allow dynamic params not returned by generateStaticParams
+
 export default function BlogDetailsPage() {
   const params = useParams();
   const router = useRouter();

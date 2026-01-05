@@ -52,6 +52,25 @@ jobs:
               fi
             fi
           fi
+          # Move blog-details/[id] dynamic route (cannot use generateStaticParams with 'use client')
+          # Will be handled by client-side routing via .htaccess redirect to index.html
+          if [ -d "app/blog-details" ]; then
+            mkdir -p .blog_details_backup
+            # Use find to locate the [id] directory (handles brackets correctly)
+            if find app/blog-details -type d -name '[id]' | grep -q .; then
+              find app/blog-details -type d -name '[id]' -exec mv {} .blog_details_backup/ \;
+              echo "✅ Blog-details [id] page moved to .blog_details_backup"
+            else
+              # Alternative: try direct path with quotes
+              if [ -d "app/blog-details/[id]" ]; then
+                mv "app/blog-details/[id]" .blog_details_backup/
+                echo "✅ Blog-details [id] page moved to .blog_details_backup (direct path)"
+              else
+                echo "⚠️  Blog-details [id] directory not found, listing app/blog-details:"
+                ls -la app/blog-details/ || echo "app/blog-details directory not found or empty"
+              fi
+            fi
+          fi
           # Verify files are moved
           echo ""
           echo "📋 Verification:"
@@ -61,6 +80,11 @@ jobs:
             echo "  - app/cars/[id] exists: YES ❌"
           else
             echo "  - app/cars/[id] exists: NO ✅"
+          fi
+          if find app/blog-details -type d -name '[id]' 2>/dev/null | grep -q .; then
+            echo "  - app/blog-details/[id] exists: YES ❌"
+          else
+            echo "  - app/blog-details/[id] exists: NO ✅"
           fi
 
       - name: Enable static export in next.config.js
@@ -99,6 +123,18 @@ jobs:
             fi
             # Clean up backup directory
             rm -rf .cars_backup
+          fi
+          # Restore blog-details/[id] dynamic route
+          if [ -d ".blog_details_backup" ]; then
+            if find .blog_details_backup -type d -name '[id]' | grep -q .; then
+              find .blog_details_backup -type d -name '[id]' -exec mv {} app/blog-details/ \;
+              echo "✅ Blog-details [id] page restored"
+            elif [ -d ".blog_details_backup/[id]" ]; then
+              mv ".blog_details_backup/[id]" app/blog-details/
+              echo "✅ Blog-details [id] page restored (direct path)"
+            fi
+            # Clean up backup directory
+            rm -rf .blog_details_backup
           fi
           # Restore next.config.js
           sed -i 's|output: '\''export'\'',|// output: '\''export'\'',|g' next.config.js
