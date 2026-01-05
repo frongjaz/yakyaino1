@@ -47,7 +47,7 @@ const SellHero = () => {
 
             {/* Sell Car button */}
             <Link
-              href="#contact"
+              href="tel:0625646455"
               className="rounded-lg bg-[#EF4444] px-10 py-4 text-lg font-semibold text-white transition hover:bg-[#DC2626] shadow-lg"
             >
               ขายรถ

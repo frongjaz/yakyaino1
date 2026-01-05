@@ -1,30 +1,50 @@
 "use client";
 import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { apiGet } from "@/lib/api";
 
 const HowToSell = () => {
+  const router = useRouter();
   const [selectedBrand, setSelectedBrand] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [advancedSearch, setAdvancedSearch] = useState("");
+  const [carBrands, setCarBrands] = useState<string[]>([]);
+  const [loadingBrands, setLoadingBrands] = useState(true);
 
-  const carBrands = [
-    "โตโยต้า",
-    "ฮอนด้า",
-    "มาสด้า",
-    "นิสสัน",
-    "อีซูซุ",
-    "ฟอร์ด",
-    "เชฟโรเลต",
-    "เอ็มจี",
-  ];
+  // Fetch brands from API
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        setLoadingBrands(true);
+        const data = await apiGet<{ success: boolean; data: string[] }>('/api/brands');
+        if (data.success && data.data && Array.isArray(data.data)) {
+          // Filter out empty brands and ensure unique values
+          const uniqueBrands = data.data.filter(brand => brand && brand.trim() !== '');
+          setCarBrands(uniqueBrands);
+        } else {
+          // Fallback to empty array if API fails
+          setCarBrands([]);
+        }
+      } catch (error) {
+        console.error('Error fetching brands:', error);
+        // Fallback to empty array if API fails
+        setCarBrands([]);
+      } finally {
+        setLoadingBrands(false);
+      }
+    };
+
+    fetchBrands();
+  }, []);
 
   return (
     <>
       {/* Hero Section with Search Form */}
       <section className="relative overflow-hidden">
-        <div className="relative h-[550px] w-full overflow-x-hidden md:h-[650px] lg:h-[750px]">
+        <div className="relative min-h-[600px] w-full py-12 md:py-16 lg:py-20">
           {/* Background Image with fade effect */}
           <div className="absolute inset-0">
             <Image
@@ -41,11 +61,11 @@ const HowToSell = () => {
           {/* Enhanced backdrop blur overlay */}
           <div className="absolute inset-0 backdrop-blur-[3px] bg-gradient-to-b from-[#EF4444]/10 via-transparent to-[#2C2C2C]/40"></div>
           
-          <div className="container relative z-10 h-full px-4 sm:px-6 lg:px-8">
-            <div className="flex h-full items-center py-6 sm:py-8">
+          <div className="container relative z-10 px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center py-6 sm:py-8">
               <div className="grid w-full max-w-full grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
                 {/* Left side - Car image (flipped to face right) */}
-                <div className="relative h-[280px] w-full overflow-hidden sm:h-[350px] md:h-[450px] lg:h-[680px] xl:h-[720px]">
+                <div className="relative h-[280px] w-full overflow-hidden sm:h-[350px] md:h-[400px] lg:h-[500px]">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#EF4444]/5 to-transparent"></div>
                   <Image
                     src={getImagePath("/images/hero/123.png")}
@@ -60,7 +80,7 @@ const HowToSell = () => {
 
                 {/* Right side - Search Form */}
                 <div className="flex justify-center lg:justify-end">
-                  <div className="w-full max-w-full transform rounded-2xl border-2 border-[#EF4444]/80 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 p-5 shadow-2xl shadow-[#EF4444]/20 backdrop-blur-md transition-all duration-300 hover:border-[#EF4444] hover:shadow-[#EF4444]/30 sm:max-w-md sm:p-7 md:p-9 lg:scale-105">
+                  <div className="w-full max-w-full rounded-2xl border-2 border-[#EF4444]/80 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 p-5 shadow-2xl shadow-[#EF4444]/20 backdrop-blur-md transition-all duration-300 hover:border-[#EF4444] hover:shadow-[#EF4444]/30 sm:max-w-md sm:p-7 md:p-9">
                     <div className="mb-5 flex items-center gap-3 sm:mb-6">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#EF4444] to-[#DC2626] shadow-lg">
                         <svg
@@ -83,7 +103,28 @@ const HowToSell = () => {
                         </span>
                       </h3>
                     </div>
-                    <form className="space-y-4 sm:space-y-5">
+                    <form 
+                      className="space-y-4 sm:space-y-5"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const params = new URLSearchParams();
+                        
+                        if (selectedBrand && selectedBrand !== "") {
+                          params.set("brand", selectedBrand);
+                        }
+                        
+                        if (minPrice && minPrice !== "") {
+                          params.set("minPrice", minPrice);
+                        }
+                        
+                        if (maxPrice && maxPrice !== "") {
+                          params.set("maxPrice", maxPrice);
+                        }
+                        
+                        const queryString = params.toString();
+                        router.push(`/cars${queryString ? `?${queryString}` : ""}`);
+                      }}
+                    >
                       <div>
                         <label className="mb-2.5 block text-sm font-semibold text-white/90">
                           ยี่ห้อรถที่ต้องการ
@@ -92,9 +133,12 @@ const HowToSell = () => {
                           <select
                             value={selectedBrand}
                             onChange={(e) => setSelectedBrand(e.target.value)}
-                            className="w-full appearance-none rounded-xl border-2 border-[#EF4444]/50 bg-gray-700/80 px-4 py-3 pr-10 text-white backdrop-blur-sm transition-all duration-300 placeholder:text-gray-400 hover:border-[#EF4444] focus:border-[#EF4444] focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#EF4444]/30"
+                            disabled={loadingBrands}
+                            className="w-full appearance-none rounded-xl border-2 border-[#EF4444]/50 bg-gray-700/80 px-4 py-3 pr-10 text-white backdrop-blur-sm transition-all duration-300 placeholder:text-gray-400 hover:border-[#EF4444] focus:border-[#EF4444] focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#EF4444]/30 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <option value="" className="bg-gray-800">เลือกยี่ห้อ</option>
+                            <option value="" className="bg-gray-800">
+                              {loadingBrands ? "กำลังโหลด..." : "เลือกยี่ห้อ"}
+                            </option>
                             {carBrands.map((brand) => (
                               <option key={brand} value={brand} className="bg-gray-800">
                                 {brand}

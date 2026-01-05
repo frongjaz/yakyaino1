@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,37 +18,55 @@ type CarListing = {
   status?: string;
 };
 
+type PaginationInfo = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
 const CarListingsGrid = () => {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
   const brand = searchParams.get('brand') || '';
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
+  const page = searchParams.get('page') || '1';
   
   const [cars, setCars] = useState<CarListing[]>([]);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 1,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCars();
-  }, [searchQuery, brand, minPrice, maxPrice]);
+  }, [searchQuery, brand, minPrice, maxPrice, page]);
 
   const fetchCars = async () => {
     try {
       setLoading(true);
       
-      // Build URL with all filter parameters
+      // Build URL with all filter parameters including pagination
       const params = new URLSearchParams();
       if (searchQuery) params.set('q', searchQuery);
       if (brand && brand !== 'ทั้งหมด') params.set('brand', brand);
       if (minPrice) params.set('minPrice', minPrice);
       if (maxPrice) params.set('maxPrice', maxPrice);
+      params.set('page', page);
+      params.set('limit', '12');
       
-      const url = params.toString() 
-        ? `/api/cars?${params.toString()}`
-        : '/api/cars';
+      const url = `/api/cars?${params.toString()}`;
       
-      const data = await apiGet<{ success: boolean; data: CarListing[] }>(url);
+      const data = await apiGet<{ 
+        success: boolean; 
+        data: CarListing[];
+        pagination?: PaginationInfo;
+      }>(url);
       
       if (data.success && data.data) {
         // Filter only available cars
@@ -56,6 +74,11 @@ const CarListingsGrid = () => {
           car.status === 'available' || !car.status
         );
         setCars(availableCars);
+        
+        // Update pagination info
+        if (data.pagination) {
+          setPagination(data.pagination);
+        }
       } else {
         setError('ไม่สามารถโหลดข้อมูลรถได้');
       }
@@ -123,9 +146,10 @@ const CarListingsGrid = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {cars.map((car) => (
-            <div
+            <Link
               key={car.id}
-              className="group relative overflow-hidden rounded-lg bg-gray-800 transition hover:shadow-lg"
+              href={`/cars/${encodeCarId(car.id)}`}
+              className="group relative block overflow-hidden rounded-lg bg-gray-800 transition hover:shadow-lg cursor-pointer"
             >
               {/* Car Image */}
               <div className="relative aspect-[4/3] w-full overflow-hidden">
@@ -142,7 +166,7 @@ const CarListingsGrid = () => {
                 />
                 
                 {/* Photo Count Badge - White circle with black border */}
-                <div className="absolute left-4 top-4 flex items-center gap-1 rounded-full border-2 border-black bg-white px-2 py-1">
+                <div className="absolute left-4 top-4 flex items-center gap-1 rounded-full border-2 border-black bg-white px-2 py-1 z-10">
                   <svg
                     className="h-3.5 w-3.5 text-black"
                     fill="none"
@@ -168,7 +192,7 @@ const CarListingsGrid = () => {
                 </div>
 
                 {/* Year Badge - Red with rounded corners */}
-                <div className="absolute right-4 top-4 rounded-md bg-[#EF4444] px-3 py-1.5 text-sm font-bold text-white">
+                <div className="absolute right-4 top-4 rounded-md bg-[#EF4444] px-3 py-1.5 text-sm font-bold text-white z-10">
                   {car.year}
                 </div>
               </div>
@@ -196,11 +220,8 @@ const CarListingsGrid = () => {
                 {/* Divider Line */}
                 <div className="mb-3 h-px bg-gray-700"></div>
                 
-                {/* View All Link */}
-                <Link
-                  href={`/cars/${encodeCarId(car.id)}`}
-                  className="flex items-center justify-between text-sm text-white transition hover:text-gray-300"
-                >
+                {/* View All Link - Now just a visual indicator */}
+                <div className="flex items-center justify-between text-sm text-white transition group-hover:text-gray-300">
                   <span>ดูทั้งหมด</span>
                   <svg
                     className="h-4 w-4 text-[#EF4444]"
@@ -215,9 +236,9 @@ const CarListingsGrid = () => {
                       d="M9 5l7 7-7 7"
                     />
                   </svg>
-                </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

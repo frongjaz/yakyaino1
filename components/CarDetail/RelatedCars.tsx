@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { encodeCarId } from "@/lib/id-encoder";
+import { apiGet } from "@/lib/api";
 
 type RelatedCar = {
   id: string | number;
@@ -12,93 +13,19 @@ type RelatedCar = {
   year: number;
   price: number;
   image: string;
-  photoCount: number;
+  photo_count: number;
 };
 
-// All available cars data
-const allCars: RelatedCar[] = [
-  {
-    id: 1,
-    brand: "Benz",
-    model: "GLA200",
-    year: 2022,
-    price: 1199000,
-    image: "/images/hero/main1.png",
-    photoCount: 4,
-  },
-  {
-    id: 2,
-    brand: "BENZ",
-    model: "CLS 250",
-    year: 2016,
-    price: 1090000,
-    image: "/images/hero/main11.jpg",
-    photoCount: 3,
-  },
-  {
-    id: 3,
-    brand: "TOYOTA",
-    model: "Corolla Altis",
-    year: 2023,
-    price: 699000,
-    image: "/images/hero/main21.jpg",
-    photoCount: 5,
-  },
-  {
-    id: 4,
-    brand: "HONDA",
-    model: "ACCORD",
-    year: 2022,
-    price: 899000,
-    image: "/images/hero/main31.jpg",
-    photoCount: 4,
-  },
-  {
-    id: 5,
-    brand: "TOYOTA",
-    model: "Harrier",
-    year: 2014,
-    price: 699000,
-    image: "/images/hero/main41.jpg",
-    photoCount: 6,
-  },
-  {
-    id: 6,
-    brand: "BMW",
-    model: "530E",
-    year: 2020,
-    price: 799000,
-    image: "/images/hero/main51.jpg",
-    photoCount: 3,
-  },
-  {
-    id: 7,
-    brand: "TOYOTA",
-    model: "Alphard",
-    year: 2023,
-    price: 2459000,
-    image: "/images/hero/main61.jpg",
-    photoCount: 5,
-  },
-  {
-    id: 8,
-    brand: "Benz",
-    model: "SLK200",
-    year: 2013,
-    price: 899000,
-    image: "/images/hero/main71.jpg",
-    photoCount: 4,
-  },
-  {
-    id: 9,
-    brand: "BMW",
-    model: "740LI",
-    year: 2017,
-    price: 1269000,
-    image: "/images/hero/main81.jpg",
-    photoCount: 6,
-  },
-];
+type CarData = {
+  id: string | number;
+  brand: string;
+  model: string;
+  year: number;
+  price: number;
+  image: string;
+  photo_count: number;
+  status?: string;
+};
 
 // Fisher-Yates shuffle algorithm for random selection
 function shuffleArray<T>(array: T[]): T[] {
@@ -117,19 +44,51 @@ interface RelatedCarsProps {
 
 const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
   const [relatedCars, setRelatedCars] = useState<RelatedCar[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    // Filter out current car if provided
-    const availableCars = allCars.filter(
-      (car) => String(car.id) !== String(currentCarId)
-    );
-
-    // Shuffle and take the requested count (only on client-side)
-    const shuffled = shuffleArray(availableCars);
-    setRelatedCars(shuffled.slice(0, Math.min(count, shuffled.length)));
+    fetchRelatedCars();
   }, [currentCarId, count]);
+
+  const fetchRelatedCars = async () => {
+    try {
+      setLoading(true);
+      // Fetch all available cars from API
+      const data = await apiGet<{ 
+        success: boolean; 
+        data: CarData[];
+      }>('/api/cars?limit=100'); // Get more cars for better random selection
+      
+      if (data.success && data.data) {
+        // Filter only available cars and exclude current car
+        const availableCars = data.data
+          .filter((car: CarData) => 
+            (car.status === 'available' || !car.status) &&
+            String(car.id) !== String(currentCarId)
+          )
+          .map((car: CarData): RelatedCar => ({
+            id: car.id,
+            brand: car.brand,
+            model: car.model,
+            year: car.year,
+            price: car.price,
+            image: car.image || '/images/placeholder.jpg',
+            photo_count: car.photo_count || 0,
+          }));
+
+        // Shuffle and take the requested count
+        const shuffled = shuffleArray(availableCars);
+        setRelatedCars(shuffled.slice(0, Math.min(count, shuffled.length)));
+      }
+    } catch (error) {
+      console.error('Error fetching related cars:', error);
+      setRelatedCars([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("th-TH").format(price);
@@ -149,15 +108,39 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
     );
   }
 
+  if (loading) {
+    return (
+      <section className="bg-white py-12">
+        <div className="container mx-auto px-4">
+          <h2 className="mb-8 text-2xl font-bold text-gray-900">รถที่เกี่ยวข้อง</h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {Array.from({ length: count }).map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="aspect-[4/3] w-full bg-gray-300 rounded-lg mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (relatedCars.length === 0) {
+    return null; // Don't render if no related cars
+  }
+
   return (
     <section className="bg-white py-12">
       <div className="container mx-auto px-4">
         <h2 className="mb-8 text-2xl font-bold text-gray-900">รถที่เกี่ยวข้อง</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {relatedCars.map((car) => (
-            <div
+            <Link
               key={car.id}
-              className="group relative overflow-hidden rounded-lg bg-gray-800"
+              href={`/cars/${encodeCarId(car.id)}`}
+              className="group relative block overflow-hidden rounded-lg bg-gray-800 transition hover:shadow-lg cursor-pointer"
             >
               {/* Car Image */}
               <div className="relative aspect-[4/3] w-full overflow-hidden">
@@ -170,7 +153,7 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
                 />
                 
                 {/* Photo Count Badge */}
-                <div className="absolute left-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-white">
+                <div className="absolute left-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-white">
                   <svg
                     className="h-3.5 w-3.5 text-black"
                     fill="none"
@@ -191,12 +174,12 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
                     />
                   </svg>
                   <span className="ml-0.5 text-xs font-semibold text-black">
-                    {car.photoCount}
+                    {car.photo_count}
                   </span>
                 </div>
 
                 {/* Year Badge */}
-                <div className="absolute right-4 top-4 rounded-md bg-[#EF4444] px-3 py-1.5 text-sm font-bold text-white">
+                <div className="absolute right-4 top-4 z-10 rounded-md bg-[#EF4444] px-3 py-1.5 text-sm font-bold text-white">
                   {car.year}
                 </div>
               </div>
@@ -216,10 +199,7 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
                   </p>
                 </div>
                 <div className="mb-3 h-px bg-gray-700"></div>
-                <Link
-                  href={`/cars/${encodeCarId(car.id)}`}
-                  className="flex items-center justify-between text-sm text-white transition hover:text-gray-300"
-                >
+                <div className="flex items-center justify-between text-sm text-white transition group-hover:text-gray-300">
                   <span>ดูทั้งหมด</span>
                   <svg
                     className="h-4 w-4 text-[#EF4444]"
@@ -234,9 +214,9 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
                       d="M9 5l7 7-7 7"
                     />
                   </svg>
-                </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

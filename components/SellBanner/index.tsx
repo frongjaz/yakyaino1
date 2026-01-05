@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const SellBanner = () => {
   return (
-    <section className="w-full bg-[#DC2626] py-8 md:py-12">
+    <section className="w-full bg-gradient-to-br from-[#991B1B] via-[#B91C1C] to-[#DC2626] py-8 md:py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-2">
           {/* Left side - Car image */}
@@ -28,7 +28,7 @@ const SellBanner = () => {
             <div className="flex items-center justify-center gap-4 lg:justify-start">
               <Link
                 href="/sell"
-                className="inline-block rounded-full border-2 border-white bg-[#DC2626] px-8 py-3 font-semibold text-white transition hover:bg-[#B91C1C]"
+                className="inline-block rounded-full border-2 border-white bg-white/10 backdrop-blur-sm px-8 py-3 font-semibold text-white transition hover:bg-white/20 hover:border-white/80"
               >
                 ขายรถ
               </Link>

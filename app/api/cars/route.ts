@@ -31,29 +31,35 @@ export async function GET(request: NextRequest) {
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     
-    let sql = 'SELECT * FROM cars WHERE (status = ? OR status IS NULL)';
-    const params: any[] = ['available'];
+    // Pagination parameters
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '12'); // 12 cars per page
+    const offset = (page - 1) * limit;
+    
+    // Build WHERE conditions
+    let whereSql = 'WHERE (status = ? OR status IS NULL)';
+    const whereParams: any[] = ['available'];
     
     // Add brand filter
     if (brand && brand !== 'ทั้งหมด') {
-      sql += ' AND LOWER(brand) = ?';
-      params.push(brand.toLowerCase());
+      whereSql += ' AND LOWER(brand) = ?';
+      whereParams.push(brand.toLowerCase());
     }
     
     // Add price filters
     if (minPrice) {
       const min = parseInt(minPrice);
       if (!isNaN(min)) {
-        sql += ' AND price >= ?';
-        params.push(min);
+        whereSql += ' AND price >= ?';
+        whereParams.push(min);
       }
     }
     
     if (maxPrice) {
       const max = parseInt(maxPrice);
       if (!isNaN(max)) {
-        sql += ' AND price <= ?';
-        params.push(max);
+        whereSql += ' AND price <= ?';
+        whereParams.push(max);
       }
     }
     
@@ -64,7 +70,7 @@ export async function GET(request: NextRequest) {
       const containsTerm = `%${searchLower}%`;
       
       // Focus search on brand and model primarily
-      sql += ` AND (
+      whereSql += ` AND (
         LOWER(brand) = ? OR
         LOWER(brand) LIKE ? OR
         LOWER(model) LIKE ? OR
@@ -75,14 +81,33 @@ export async function GET(request: NextRequest) {
       const exactBrand = searchLower;
       const brandStartsWith = `${searchLower}%`;
       
-      params.push(
+      whereParams.push(
         exactBrand,        // LOWER(brand) = ? (exact match)
         brandStartsWith,   // LOWER(brand) LIKE ? (starts with)
         containsTerm,      // LOWER(model) LIKE ? (contains)
         containsTerm       // LOWER(CONCAT(brand, ' ', model)) LIKE ? (full name contains)
       );
+    }
+    
+    // Get total count for pagination (without ORDER BY and LIMIT)
+    const countSql = `SELECT COUNT(*) as total FROM cars ${whereSql}`;
+    const countResult = await query(countSql, whereParams);
+    const total = Array.isArray(countResult) && countResult.length > 0 
+      ? (countResult[0] as any).total 
+      : 0;
+    
+    // Build SELECT query with ORDER BY and pagination
+    let sql = `SELECT * FROM cars ${whereSql}`;
+    const params = [...whereParams];
+    
+    // Add ORDER BY
+    if (searchQuery.trim() && !brand) {
+      const searchTerm = searchQuery.trim();
+      const searchLower = searchTerm.toLowerCase();
+      const containsTerm = `%${searchLower}%`;
+      const exactBrand = searchLower;
+      const brandStartsWith = `${searchLower}%`;
       
-      // Order by relevance: exact brand matches first, then brand starts with, then model
       sql += ` ORDER BY 
         CASE 
           WHEN LOWER(brand) = ? THEN 1
@@ -97,13 +122,24 @@ export async function GET(request: NextRequest) {
       sql += ' ORDER BY created_at DESC';
     }
     
+    // Add pagination
+    sql += ' LIMIT ? OFFSET ?';
+    params.push(limit, offset);
+    
     const cars = await query(sql, params);
 
     const carsArray = Array.isArray(cars) ? cars : [];
+    const totalPages = Math.ceil(total / limit);
 
     return NextResponse.json({
       success: true,
       data: carsArray,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
     }, {
       headers: corsHeaders,
     });
