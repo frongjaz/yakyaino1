@@ -15,12 +15,7 @@ const SearchFilterSection = () => {
   const [selectedBrand, setSelectedBrand] = useState(
     searchParams.get("brand") || ""
   );
-  const [minPrice, setMinPrice] = useState(
-    searchParams.get("minPrice") || ""
-  );
-  const [maxPrice, setMaxPrice] = useState(
-    searchParams.get("maxPrice") || ""
-  );
+  const [priceRange, setPriceRange] = useState("");
   
   const [brands, setBrands] = useState<string[]>([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
@@ -106,47 +101,38 @@ const SearchFilterSection = () => {
     // Update tab if changed
     setSelectedTab(urlTab);
     
-    // Update min price if changed
-    if (urlMinPrice) {
-      const numPrice = parseInt(urlMinPrice);
-      if (!isNaN(numPrice)) {
-        const range = priceToRange(numPrice);
-        if (range) {
-          setMinPrice(range);
-        } else {
-          setMinPrice("");
-        }
-      } else {
-        setMinPrice("");
-      }
-    } else {
-      setMinPrice("");
-    }
-    
-    // Update max price if changed
-    if (urlMaxPrice) {
-      const numPrice = parseInt(urlMaxPrice);
-      if (!isNaN(numPrice)) {
-        // For max price, find the range that contains this value
-        let matchedRange = "";
-        for (const range of priceRanges) {
-          if (range === "ทั้งหมด") continue;
-          const { min, max } = parsePriceRange(range);
-          if (min !== null && max !== null && numPrice >= min && numPrice <= max) {
-            matchedRange = range;
-            break;
-          } else if (min !== null && max === null && numPrice >= min) {
+    // Update price range from URL params
+    let matchedRange = "";
+    if (urlMinPrice || urlMaxPrice) {
+      // Try to find matching range from min or max price
+      const min = urlMinPrice ? parseInt(urlMinPrice) : null;
+      const max = urlMaxPrice ? parseInt(urlMaxPrice) : null;
+      
+      // Find the range that matches the URL params
+      for (const range of priceRanges) {
+        if (range === "ทั้งหมด") continue;
+        const { min: rangeMin, max: rangeMax } = parsePriceRange(range);
+        
+        // Match if min price falls within range
+        if (min !== null && rangeMin !== null && min >= rangeMin) {
+          if (rangeMax === null || min <= rangeMax) {
             matchedRange = range;
             break;
           }
         }
-        setMaxPrice(matchedRange);
-      } else {
-        setMaxPrice("");
+        // Match if max price falls within range
+        if (max !== null) {
+          if (rangeMax !== null && max <= rangeMax && (rangeMin === null || max >= rangeMin)) {
+            matchedRange = range;
+            break;
+          } else if (rangeMax === null && rangeMin !== null && max >= rangeMin) {
+            matchedRange = range;
+            break;
+          }
+        }
       }
-    } else {
-      setMaxPrice("");
     }
+    setPriceRange(matchedRange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
@@ -154,8 +140,7 @@ const SearchFilterSection = () => {
   const updateFilters = useCallback((updates: {
     tab?: "all" | "new";
     brand?: string;
-    minPrice?: string;
-    maxPrice?: string;
+    priceRange?: string;
   }) => {
     const params = new URLSearchParams(searchParams.toString());
     
@@ -175,24 +160,17 @@ const SearchFilterSection = () => {
       }
     }
     
-    if (updates.minPrice !== undefined) {
-      if (!updates.minPrice || updates.minPrice === "ทั้งหมด") {
+    if (updates.priceRange !== undefined) {
+      if (!updates.priceRange || updates.priceRange === "ทั้งหมด") {
         params.delete("minPrice");
+        params.delete("maxPrice");
       } else {
-        const { min } = parsePriceRange(updates.minPrice);
+        const { min, max } = parsePriceRange(updates.priceRange);
         if (min !== null) {
           params.set("minPrice", min.toString());
         } else {
           params.delete("minPrice");
         }
-      }
-    }
-    
-    if (updates.maxPrice !== undefined) {
-      if (!updates.maxPrice || updates.maxPrice === "ทั้งหมด") {
-        params.delete("maxPrice");
-      } else {
-        const { max } = parsePriceRange(updates.maxPrice);
         if (max !== null) {
           params.set("maxPrice", max.toString());
         } else {
@@ -202,7 +180,7 @@ const SearchFilterSection = () => {
     }
     
     // Remove search query if filtering
-    if (updates.brand || updates.minPrice || updates.maxPrice) {
+    if (updates.brand || updates.priceRange) {
       params.delete("q");
     }
     
@@ -221,24 +199,17 @@ const SearchFilterSection = () => {
     updateFilters({ brand });
   };
 
-  // Handle min price change with debounce
-  const handleMinPriceChange = (price: string) => {
-    setMinPrice(price);
-    updateFilters({ minPrice: price });
-  };
-
-  // Handle max price change with debounce
-  const handleMaxPriceChange = (price: string) => {
-    setMaxPrice(price);
-    updateFilters({ maxPrice: price });
+  // Handle price range change
+  const handlePriceRangeChange = (range: string) => {
+    setPriceRange(range);
+    updateFilters({ priceRange: range });
   };
 
   // Reset filters
   const handleReset = () => {
     setSelectedTab("all");
     setSelectedBrand("");
-    setMinPrice("");
-    setMaxPrice("");
+    setPriceRange("");
     router.push("/cars", { scroll: false });
   };
 
@@ -288,7 +259,7 @@ const SearchFilterSection = () => {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Brand Dropdown */}
             <div className="relative">
               <select
@@ -323,48 +294,15 @@ const SearchFilterSection = () => {
               </div>
             </div>
 
-            {/* Min Price Dropdown */}
+            {/* Price Range Dropdown */}
             <div className="relative">
               <select
-                value={minPrice}
-                onChange={(e) => handleMinPriceChange(e.target.value)}
+                value={priceRange}
+                onChange={(e) => handlePriceRangeChange(e.target.value)}
                 className="w-full appearance-none rounded-lg border border-[#EF4444] bg-gray-800/90 px-4 py-3 text-white transition-all focus:border-[#EF4444] focus:outline-none focus:ring-2 focus:ring-[#EF4444]/20 hover:bg-gray-800"
               >
                 <option value="" className="bg-gray-800">
-                  ราคาต่ำสุด
-                </option>
-                {priceRanges.map((price) => (
-                  <option key={price} value={price} className="bg-gray-800">
-                    {price}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
-                <svg
-                  className="h-5 w-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            {/* Max Price Dropdown */}
-            <div className="relative">
-              <select
-                value={maxPrice}
-                onChange={(e) => handleMaxPriceChange(e.target.value)}
-                className="w-full appearance-none rounded-lg border border-[#EF4444] bg-gray-800/90 px-4 py-3 text-white transition-all focus:border-[#EF4444] focus:outline-none focus:ring-2 focus:ring-[#EF4444]/20 hover:bg-gray-800"
-              >
-                <option value="" className="bg-gray-800">
-                  ราคาสูงสุด
+                  ราคา
                 </option>
                 {priceRanges.map((price) => (
                   <option key={price} value={price} className="bg-gray-800">
@@ -392,7 +330,7 @@ const SearchFilterSection = () => {
 
           {/* Search Actions */}
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            {(selectedBrand || minPrice || maxPrice) && (
+            {(selectedBrand || priceRange) && (
               <button
                 onClick={handleReset}
                 className="text-sm text-white hover:text-[#EF4444] transition-colors underline"
@@ -400,13 +338,13 @@ const SearchFilterSection = () => {
                 ล้างตัวกรอง
               </button>
             )}
-            {!(selectedBrand || minPrice || maxPrice) && (
+            {!(selectedBrand || priceRange) && (
               <div className="text-sm text-gray-400">
                 เลือกตัวกรองเพื่อค้นหา
               </div>
             )}
             <div className="flex items-center gap-2">
-              {(selectedBrand || minPrice || maxPrice) && (
+              {(selectedBrand || priceRange) && (
                 <span className="text-xs text-gray-400">
                   กำลังกรอง...
                 </span>

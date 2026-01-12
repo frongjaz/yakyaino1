@@ -131,9 +131,25 @@ export async function GET(
       );
     }
 
+    // Calculate photo_count from actual images in database
+    const car = carsArray[0];
+    let photoCount = 0;
+    
+    // Count non-empty image fields
+    if (car.image && car.image.trim() !== '') photoCount++;
+    if (car.image2 && car.image2.trim() !== '') photoCount++;
+    if (car.image3 && car.image3.trim() !== '') photoCount++;
+    if (car.image4 && car.image4.trim() !== '') photoCount++;
+    if (car.image5 && car.image5.trim() !== '') photoCount++;
+    
+    const carWithPhotoCount = {
+      ...car,
+      photo_count: photoCount,
+    };
+
     return NextResponse.json({
       success: true,
-      data: carsArray[0],
+      data: carWithPhotoCount,
     }, {
       headers: corsHeaders,
     });

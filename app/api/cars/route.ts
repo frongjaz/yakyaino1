@@ -129,11 +129,29 @@ export async function GET(request: NextRequest) {
     const cars = await query(sql, params);
 
     const carsArray = Array.isArray(cars) ? cars : [];
+    
+    // Calculate photo_count from actual images in database
+    const carsWithPhotoCount = carsArray.map((car: any) => {
+      let photoCount = 0;
+      
+      // Count non-empty image fields
+      if (car.image && car.image.trim() !== '') photoCount++;
+      if (car.image2 && car.image2.trim() !== '') photoCount++;
+      if (car.image3 && car.image3.trim() !== '') photoCount++;
+      if (car.image4 && car.image4.trim() !== '') photoCount++;
+      if (car.image5 && car.image5.trim() !== '') photoCount++;
+      
+      return {
+        ...car,
+        photo_count: photoCount,
+      };
+    });
+    
     const totalPages = Math.ceil(total / limit);
 
     return NextResponse.json({
       success: true,
-      data: carsArray,
+      data: carsWithPhotoCount,
       pagination: {
         page,
         limit,
