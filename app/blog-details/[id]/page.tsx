@@ -6,9 +6,11 @@ import SharePost from "@/components/Blog/SharePost";
 import TagButton from "@/components/Blog/TagButton";
 import Image from "next/image";
 import Script from "next/script";
+import Link from "next/link";
 import { apiGet } from "@/lib/api";
+import { getSession } from "@/lib/auth-client";
 import { Blog } from "@/types/blog";
-import Breadcrumb from "@/components/Common/Breadcrumb"; // Allow dynamic params not returned by generateStaticParams
+import Breadcrumb from "@/components/Common/Breadcrumb";
 
 export default function BlogDetailsPage() {
   const params = useParams();
@@ -18,6 +20,15 @@ export default function BlogDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
   const blogId = params?.id as string;
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check if user is admin
+    const session = getSession();
+    if (session && session.role === 'admin') {
+      setIsAdmin(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (blogId) {
@@ -132,9 +143,22 @@ export default function BlogDetailsPage() {
           <div className="-mx-4 flex flex-wrap justify-center">
             <div className="w-full px-4 lg:w-8/12">
               <div>
-                <h2 className="mb-8 text-3xl font-bold leading-tight text-black dark:text-white sm:text-4xl sm:leading-tight">
-                  {blog.title}
-                </h2>
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                  <h2 className="text-3xl font-bold leading-tight text-black dark:text-white sm:text-4xl sm:leading-tight">
+                    {blog.title}
+                  </h2>
+                  {isAdmin && (
+                    <Link
+                      href={`/admin/blogs?edit=${blog.id}`}
+                      className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      แก้ไขบทความนี้
+                    </Link>
+                  )}
+                </div>
                 <div className="mb-10 flex flex-wrap items-center justify-between border-b border-body-color border-opacity-10 pb-4 dark:border-white dark:border-opacity-10">
                   <div className="flex flex-wrap items-center">
                     {blog.author.image && (
@@ -213,7 +237,7 @@ export default function BlogDetailsPage() {
                       </div>
                     </div>
                   )}
-                  <div 
+                  <div
                     className="mb-10 text-base font-medium leading-relaxed text-body-color sm:text-lg sm:leading-relaxed lg:text-base lg:leading-relaxed xl:text-lg xl:leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: blog.content || blog.paragraph }}
                   />

@@ -33,14 +33,15 @@ export default function AdminLoginPage() {
             role: data.user.role,
           });
         }
-        
+
         router.push('/admin/dashboard');
         router.refresh();
       } else {
         setError(data.message || 'เกิดข้อผิดพลาด');
       }
-    } catch (err) {
-      setError('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+    } catch (err: any) {
+      console.error('Login submit error:', err);
+      setError(err.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ');
     } finally {
       setLoading(false);
     }
