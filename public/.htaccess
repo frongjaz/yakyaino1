@@ -1,45 +1,26 @@
 # .htaccess สำหรับ Next.js Static Export
-# ใช้เมื่อ deploy ผ่าน GitHub Actions (static files)
+# ใช้เมื่อ deploy เป็นไฟล์ Static (.html, .js, .css)
 
-# Enable Rewrite Engine
 RewriteEngine On
 
-# Allow all access (แก้ปัญหา Forbidden)
-# สำหรับ Apache 2.4+
-<IfModule mod_authz_core.c>
-    Require all granted
-</IfModule>
-
-# สำหรับ Apache 2.2 หรือเก่ากว่า
-<IfModule !mod_authz_core.c>
-    Order allow,deny
-    Allow from all
-</IfModule>
-
-# Handle Next.js static routing - redirect to index.html for client-side routing
-# This allows Next.js client-side routing to handle dynamic routes like /cars/[id]
-RewriteCond %{REQUEST_FILENAME} !-f
+# 1. จัดการ Trailing Slash (เพื่อให้ URL สะอาด)
+# /blog-details/52/ -> /blog-details/52
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /index.html [L]
+RewriteRule ^(.*)/$ /$1 [L,R=301]
 
-# Prevent directory listing
-Options -Indexes
+# 2. ให้ Apache เปิดไฟล์จริงๆ ถ้าไฟล์นั้นมีอยู่ (เช่น images, css)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
-# Allow access to static files
-<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|css|js|woff|woff2|ttf|eot|json|html|htm|xml|txt)$">
-    <IfModule mod_authz_core.c>
-        Require all granted
-    </IfModule>
-    <IfModule !mod_authz_core.c>
-        Order allow,deny
-        Allow from all
-    </IfModule>
-</FilesMatch>
+# 3. จัดการ SPA Routing (Dynamic Routes)
+# ถ้าหาไฟล์ไม่เจอ ให้ส่งกลับไปหน้าหลัก (index.html หรือหน้าแม่) 
+# เพื่อให้ Next.js Router (Client-side) จัดการต่อ
+# ตัวอย่าง: /blog-details/52 -> จะไปเปิด index.html แล้ว Next.js จะดึงข้อมูลมาแสดงเอง
 
-# Security headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
-</IfModule>
+# สำหรับหน้าที่มีโฟลเดอร์รองรับ (ถ้ามี)
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^([^/]+)/?$ $1.html [L]
 
+# ไม่อย่างนั้น ให้ส่งไปที่ index.html (ตัวคุม Routing ทั้งหมด)
+RewriteRule ^ index.html [L]
