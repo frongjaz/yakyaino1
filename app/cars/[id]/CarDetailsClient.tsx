@@ -41,11 +41,19 @@ export default function CarDetailsClient() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Get ID from params or from URL path
-        const rawId = params.id;
-        const encodedId = Array.isArray(rawId) ? rawId[0] : rawId || window.location.pathname.split('/cars/')[1]?.split('/')[0];
+        // Get ID from params or from URL path (for static export compatibility)
+        const rawId = params?.id;
+        let encodedId = Array.isArray(rawId) ? rawId[0] : rawId as string;
 
-        if (encodedId && typeof encodedId === 'string') {
+        // If ID is 'detail' (placeholder for static export) or missing, try to get it from the URL
+        if (!encodedId || encodedId === 'detail') {
+            const pathParts = window.location.pathname.split('/cars/');
+            if (pathParts.length > 1) {
+                encodedId = pathParts[1].split('/')[0];
+            }
+        }
+
+        if (encodedId && typeof encodedId === 'string' && encodedId !== 'detail') {
             // Decode the encoded ID
             const decodedId = decodeCarId(encodedId);
             const carId = decodedId || encodedId; // Fallback to original if decode fails
@@ -56,11 +64,14 @@ export default function CarDetailsClient() {
                 setError('ไม่พบ ID รถ');
                 setLoading(false);
             }
+        } else if (encodedId === 'detail') {
+            // Still 'detail' after attempting to get from path, wait or handle error
+            // This might happen during initial hydration
         } else {
             setError('ไม่พบ ID รถ');
             setLoading(false);
         }
-    }, [params.id]);
+    }, [params]);
 
     const fetchCarData = async (id: string) => {
         try {

@@ -19,8 +19,33 @@ export default function BlogDetailsClient() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
-    const blogId = params?.id as string;
+    const [blogId, setBlogId] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        // Get ID from params or from URL path (for static export compatibility)
+        const rawId = params?.id;
+        let id = Array.isArray(rawId) ? rawId[0] : rawId as string;
+
+        // If ID is 'detail' (placeholder for static export) or missing, try to get it from the URL
+        if (!id || id === 'detail') {
+            const pathParts = window.location.pathname.split('/blog-details/');
+            if (pathParts.length > 1) {
+                id = pathParts[1].split('/')[0];
+            }
+        }
+
+        if (id && id !== 'detail') {
+            setBlogId(id);
+        } else if (id === 'detail') {
+            // Still 'detail', might be initial load or actual 'detail' path
+            // If it's the actual path, we should eventually show an error
+            // For now, don't set blogId yet to avoid invalid API call
+        } else {
+            setError('ไม่พบ ID บทความ');
+            setLoading(false);
+        }
+    }, [params]);
 
     useEffect(() => {
         // Check if user is admin
@@ -31,16 +56,16 @@ export default function BlogDetailsClient() {
     }, []);
 
     useEffect(() => {
-        if (blogId) {
-            fetchBlog();
+        if (blogId && blogId !== 'detail') {
+            fetchBlog(blogId);
         }
     }, [blogId]);
 
-    const fetchBlog = async () => {
+    const fetchBlog = async (id: string) => {
         try {
             setLoading(true);
             setError(null);
-            const data = await apiGet<{ success: boolean; data: Blog }>(`/api/blogs/${blogId}`);
+            const data = await apiGet<{ success: boolean; data: Blog }>(`/api/blogs/${id}`);
             if (data.success && data.data) {
                 setBlog(data.data);
             } else {
