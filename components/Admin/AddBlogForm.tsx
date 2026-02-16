@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { apiPost, getApiUrl, getSessionToken } from '@/lib/api';
 import { getSession } from '@/lib/auth-client';
 
-interface BlogData {
+export interface BlogData {
   id?: number;
   title: string;
   paragraph: string;
@@ -280,8 +280,8 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
       {message && (
         <div
           className={`rounded-lg p-4 ${message.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200 shadow-sm'
-              : 'bg-red-50 text-red-800 border border-red-200 shadow-sm'
+            ? 'bg-green-50 text-green-800 border border-green-200 shadow-sm'
+            : 'bg-red-50 text-red-800 border border-red-200 shadow-sm'
             }`}
         >
           {message.text}
