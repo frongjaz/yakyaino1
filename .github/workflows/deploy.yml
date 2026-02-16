@@ -34,10 +34,16 @@ jobs:
           cp -r public dist/
           cp -r scripts dist/
           cp -r lib dist/
+          cp -r app dist/
+          cp -r components dist/
+          cp -r styles dist/
+          cp -r types dist/
           cp package.json dist/
           cp server.js dist/
           cp ecosystem.config.js dist/
           cp restart-pm2.php dist/
+          cp next.config.js dist/
+          cp tsconfig.json dist/
           
           # Copy .htaccess for production
           if [ -f .htaccess.production ]; then
