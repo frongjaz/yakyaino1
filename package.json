@@ -11,8 +11,8 @@
     "start:prod": "NODE_ENV=production next start -p 3000",
     "lint": "next lint",
     "export": "next build && next export",
-    "deploy": "npm run build:prod && touch dist/.nojekyll",
-    "deploy:root": "npm run build:root && touch dist/.nojekyll",
+    "deploy": "npm run build:prod && touch dist/.nojekyll && pm2 restart nextjs-app",
+    "deploy:root": "npm run build:root && touch dist/.nojekyll && pm2 restart nextjs-app",
     "test:db": "node scripts/test-db-connection.js",
     "create:admin": "node scripts/create-admin.js",
     "import:mock": "ts-node scripts/import-mock-data.ts"
