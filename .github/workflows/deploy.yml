@@ -1,4 +1,4 @@
-name: Deploy Next.js Static to HostAtom (FTP)
+name: Deploy Next.js Dynamic to HostAtom (FTP)
 
 on:
   push:
@@ -18,174 +18,34 @@ jobs:
           node-version: "18"
           cache: "npm"
 
-      - run: npm ci
-
-      - name: Temporarily move API routes and dynamic pages
-        run: |
-          # Move API routes
-          if [ -d "app/api" ]; then
-            mv app/api .api_backup
-            echo "✅ API routes moved to .api_backup"
-          fi
-          # Note: admin/dashboard is now a client component, no need to move
-          # Move test-db page (require server-side)
-          if [ -d "app/test-db" ]; then
-            mv app/test-db .test_db_backup
-            echo "✅ Test DB page moved to .test_db_backup"
-          fi
-          # Move cars/[id] dynamic route (cannot use generateStaticParams with 'use client')
-          # Will be handled by client-side routing via .htaccess redirect to index.html
-          if [ -d "app/cars" ]; then
-            mkdir -p .cars_backup
-            # Use find to locate the [id] directory (handles brackets correctly)
-            if find app/cars -type d -name '[id]' | grep -q .; then
-              find app/cars -type d -name '[id]' -exec mv {} .cars_backup/ \;
-              echo "✅ Cars [id] page moved to .cars_backup"
-            else
-              # Alternative: try direct path with quotes
-              if [ -d "app/cars/[id]" ]; then
-                mv "app/cars/[id]" .cars_backup/
-                echo "✅ Cars [id] page moved to .cars_backup (direct path)"
-              else
-                echo "⚠️  Cars [id] directory not found, listing app/cars:"
-                ls -la app/cars/ || echo "app/cars directory not found or empty"
-              fi
-            fi
-          fi
-          # Move blog-details/[id] dynamic route (cannot use generateStaticParams with 'use client')
-          # Will be handled by client-side routing via .htaccess redirect to index.html
-          if [ -d "app/blog-details" ]; then
-            mkdir -p .blog_details_backup
-            # Use find to locate the [id] directory (handles brackets correctly)
-            if find app/blog-details -type d -name '[id]' | grep -q .; then
-              find app/blog-details -type d -name '[id]' -exec mv {} .blog_details_backup/ \;
-              echo "✅ Blog-details [id] page moved to .blog_details_backup"
-            else
-              # Alternative: try direct path with quotes
-              if [ -d "app/blog-details/[id]" ]; then
-                mv "app/blog-details/[id]" .blog_details_backup/
-                echo "✅ Blog-details [id] page moved to .blog_details_backup (direct path)"
-              else
-                echo "⚠️  Blog-details [id] directory not found, listing app/blog-details:"
-                ls -la app/blog-details/ || echo "app/blog-details directory not found or empty"
-              fi
-            fi
-          fi
-          # Verify files are moved
-          echo ""
-          echo "📋 Verification:"
-          echo "  - app/api exists: $([ -d "app/api" ] && echo 'YES ❌' || echo 'NO ✅')"
-          echo "  - app/test-db exists: $([ -d "app/test-db" ] && echo 'YES ❌' || echo 'NO ✅')"
-          if find app/cars -type d -name '[id]' 2>/dev/null | grep -q .; then
-            echo "  - app/cars/[id] exists: YES ❌"
-          else
-            echo "  - app/cars/[id] exists: NO ✅"
-          fi
-          if find app/blog-details -type d -name '[id]' 2>/dev/null | grep -q .; then
-            echo "  - app/blog-details/[id] exists: YES ❌"
-          else
-            echo "  - app/blog-details/[id] exists: NO ✅"
-          fi
-
-      - name: Enable static export in next.config.js
-        run: |
-          # Enable output: 'export' for static build
-          sed -i 's|// output: '\''export'\'',|output: '\''export'\'',|g' next.config.js
-          # When using output: 'export', Next.js outputs to 'out/' directory, not 'dist/'
-          # So we need to set distDir to 'out' or copy after build
-          echo "✅ Static export enabled"
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build project
         run: npm run build:root
         env:
-          # Ensure no trailing slash in API URL
-          NEXT_PUBLIC_API_URL: ${{ secrets.VERCEL_API_URL || 'https://yakyaino1.vercel.app' }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.VERCEL_API_URL || 'https://checkkub.com' }}
 
-      - name: Restore moved files
+      - name: Prepare deployment directory
         run: |
-          if [ -d ".api_backup" ]; then
-            mv .api_backup app/api
-            echo "API routes restored"
-          fi
-          # Note: admin/dashboard is now a client component, no need to restore
-          if [ -d ".test_db_backup" ]; then
-            mv .test_db_backup app/test-db
-            echo "Test DB page restored"
-          fi
-          # Restore cars/[id] dynamic route
-          if [ -d ".cars_backup" ]; then
-            if find .cars_backup -type d -name '[id]' | grep -q .; then
-              find .cars_backup -type d -name '[id]' -exec mv {} app/cars/ \;
-              echo "✅ Cars [id] page restored"
-            elif [ -d ".cars_backup/[id]" ]; then
-              mv ".cars_backup/[id]" app/cars/
-              echo "✅ Cars [id] page restored (direct path)"
-            fi
-            # Clean up backup directory
-            rm -rf .cars_backup
-          fi
-          # Restore blog-details/[id] dynamic route
-          if [ -d ".blog_details_backup" ]; then
-            if find .blog_details_backup -type d -name '[id]' | grep -q .; then
-              find .blog_details_backup -type d -name '[id]' -exec mv {} app/blog-details/ \;
-              echo "✅ Blog-details [id] page restored"
-            elif [ -d ".blog_details_backup/[id]" ]; then
-              mv ".blog_details_backup/[id]" app/blog-details/
-              echo "✅ Blog-details [id] page restored (direct path)"
-            fi
-            # Clean up backup directory
-            rm -rf .blog_details_backup
-          fi
-          # Restore next.config.js
-          sed -i 's|output: '\''export'\'',|// output: '\''export'\'',|g' next.config.js
-          echo "✅ next.config.js restored"
-
-      - name: Verify build output
-        run: |
-          echo "Checking build output directories:"
-          echo "out/ directory:"
-          ls -la out/ 2>/dev/null || echo "out/ not found"
-          echo "dist/ directory:"
-          ls -la dist/ 2>/dev/null || echo "dist/ not found"
-          echo ""
-          echo "Checking for index.html in out/:"
-          ls -la out/index.html 2>/dev/null || echo "index.html not found in out/"
-          echo "Checking for index.html in dist/:"
-          ls -la dist/index.html 2>/dev/null || echo "index.html not found in dist/"
-          echo ""
-          echo "Build output structure:"
-          find out -name "*.html" 2>/dev/null | head -20 || find dist -name "*.html" 2>/dev/null | head -20 || echo "No HTML files found"
-
-      - name: Prepare dist directory
-        run: |
-          # When using output: 'export', Next.js outputs to 'out/' directory
-          # Copy from out/ to dist/ for deployment
-          if [ -d "out" ]; then
-            echo "✅ Found out/ directory, copying to dist/"
-            mkdir -p dist
-            cp -r out/* dist/
-            echo "✅ Files copied to dist/"
-          elif [ -d "dist" ]; then
-            echo "✅ Using existing dist/ directory"
-          else
-            echo "❌ Error: Neither out/ nor dist/ directory found!"
-            echo "Build may have failed. Checking build logs..."
-            exit 1
-          fi
-
-      - name: Copy .htaccess to dist
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "❌ Error: dist directory does not exist!"
-            exit 1
-          fi
-          if [ -f public/.htaccess ]; then
+          mkdir -p dist
+          # Copy essential files for production
+          cp -r .next dist/
+          cp -r public dist/
+          cp -r scripts dist/
+          cp package.json dist/
+          cp server.js dist/
+          cp ecosystem.config.js dist/
+          cp restart-pm2.php dist/
+          
+          # Copy .htaccess for production
+          if [ -f .htaccess.production ]; then
+            cp .htaccess.production dist/.htaccess
+          elif [ -f public/.htaccess ]; then
             cp public/.htaccess dist/.htaccess
-            echo "✅ .htaccess copied successfully"
-            ls -la dist/.htaccess
-          else
-            echo "⚠️ Warning: public/.htaccess not found"
           fi
+          
+          echo "✅ Deployment directory 'dist' prepared"
 
       - name: Deploy to HostAtom via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -200,3 +60,9 @@ jobs:
             **/.git*/**
             **/node_modules/**
             **/.DS_Store
+
+      - name: Trigger PM2 Restart
+        run: |
+          echo "🚀 Triggering PM2 restart via HTTP..."
+          curl -s https://checkkub.com/restart-pm2.php
+          echo "✅ Restart trigger sent"
