@@ -21,7 +21,7 @@ export function getApiUrl(endpoint: string): string {
     const cleanApiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
     const url = `${cleanApiUrl}/${cleanEndpoint}`;
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-      console.log('[API] Using external API:', url);
+      console.log(`[API] Using external API: ${url} (from ${endpoint})`);
     }
     return url;
   }
@@ -33,14 +33,14 @@ export function getApiUrl(endpoint: string): string {
     const finalBasePath = cleanBasePath.endsWith('/') ? cleanBasePath.slice(0, -1) : cleanBasePath;
     const url = `${finalBasePath}/${cleanEndpoint}`;
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-      console.log('[API] Using local API with base path:', url);
+      console.log(`[API] Using local API with base path: ${url} (from ${endpoint})`);
     }
     return url;
   }
 
   const url = `/${cleanEndpoint}`;
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    console.log('[API] Using local API:', url);
+    console.log(`[API] Using local API: ${url} (from ${endpoint})`);
   }
   return url;
 }
@@ -105,21 +105,62 @@ export async function apiFetch(
       endpoint,
       error: error.message,
     });
+
+    // Check if it's a network error
+    if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+      throw new Error(`ไม่สามารถเชื่อมต่อกับ API ได้ (${url}) กรุณาตรวจสอบว่าเซิร์ฟเวอร์เปิดอยู่หรือ URL ถูกต้อง`);
+    }
+
     throw error;
   }
+}
+
+/**
+ * Parses response as JSON and handles errors
+ */
+async function handleResponse(response: Response, url: string): Promise<any> {
+  const contentType = response.headers.get('content-type');
+  const isJson = contentType && contentType.includes('application/json');
+
+  if (!response.ok) {
+    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+
+    if (isJson) {
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {
+        // Fallback if parsing fails
+      }
+    } else {
+      // If not JSON, it might be an HTML error page
+      const text = await response.text();
+      if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+        errorMessage = `API Error ${response.status}: ได้รับการตอบกลับเป็น HTML แทนที่จะเป็น JSON (เป็นไปได้ว่า URL ไม่ถูกต้อง หรือเซิร์ฟเวอร์ส่งหน้า 404/Error ออกมา)`;
+      }
+    }
+
+    throw new Error(errorMessage);
+  }
+
+  if (!isJson) {
+    const text = await response.text();
+    if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+      throw new Error(`ได้รับข้อมูลที่ไม่ถูกต้องจาก API (HTML แทนที่จะเป็น JSON) ที่ URL: ${url}. กรุณาตรวจสอบการตั้งค่า NEXT_PUBLIC_API_URL ใน .env.local`);
+    }
+    return text; // Or throw error
+  }
+
+  return response.json();
 }
 
 /**
  * GET request helper
  */
 export async function apiGet<T = any>(endpoint: string): Promise<T> {
+  const url = getApiUrl(endpoint);
   const response = await apiFetch(endpoint, { method: 'GET' });
-
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
+  return handleResponse(response, url);
 }
 
 /**
@@ -129,26 +170,13 @@ export async function apiPost<T = any>(
   endpoint: string,
   data?: any
 ): Promise<T> {
+  const url = getApiUrl(endpoint);
   const response = await apiFetch(endpoint, {
     method: 'POST',
     body: data ? JSON.stringify(data) : undefined,
   });
 
-  if (!response.ok) {
-    // Try to parse error message from response
-    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
-    try {
-      const errorData = await response.json();
-      if (errorData.message) {
-        errorMessage = errorData.message;
-      }
-    } catch {
-      // If can't parse JSON, use default message
-    }
-    throw new Error(errorMessage);
-  }
-
-  return response.json();
+  return handleResponse(response, url);
 }
 
 /**
@@ -158,28 +186,21 @@ export async function apiPut<T = any>(
   endpoint: string,
   data?: any
 ): Promise<T> {
+  const url = getApiUrl(endpoint);
   const response = await apiFetch(endpoint, {
     method: 'PUT',
     body: data ? JSON.stringify(data) : undefined,
   });
 
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
+  return handleResponse(response, url);
 }
 
 /**
  * DELETE request helper
  */
 export async function apiDelete<T = any>(endpoint: string): Promise<T> {
+  const url = getApiUrl(endpoint);
   const response = await apiFetch(endpoint, { method: 'DELETE' });
-
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
+  return handleResponse(response, url);
 }
 
