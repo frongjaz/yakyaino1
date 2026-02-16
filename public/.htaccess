@@ -3,24 +3,26 @@
 
 RewriteEngine On
 
-# 1. จัดการ Trailing Slash (เพื่อให้ URL สะอาด)
-# /blog-details/52/ -> /blog-details/52
+# 1. จัดการ Trailing Slash
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
-# 2. ให้ Apache เปิดไฟล์จริงๆ ถ้าไฟล์นั้นมีอยู่ (เช่น images, css)
+# 2. ให้ Apache เปิดไฟล์จริงๆ ถ้าไฟล์นั้นมีอยู่
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# 3. จัดการ SPA Routing (Dynamic Routes)
-# ถ้าหาไฟล์ไม่เจอ ให้ส่งกลับไปหน้าหลัก (index.html หรือหน้าแม่) 
-# เพื่อให้ Next.js Router (Client-side) จัดการต่อ
-# ตัวอย่าง: /blog-details/52 -> จะไปเปิด index.html แล้ว Next.js จะดึงข้อมูลมาแสดงเอง
+# 3. จัดการ SPA Routing สำหรับ Dynamic Routes
+# มาร์คหน้าดีเทลเป็น 'detail.html' (จากการใช้ generateStaticParams ในโค้ด)
 
-# สำหรับหน้าที่มีโฟลเดอร์รองรับ (ถ้ามี)
+# สำหรับ Blog Details: /blog-details/52 -> /blog-details/detail.html
+RewriteRule ^blog-details/[^/]+$ blog-details/detail.html [L]
+
+# สำหรับ Car Details: /cars/encoded-id -> /cars/detail.html
+RewriteRule ^cars/[^/]+$ cars/detail.html [L]
+
+# 4. สำหรับหน้าอื่นๆ ที่หาไม่เจอ ให้ส่งไปที่ index.html
 RewriteCond %{DOCUMENT_ROOT}/$1.html -f
 RewriteRule ^([^/]+)/?$ $1.html [L]
 
-# ไม่อย่างนั้น ให้ส่งไปที่ index.html (ตัวคุม Routing ทั้งหมด)
 RewriteRule ^ index.html [L]

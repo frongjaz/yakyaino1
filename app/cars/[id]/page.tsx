@@ -11,6 +11,11 @@ import RelatedCars from "@/components/CarDetail/RelatedCars";
 import { apiGet } from '@/lib/api';
 import { decodeCarId, encodeCarId } from '@/lib/id-encoder';
 
+// สำหรับ Static Export: สร้างหน้าตั้งต้นไว้ 1 หน้า (เพื่อให้ build ผ่าน)
+export function generateStaticParams() {
+  return [{ id: 'detail' }];
+}
+
 interface CarData {
   id: number;
   brand: string;
@@ -45,12 +50,12 @@ export default function CarDetailPage() {
     // Handle both string and string[] (Next.js can return array for catch-all routes)
     const rawId = params.id;
     const encodedId = Array.isArray(rawId) ? rawId[0] : rawId || window.location.pathname.split('/cars/')[1]?.split('/')[0];
-    
+
     if (encodedId && typeof encodedId === 'string') {
       // Decode the encoded ID
       const decodedId = decodeCarId(encodedId);
       const carId = decodedId || encodedId; // Fallback to original if decode fails
-      
+
       if (carId && typeof carId === 'string') {
         fetchCarData(carId);
       } else {
@@ -69,7 +74,7 @@ export default function CarDetailPage() {
       // Encode ID before sending to API
       const encodedId = encodeCarId(id);
       const data = await apiGet<{ success: boolean; data: CarData }>(`/api/cars/${encodedId}`);
-      
+
       if (data.success && data.data) {
         setCar(data.data);
       } else {
@@ -166,7 +171,7 @@ export default function CarDetailPage() {
               images={carData.images}
               totalPhotos={carData.totalPhotos}
             />
-            
+
             {/* Specs and Contact - 2 Columns */}
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr]">
               {/* Left Column - Specs and Pricing */}
