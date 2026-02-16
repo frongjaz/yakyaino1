@@ -33,6 +33,7 @@ jobs:
           cp -r .next dist/
           cp -r public dist/
           cp -r scripts dist/
+          cp -r lib dist/
           cp package.json dist/
           cp server.js dist/
           cp ecosystem.config.js dist/
@@ -55,6 +56,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: dist/
           server-dir: domains/checkkub.com/public_html/
+          dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git*/**

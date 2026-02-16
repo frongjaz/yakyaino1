@@ -25,10 +25,16 @@ if (!function_exists('shell_exec')) {
 // Try to find PM2 path or add common paths
 $path = 'export PATH=$PATH:/usr/local/bin:/usr/bin:/bin:/home/' . get_current_user() . '/bin; ';
 
-// 1. Check PM2 status
+// 1. Check if node_modules exists, if not, try to install
+if (!is_dir(__DIR__ . '/node_modules')) {
+    echo "⚠️ node_modules not found. Attempting to install...\n";
+    run_cmd($path . "npm install --production");
+}
+
+// 2. Check PM2 status
 run_cmd($path . "pm2 status");
 
-// 2. Restart your app
+// 3. Restart your app
 // Change 'nextjs-app' to the name in your ecosystem.config.js if different
 run_cmd($path . "pm2 restart nextjs-app || pm2 start ecosystem.config.js");
 
