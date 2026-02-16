@@ -4,6 +4,7 @@
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 /**
  * สร้าง API endpoint URL
@@ -13,15 +14,22 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 export function getApiUrl(endpoint: string): string {
   // Remove leading slash if present
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-  
+
   if (API_URL) {
     // Use external API
     // Remove trailing slash from API_URL if present
     const cleanApiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
     return `${cleanApiUrl}/${cleanEndpoint}`;
   }
-  
+
   // Use relative path (local development or same domain)
+  // Incorporate NEXT_PUBLIC_BASE_PATH if present
+  if (BASE_PATH) {
+    const cleanBasePath = BASE_PATH.startsWith('/') ? BASE_PATH : `/${BASE_PATH}`;
+    const finalBasePath = cleanBasePath.endsWith('/') ? cleanBasePath.slice(0, -1) : cleanBasePath;
+    return `${finalBasePath}/${cleanEndpoint}`;
+  }
+
   return `/${cleanEndpoint}`;
 }
 
@@ -33,13 +41,13 @@ export function getSessionToken(): string | null {
   if (typeof window === 'undefined') {
     return null;
   }
-  
+
   try {
     const sessionStr = localStorage.getItem('admin_session');
     if (!sessionStr) {
       return null;
     }
-    
+
     // Encode session as token for Authorization header
     return encodeURIComponent(sessionStr);
   } catch {
@@ -55,20 +63,20 @@ export async function apiFetch(
   options?: RequestInit
 ): Promise<Response> {
   const url = getApiUrl(endpoint);
-  
+
   // Get session token for Authorization header (cross-domain support)
   const sessionToken = getSessionToken();
-  
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...options?.headers,
   };
-  
+
   // Add Authorization header if session exists
   if (sessionToken) {
     headers['Authorization'] = `Bearer ${sessionToken}`;
   }
-  
+
   try {
     const response = await fetch(url, {
       ...options,
@@ -76,7 +84,7 @@ export async function apiFetch(
       credentials: 'include', // Still include credentials for cookies (if same-domain)
       headers,
     });
-    
+
     return response;
   } catch (error: any) {
     // Log error for debugging
@@ -94,11 +102,11 @@ export async function apiFetch(
  */
 export async function apiGet<T = any>(endpoint: string): Promise<T> {
   const response = await apiFetch(endpoint, { method: 'GET' });
-  
+
   if (!response.ok) {
     throw new Error(`API Error: ${response.status} ${response.statusText}`);
   }
-  
+
   return response.json();
 }
 
@@ -113,7 +121,7 @@ export async function apiPost<T = any>(
     method: 'POST',
     body: data ? JSON.stringify(data) : undefined,
   });
-  
+
   if (!response.ok) {
     // Try to parse error message from response
     let errorMessage = `API Error: ${response.status} ${response.statusText}`;
@@ -127,7 +135,7 @@ export async function apiPost<T = any>(
     }
     throw new Error(errorMessage);
   }
-  
+
   return response.json();
 }
 
@@ -142,11 +150,11 @@ export async function apiPut<T = any>(
     method: 'PUT',
     body: data ? JSON.stringify(data) : undefined,
   });
-  
+
   if (!response.ok) {
     throw new Error(`API Error: ${response.status} ${response.statusText}`);
   }
-  
+
   return response.json();
 }
 
@@ -155,11 +163,11 @@ export async function apiPut<T = any>(
  */
 export async function apiDelete<T = any>(endpoint: string): Promise<T> {
   const response = await apiFetch(endpoint, { method: 'DELETE' });
-  
+
   if (!response.ok) {
     throw new Error(`API Error: ${response.status} ${response.statusText}`);
   }
-  
+
   return response.json();
 }
 
