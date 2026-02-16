@@ -19,7 +19,11 @@ export function getApiUrl(endpoint: string): string {
     // Use external API
     // Remove trailing slash from API_URL if present
     const cleanApiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    return `${cleanApiUrl}/${cleanEndpoint}`;
+    const url = `${cleanApiUrl}/${cleanEndpoint}`;
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.log('[API] Using external API:', url);
+    }
+    return url;
   }
 
   // Use relative path (local development or same domain)
@@ -27,10 +31,18 @@ export function getApiUrl(endpoint: string): string {
   if (BASE_PATH) {
     const cleanBasePath = BASE_PATH.startsWith('/') ? BASE_PATH : `/${BASE_PATH}`;
     const finalBasePath = cleanBasePath.endsWith('/') ? cleanBasePath.slice(0, -1) : cleanBasePath;
-    return `${finalBasePath}/${cleanEndpoint}`;
+    const url = `${finalBasePath}/${cleanEndpoint}`;
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.log('[API] Using local API with base path:', url);
+    }
+    return url;
   }
 
-  return `/${cleanEndpoint}`;
+  const url = `/${cleanEndpoint}`;
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    console.log('[API] Using local API:', url);
+  }
+  return url;
 }
 
 /**

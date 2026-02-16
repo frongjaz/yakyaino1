@@ -31,7 +31,7 @@ jobs:
       - name: Build project
         run: npm run build:root
         env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.VERCEL_API_URL || 'https://checkkub.com' }}
+          NEXT_PUBLIC_API_URL: ''
 
       - name: Restore API routes
         run: |
