@@ -26,6 +26,11 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Create Restart Trigger File
+        run: |
+          mkdir -p tmp
+          touch tmp/restart.txt
+
       - name: Deploy to HostAtom via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -47,9 +52,3 @@ jobs:
             .env
             README.md
             package-lock.json
-
-      - name: Trigger PM2 Restart
-        run: |
-          echo "Triggering PM2 restart..."
-          curl -s https://checkkub.com/restart-pm2.php
-          echo "✅ Restart request sent."
