@@ -135,8 +135,9 @@ async function handleResponse(response: Response, url: string): Promise<any> {
     } else {
       // If not JSON, it might be an HTML error page
       const text = await response.text();
+      const snippet = text.substring(0, 100).replace(/\s+/g, ' ');
       if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-        errorMessage = `API Error ${response.status}: ได้รับการตอบกลับเป็น HTML แทนที่จะเป็น JSON (เป็นไปได้ว่า URL ไม่ถูกต้อง หรือเซิร์ฟเวอร์ส่งหน้า 404/Error ออกมา)`;
+        errorMessage = `API Error ${response.status}: ได้รับการตอบกลับเป็น HTML แทนที่จะเป็น JSON (เป็นไปได้ว่า URL ไม่ถูกต้อง หรือเซิร์ฟเวอร์ส่งหน้า 404/Error ออกมา). ข้อความบางส่วน: "${snippet}..."`;
       }
     }
 
@@ -145,8 +146,9 @@ async function handleResponse(response: Response, url: string): Promise<any> {
 
   if (!isJson) {
     const text = await response.text();
+    const snippet = text.substring(0, 100).replace(/\s+/g, ' ');
     if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-      throw new Error(`ได้รับข้อมูลที่ไม่ถูกต้องจาก API (HTML แทนที่จะเป็น JSON) ที่ URL: ${url}. กรุณาตรวจสอบการตั้งค่า NEXT_PUBLIC_API_URL ใน .env.local`);
+      throw new Error(`ได้รับข้อมูลที่ไม่ถูกต้องจาก API (HTML แทนที่จะเป็น JSON) ที่ URL: ${url}. กรุณาตรวจสอบการตั้งค่า NEXT_PUBLIC_API_URL ใน .env.local. ข้อความบางส่วน: "${snippet}..."`);
     }
     return text; // Or throw error
   }
