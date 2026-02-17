@@ -1,4 +1,4 @@
-name: Deploy Next.js Static to HostAtom (FTP)
+name: Deploy Next.js App to HostAtom (Production)
 
 on:
   push:
@@ -21,24 +21,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Temporarily move API routes
-        run: |
-          if [ -d "app/api" ]; then
-            mv app/api .api_backup
-            echo "✅ API routes moved to .api_backup"
-          fi
-
       - name: Build project
         run: npm run build:root
         env:
-          NEXT_PUBLIC_API_URL: ''
-
-      - name: Restore API routes
-        run: |
-          if [ -d ".api_backup" ]; then
-            mv .api_backup app/api
-            echo "✅ API routes restored"
-          fi
+          NODE_ENV: production
 
       - name: Deploy to HostAtom via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -46,15 +32,24 @@ jobs:
           server: ftp.checkkub.com
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: out/
+          local-dir: ./
           server-dir: domains/checkkub.com/public_html/
-          dangerous-clean-slate: true
+          dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             **/.DS_Store
-            ecosystem.config.js
-            server.js
-            restart-pm2.php
-            .env.local
+            **/src/**
+            **/.vscode/**
+            **/scripts/**
+            .env*.local
+            .env
+            README.md
+            package-lock.json
+
+      - name: Trigger PM2 Restart
+        run: |
+          echo "Triggering PM2 restart..."
+          curl -s https://checkkub.com/restart-pm2.php
+          echo "✅ Restart request sent."
