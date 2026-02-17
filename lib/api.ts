@@ -15,34 +15,33 @@ export function getApiUrl(endpoint: string): string {
   // Remove leading slash if present
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
 
+  // Final API URL to use
+  let finalUrl = '';
+
   if (API_URL) {
     // Use external API
-    // Remove trailing slash from API_URL if present
     const cleanApiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    const url = `${cleanApiUrl}/${cleanEndpoint}`;
-    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-      console.log(`[API] Using external API: ${url} (from ${endpoint})`);
-    }
-    return url;
-  }
-
-  // Use relative path (local development or same domain)
-  // Incorporate NEXT_PUBLIC_BASE_PATH if present
-  if (BASE_PATH) {
-    const cleanBasePath = BASE_PATH.startsWith('/') ? BASE_PATH : `/${BASE_PATH}`;
+    finalUrl = `${cleanApiUrl}/${cleanEndpoint}`;
+  } else if (typeof window !== 'undefined') {
+    // Fallback: If no API_URL set, use current domain origin
+    // This handles cases where NEXT_PUBLIC_API_URL was empty during build
+    const origin = window.location.origin;
+    const cleanBasePath = BASE_PATH ? (BASE_PATH.startsWith('/') ? BASE_PATH : `/${BASE_PATH}`) : '';
     const finalBasePath = cleanBasePath.endsWith('/') ? cleanBasePath.slice(0, -1) : cleanBasePath;
-    const url = `${finalBasePath}/${cleanEndpoint}`;
-    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-      console.log(`[API] Using local API with base path: ${url} (from ${endpoint})`);
-    }
-    return url;
+
+    finalUrl = `${origin}${finalBasePath}/${cleanEndpoint}`;
+  } else {
+    // Server-side fallback or relative path
+    const cleanBasePath = BASE_PATH ? (BASE_PATH.startsWith('/') ? BASE_PATH : `/${BASE_PATH}`) : '';
+    const finalBasePath = cleanBasePath.endsWith('/') ? cleanBasePath.slice(0, -1) : cleanBasePath;
+    finalUrl = `${finalBasePath}/${cleanEndpoint}`;
   }
 
-  const url = `/${cleanEndpoint}`;
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    console.log(`[API] Using local API: ${url} (from ${endpoint})`);
+    console.log(`[API] Target URL: ${finalUrl} (from ${endpoint})`);
   }
-  return url;
+
+  return finalUrl;
 }
 
 /**
