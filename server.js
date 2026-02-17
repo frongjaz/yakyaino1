@@ -19,9 +19,9 @@ app.prepare().then(() => {
       res.statusCode = 500;
       res.end('internal server error');
     }
-  }).listen(port, hostname, (err) => {
+  }).listen(port, (err) => { // Removed hostname for better Passenger compatibility
     if (err) throw err;
-    console.log(`> Ready on http://${hostname}:${port}`);
+    console.log(`> Ready on port ${port}`);
   });
 });
 
