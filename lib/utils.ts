@@ -4,22 +4,22 @@
  * @returns The full image path with base path if needed
  */
 export function getImagePath(imagePath: string): string {
-  // Remove leading slash if present
-  const cleanPath = imagePath.startsWith("/") ? imagePath.slice(1) : imagePath;
+  if (!imagePath) return "/images/placeholder.jpg";
 
-  // Get basePath from environment variable (set at build time)
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith("http")) return imagePath;
 
-  // If basePath is set, prepend it to the path
-  if (basePath && basePath.trim() !== "") {
-    // Remove leading slash from basePath if present to avoid double slashes
-    const cleanBasePath = basePath.startsWith("/")
-      ? basePath.slice(1)
-      : basePath;
-    return `/${cleanBasePath}/${cleanPath}`;
+  // Ensure path starts with a slash for internal processing
+  const pathWithSlash = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+
+  // In production, images are hosted on HostAtom (checkkub.com)
+  // Even if the API is on Vercel, we want to point to the images on the main domain
+  if (process.env.NODE_ENV === 'production' || !imagePath.includes('localhost')) {
+    return `https://checkkub.com${pathWithSlash}`;
   }
 
-  return `/${cleanPath}`;
+  // Local development fallback
+  return pathWithSlash;
 }
 
 /**

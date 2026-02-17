@@ -6,12 +6,19 @@ const nextConfig = {
   assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '',
   images: {
     unoptimized: true,
-    domains: ["localhost"],
+    domains: ["localhost", "checkkub.com", "yakyai-api.vercel.app"],
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "checkkub.com",
+      },
+      {
+        protocol: "https",
+        hostname: "yakyai-api.vercel.app",
+      },
+      {
+        protocol: "https",
         hostname: "cdn.sanity.io",
-        port: "",
       },
     ],
   },

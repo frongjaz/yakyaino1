@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { apiGet } from '@/lib/api';
+import { getImagePath } from '@/lib/utils';
 
 interface Car {
   id: number;
@@ -114,7 +115,7 @@ export default function CarsList() {
               <td className="px-4 py-3 whitespace-nowrap">
                 <div className="relative h-16 w-24 rounded overflow-hidden">
                   <Image
-                    src={car.image}
+                    src={getImagePath(car.image)}
                     alt={`${car.brand} ${car.model}`}
                     fill
                     className="object-cover"

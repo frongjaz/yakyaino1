@@ -32,7 +32,7 @@ const CarListingsGrid = () => {
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
   const page = searchParams.get('page') || '1';
-  
+
   const [cars, setCars] = useState<CarListing[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
@@ -50,7 +50,7 @@ const CarListingsGrid = () => {
   const fetchCars = async () => {
     try {
       setLoading(true);
-      
+
       // Build URL with all filter parameters including pagination
       const params = new URLSearchParams();
       if (searchQuery) params.set('q', searchQuery);
@@ -59,22 +59,22 @@ const CarListingsGrid = () => {
       if (maxPrice) params.set('maxPrice', maxPrice);
       params.set('page', page);
       params.set('limit', '12');
-      
+
       const url = `/api/cars?${params.toString()}`;
-      
-      const data = await apiGet<{ 
-        success: boolean; 
+
+      const data = await apiGet<{
+        success: boolean;
         data: CarListing[];
         pagination?: PaginationInfo;
       }>(url);
-      
+
       if (data.success && data.data) {
         // Filter only available cars
-        const availableCars = data.data.filter((car: CarListing) => 
+        const availableCars = data.data.filter((car: CarListing) =>
           car.status === 'available' || !car.status
         );
         setCars(availableCars);
-        
+
         // Update pagination info
         if (data.pagination) {
           setPagination(data.pagination);
@@ -154,7 +154,7 @@ const CarListingsGrid = () => {
               {/* Car Image */}
               <div className="relative aspect-[4/3] w-full overflow-hidden">
                 <Image
-                  src={car.image || '/images/placeholder.jpg'}
+                  src={getImagePath(car.image)}
                   alt={`${car.brand} ${car.model}`}
                   fill
                   className="object-contain transition-transform duration-300 group-hover:scale-105"
@@ -164,7 +164,7 @@ const CarListingsGrid = () => {
                   }}
                   unoptimized
                 />
-                
+
                 {/* Photo Count Badge */}
                 <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-lg bg-black/60 backdrop-blur-sm px-2.5 py-1.5 z-10 border border-white/20 shadow-lg">
                   <svg
@@ -195,12 +195,12 @@ const CarListingsGrid = () => {
                 <h3 className="mb-1 text-lg font-bold uppercase text-[#EF4444]">
                   {car.brand}
                 </h3>
-                
+
                 {/* Model + Year - White */}
                 <p className="mb-3 text-sm text-white">
                   {car.model} {car.year}
                 </p>
-                
+
                 {/* Price - Red, Bold, Right aligned */}
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex-1"></div>
@@ -208,10 +208,10 @@ const CarListingsGrid = () => {
                     {formatPrice(car.price)}
                   </p>
                 </div>
-                
+
                 {/* Divider Line */}
                 <div className="mb-3 h-px bg-gray-700"></div>
-                
+
                 {/* View All Link - Now just a visual indicator */}
                 <div className="flex items-center justify-between text-sm text-white transition group-hover:text-gray-300">
                   <span>ดูทั้งหมด</span>

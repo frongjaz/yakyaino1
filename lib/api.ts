@@ -89,10 +89,23 @@ export async function apiFetch(
   }
 
   try {
+    // Determine if this is a cross-domain request
+    let isCrossDomain = false;
+    if (typeof window !== 'undefined') {
+      try {
+        const targetUrl = new URL(url, window.location.origin);
+        isCrossDomain = targetUrl.origin !== window.location.origin;
+      } catch (e) {
+        // Fallback
+      }
+    }
+
     const response = await fetch(url, {
       ...options,
       mode: 'cors',
-      credentials: 'include', // Still include credentials for cookies (if same-domain)
+      // If cross-domain, use 'same-origin' to avoid complex CORS preflight issues 
+      // since we use Authorization header anyway. Use 'include' only for same-domain.
+      credentials: isCrossDomain ? 'same-origin' : 'include',
       headers,
     });
 
@@ -105,8 +118,12 @@ export async function apiFetch(
       error: error.message,
     });
 
-    // Check if it's a network error
+    // Check if it's a network error (often CORS or server down)
     if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+      const isCrossDomain = url.startsWith('http') && !url.includes(typeof window !== 'undefined' ? window.location.hostname : '');
+      if (isCrossDomain) {
+        throw new Error(`ไม่สามารถเชื่อมต่อกับ API ข้ามโดเมนได้ (${url}) เป็นไปได้ว่าติดปัญหา CORS หรือเซิร์ฟเวอร์ปลายทางไม่อนุญาต`);
+      }
       throw new Error(`ไม่สามารถเชื่อมต่อกับ API ได้ (${url}) กรุณาตรวจสอบว่าเซิร์ฟเวอร์เปิดอยู่หรือ URL ถูกต้อง`);
     }
 

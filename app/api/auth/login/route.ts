@@ -9,12 +9,14 @@ export const dynamic = 'force-dynamic';
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
   const headers = getCorsHeaders(origin);
-  
+
   return new NextResponse(null, {
     status: 200,
     headers,
   });
 }
+
+import { signSession } from '@/lib/crypto-utils';
 
 export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin');
@@ -25,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (!username || !password) {
       return NextResponse.json(
         { success: false, message: 'กรุณากรอก username และ password' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -36,11 +38,11 @@ export async function POST(request: NextRequest) {
     );
 
     const usersArray = Array.isArray(users) ? users : [];
-    
+
     if (usersArray.length === 0) {
       return NextResponse.json(
         { success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
     if (!isPasswordValid) {
       return NextResponse.json(
         { success: false, message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
     if (user.role !== 'admin') {
       return NextResponse.json(
         { success: false, message: 'คุณไม่มีสิทธิ์เข้าถึง' },
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       );
     }
 
@@ -70,12 +72,16 @@ export async function POST(request: NextRequest) {
       [user.id]
     );
 
-    // สร้าง response และ return session data (ใช้ localStorage แทน cookies สำหรับ cross-domain)
-    const sessionData = {
+    // ข้อมูลสำหรับ session
+    const sessionPayload = {
       userId: user.id,
       username: user.username,
       role: user.role,
+      loginTime: Date.now(),
     };
+
+    // เซ็นชื่อเพื่อความปลอดภัย กันคนสวมรอย
+    const signedSession = signSession(sessionPayload);
 
     // Return session data in response body (client will store in localStorage)
     return NextResponse.json({
@@ -86,7 +92,7 @@ export async function POST(request: NextRequest) {
         username: user.username,
         role: user.role,
       },
-      session: sessionData, // Include session data for client-side storage
+      session: signedSession, // This is now a secure encrypted/signed token
     }, {
       headers: corsHeaders,
     });
@@ -94,7 +100,7 @@ export async function POST(request: NextRequest) {
     console.error('Login error:', error);
     const origin = request.headers.get('origin');
     const corsHeaders = getCorsHeaders(origin);
-    
+
     return NextResponse.json(
       { success: false, message: 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ', error: error.message },
       { status: 500, headers: corsHeaders }
