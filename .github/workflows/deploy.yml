@@ -32,7 +32,8 @@ jobs:
         run: npm run build:root
         env:
           NODE_ENV: production
-          NEXT_PUBLIC_API_URL: https://yakyai-api.vercel.app # หรือ URL API ของคุณถ้ามี
+          IS_STATIC_EXPORT: 'true'
+          NEXT_PUBLIC_API_URL: https://yakyai-api.vercel.app
 
       - name: Restore API routes
         run: |
