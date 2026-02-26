@@ -1,5 +1,5 @@
 "use client";
-import { getImagePath } from "@/lib/utils";
+import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -150,6 +150,10 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
                   fill
                   className="object-contain transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, 33vw"
+                  onError={(e) => {
+                    const t = e.target as HTMLImageElement;
+                    if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+                  }}
                 />
                 
                 {/* Photo Count Badge */}

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getImagePath } from "@/lib/utils";
+import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { apiGet } from "@/lib/api";
@@ -160,7 +160,8 @@ const CarListingsGrid = () => {
                   className="object-contain transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                    const t = e.target as HTMLImageElement;
+                    if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
                   }}
                   unoptimized
                 />

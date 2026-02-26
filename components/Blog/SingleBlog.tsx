@@ -1,6 +1,7 @@
 import { Blog } from "@/types/blog";
 import Image from "next/image";
 import Link from "next/link";
+import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 
 const SingleBlog = ({ blog }: { blog: Blog }) => {
   const { id, title, image, paragraph, author, tags, publishDate, datePublished, url } = blog;
@@ -21,10 +22,14 @@ const SingleBlog = ({ blog }: { blog: Blog }) => {
             </span>
           )}
           <Image 
-            src={image} 
+            src={getImagePath(image)} 
             alt="image" 
             fill 
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => {
+              const t = e.target as HTMLImageElement;
+              if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+            }}
           />
         </Link>
         <div className="p-6">
@@ -44,7 +49,7 @@ const SingleBlog = ({ blog }: { blog: Blog }) => {
               {author.image && (
                 <div className="mr-4">
                   <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                    <Image src={author.image} alt={author.name || "author"} fill className="object-cover" />
+                    <Image src={getImagePath(author.image)} alt={author.name || "author"} fill className="object-cover" onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }} />
                   </div>
                 </div>
               )}

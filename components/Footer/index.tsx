@@ -1,5 +1,5 @@
 "use client";
-import { getImagePath } from "@/lib/utils";
+import { getImagePath, LOGO_PLACEHOLDER } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -49,6 +49,10 @@ const Footer = () => {
                   width={120}
                   height={48}
                   className="h-auto max-w-[120px] w-auto"
+                  onError={(e) => {
+                    const t = e.target as HTMLImageElement;
+                    if (t && t.src !== LOGO_PLACEHOLDER) t.src = LOGO_PLACEHOLDER;
+                  }}
                   />
                 </Link>
               <p className="mb-6 text-sm leading-relaxed text-white">

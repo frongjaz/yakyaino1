@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getImagePath } from "@/lib/utils";
+import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import { apiGet } from "@/lib/api";
 import { encodeCarId } from "@/lib/id-encoder";
 
@@ -172,6 +172,10 @@ const CarCarousel = ({ cars: propCars }: CarCarouselProps = { cars: undefined })
                       fill
                       className="object-contain rounded-xl transition-transform duration-300 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      onError={(e) => {
+                        const t = e.target as HTMLImageElement;
+                        if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+                      }}
                     />
                   </div>
                   <p className="mt-4 text-center text-sm font-medium text-gray-800 transition-colors duration-200 group-hover:text-gray-900 md:text-base">

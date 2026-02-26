@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import { getImagePath } from "@/lib/utils";
+import { getImagePath, LOGO_PLACEHOLDER, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import Image from "next/image";
 import menuData from "./menuData";
 import { apiGet } from "@/lib/api";
@@ -148,6 +148,10 @@ const Header = () => {
                     height={72}
                     className="h-auto max-h-12 sm:max-h-14 lg:max-h-20 w-auto object-contain"
                     priority
+                    onError={(e) => {
+                      const t = e.target as HTMLImageElement;
+                      if (t && t.src !== LOGO_PLACEHOLDER) t.src = LOGO_PLACEHOLDER;
+                    }}
                   />
                 </div>
               </Link>
@@ -251,6 +255,10 @@ const Header = () => {
                                 fill
                                 className="object-cover"
                                 sizes="48px"
+                                onError={(e) => {
+                                  const t = e.target as HTMLImageElement;
+                                  if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+                                }}
                               />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -378,6 +386,10 @@ const Header = () => {
                                 fill
                                 className="object-cover"
                                 sizes="64px"
+                                onError={(e) => {
+                                  const t = e.target as HTMLImageElement;
+                                  if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+                                }}
                               />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -438,6 +450,10 @@ const Header = () => {
                 width={140}
                 height={56}
                 className="h-auto w-auto object-contain"
+                onError={(e) => {
+                  const t = e.target as HTMLImageElement;
+                  if (t && t.src !== LOGO_PLACEHOLDER) t.src = LOGO_PLACEHOLDER;
+                }}
               />
             </Link>
             <button

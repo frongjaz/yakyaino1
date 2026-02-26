@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { getImagePath, IMAGE_PLACEHOLDER } from '@/lib/utils';
 import { BlogData } from './AddBlogForm';
 
 interface BlogCardProps {
@@ -22,10 +23,11 @@ export default function BlogCard({ blog, onEdit, onDelete }: BlogCardProps) {
             {/* Image Section */}
             <div className="relative h-48 w-full overflow-hidden">
                 <Image
-                    src={blog.image || '/images/blog/blog-01.jpg'}
+                    src={getImagePath(blog.image || '/images/blog/blog-01.jpg')}
                     alt={blog.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
                 />
                 <div className="absolute top-3 left-3 flex gap-2">
                     <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm ${isPublished
@@ -60,7 +62,7 @@ export default function BlogCard({ blog, onEdit, onDelete }: BlogCardProps) {
                 <div className="flex items-center gap-3 mb-5 border-t border-gray-100 dark:border-stroke-dark pt-4">
                     <div className="relative h-8 w-8 rounded-full overflow-hidden bg-gray-200">
                         {blog.author?.image ? (
-                            <Image src={blog.author.image} alt={blog.author.name} fill className="object-cover" />
+                            <Image src={getImagePath(blog.author.image)} alt={blog.author.name} fill className="object-cover" onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }} />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center bg-primary text-white text-[10px] font-bold">
                                 {blog.author?.name?.charAt(0) || 'A'}

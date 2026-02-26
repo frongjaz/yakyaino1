@@ -9,6 +9,7 @@ import Script from "next/script";
 import Link from "next/link";
 import { apiGet } from "@/lib/api";
 import { getSession } from "@/lib/auth-client";
+import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import { Blog } from "@/types/blog";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 
@@ -191,10 +192,11 @@ export default function BlogDetailsClient() {
                                                 <div className="mr-4">
                                                     <div className="relative h-10 w-10 overflow-hidden rounded-full">
                                                         <Image
-                                                            src={blog.author.image}
+                                                            src={getImagePath(blog.author.image)}
                                                             alt={blog.author.name}
                                                             fill
                                                             className="object-cover"
+                                                            onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
                                                         />
                                                     </div>
                                                 </div>
@@ -254,10 +256,11 @@ export default function BlogDetailsClient() {
                                         <div className="mb-10 w-full overflow-hidden rounded">
                                             <div className="relative aspect-[97/60] w-full sm:aspect-[97/44]">
                                                 <Image
-                                                    src={blog.image}
+                                                    src={getImagePath(blog.image)}
                                                     alt={blog.title}
                                                     fill
                                                     className="object-cover object-center"
+                                                    onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
                                                 />
                                             </div>
                                         </div>

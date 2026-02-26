@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { getImagePath } from "@/lib/utils";
+import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 
 interface CarImageGalleryProps {
   mainImage: string;
@@ -73,6 +73,7 @@ export default function CarImageGallery({
           fill
           priority
           className="object-cover"
+          onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
         />
       </button>
 
@@ -93,6 +94,7 @@ export default function CarImageGallery({
                 alt={`thumb ${index + 1}`}
                 fill
                 className="object-cover"
+                onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
               />
             </button>
           );
@@ -109,6 +111,7 @@ export default function CarImageGallery({
               alt="more photos"
               fill
               className="object-cover opacity-40"
+              onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
             />
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 hover:bg-black/70 transition-colors">
               <span className="text-lg font-semibold text-white">
@@ -212,6 +215,7 @@ export default function CarImageGallery({
                 className="object-contain"
                 sizes="90vw"
                 priority
+                onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gray-900">
@@ -263,6 +267,7 @@ export default function CarImageGallery({
                             fill
                             className="object-cover"
                             sizes="112px"
+                            onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
                           />
                           {index === modalSelectedIndex && (
                             <div className="absolute inset-0 bg-white/10"></div>
