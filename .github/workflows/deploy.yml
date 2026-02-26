@@ -56,7 +56,6 @@ jobs:
             **/.git*/**
             **/node_modules/**
             **/.DS_Store
-            **/images/**
             .env.local
             restart-pm2.php
             ecosystem.config.js
