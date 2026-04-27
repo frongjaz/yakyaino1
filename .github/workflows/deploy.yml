@@ -48,9 +48,13 @@ jobs:
           server: ftp.checkkub.com
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
           local-dir: out/
           server-dir: domains/checkkub.com/public_html/
           dangerous-clean-slate: true
+          timeout: 120000
+          security: loose
           exclude: |
             **/.git*
             **/.git*/**
