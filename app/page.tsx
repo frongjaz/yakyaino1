@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Script from "next/script";
 import HomePageContent from "@/components/HomePageContent";
+import { fetchCarsSSR } from "@/lib/fetchCars";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://v-autocar.co.th"),
@@ -60,8 +61,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://v-autocar.co.th";
+
+  let initialCars: { id?: string | number; name: string; image: string }[] = [];
+  try {
+    const { cars } = await fetchCarsSSR({ limit: 20 });
+    initialCars = cars.map((car) => ({
+      id: car.id,
+      name: `${car.brand} ${car.model}`,
+      image: car.image || "/images/placeholder.jpg",
+    }));
+  } catch (error) {
+    console.error("[SSR] Failed to fetch initial cars for homepage:", error);
+  }
   
   const structuredData = [
     {
@@ -299,7 +312,7 @@ export default function Home() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />
       ))}
-      <HomePageContent />
+      <HomePageContent initialCars={initialCars} />
     </>
   );
 }

@@ -2,9 +2,9 @@ import AllCarsHero from "@/components/AllCarsPage/AllCarsHero";
 import CarCarousel from "@/components/CarCarousel";
 import SearchFilterSection from "@/components/AllCarsPage/SearchFilterSection";
 import CarListingsGrid from "@/components/AllCarsPage/CarListingsGrid";
-import Pagination from "@/components/AllCarsPage/Pagination";
 import Script from "next/script";
 import { Metadata } from "next";
+import { fetchCarsSSR, fetchBrandsSSR, CarSSR, PaginationSSR } from "@/lib/fetchCars";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://v-autocar.co.th"),
@@ -37,8 +37,51 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AllCarsPage() {
+type SearchParams = {
+  q?: string;
+  brand?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  page?: string;
+};
+
+export default async function AllCarsPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+
+  let initialCars: CarSSR[] = [];
+  let initialPagination: PaginationSSR = { page: 1, limit: 12, total: 0, totalPages: 1 };
+  let initialBrands: string[] = [];
+
+  try {
+    const page = Math.max(1, parseInt(searchParams.page || "1") || 1);
+    const [carsData, brands] = await Promise.all([
+      fetchCarsSSR({
+        page,
+        limit: 12,
+        brand: searchParams.brand,
+        q: searchParams.q,
+        minPrice: searchParams.minPrice,
+        maxPrice: searchParams.maxPrice,
+      }),
+      fetchBrandsSSR(),
+    ]);
+    initialCars = carsData.cars;
+    initialPagination = carsData.pagination;
+    initialBrands = brands;
+  } catch (error) {
+    console.error("[SSR] Failed to fetch initial cars data:", error);
+    // Falls through with empty defaults — client-side fetch will be used as fallback
+  }
+
+  const carouselCars = initialCars.slice(0, 20).map((car) => ({
+    id: car.id,
+    name: `${car.brand} ${car.model}`,
+    image: car.image || "/images/placeholder.jpg",
+  }));
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -65,11 +108,12 @@ export default function AllCarsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <AllCarsHero />
-      <CarCarousel />
-      <SearchFilterSection />
-      <CarListingsGrid />
-      <Pagination />
+      {carouselCars.length > 0 && <CarCarousel cars={carouselCars} />}
+      <SearchFilterSection initialBrands={initialBrands} />
+      <CarListingsGrid
+        initialData={initialCars}
+        initialPagination={initialPagination}
+      />
     </>
   );
 }
-

@@ -5,10 +5,14 @@ import Image from "next/image";
 import { getImagePath } from "@/lib/utils";
 import { apiGet } from "@/lib/api";
 
-const SearchFilterSection = () => {
+interface SearchFilterSectionProps {
+  initialBrands?: string[];
+}
+
+const SearchFilterSection = ({ initialBrands }: SearchFilterSectionProps = {}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [selectedTab, setSelectedTab] = useState<"all" | "new">(
     (searchParams.get("tab") as "all" | "new") || "all"
   );
@@ -16,9 +20,13 @@ const SearchFilterSection = () => {
     searchParams.get("brand") || ""
   );
   const [priceRange, setPriceRange] = useState("");
-  
-  const [brands, setBrands] = useState<string[]>([]);
-  const [loadingBrands, setLoadingBrands] = useState(true);
+
+  const [brands, setBrands] = useState<string[]>(
+    initialBrands
+      ? ["ทั้งหมด", ...initialBrands.filter((b) => b !== "ทั้งหมด")]
+      : []
+  );
+  const [loadingBrands, setLoadingBrands] = useState(!initialBrands);
 
   const priceRanges = [
     "ทั้งหมด",
@@ -29,23 +37,22 @@ const SearchFilterSection = () => {
     "5,000,000+",
   ];
 
-  // Fetch brands from API
+  // Fetch brands from API only when not provided via SSR
   useEffect(() => {
+    if (initialBrands) return;
+
     const fetchBrands = async () => {
       try {
         setLoadingBrands(true);
         const data = await apiGet<{ success: boolean; data: string[] }>('/api/brands');
         if (data.success && data.data && Array.isArray(data.data)) {
-          // Filter out "ทั้งหมด" if it exists in database, then add it at the beginning
           const uniqueBrands = data.data.filter(brand => brand && brand !== 'ทั้งหมด');
           setBrands(['ทั้งหมด', ...uniqueBrands]);
         } else {
-          // Fallback to empty array if API fails
           setBrands(['ทั้งหมด']);
         }
       } catch (error) {
         console.error('Error fetching brands:', error);
-        // Fallback to empty array if API fails
         setBrands(['ทั้งหมด']);
       } finally {
         setLoadingBrands(false);
@@ -53,6 +60,7 @@ const SearchFilterSection = () => {
     };
 
     fetchBrands();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Parse price range to min/max values
