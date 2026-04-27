@@ -37,36 +37,18 @@ export const metadata: Metadata = {
   },
 };
 
-type SearchParams = {
-  q?: string;
-  brand?: string;
-  minPrice?: string;
-  maxPrice?: string;
-  page?: string;
-};
-
-export default async function AllCarsPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function AllCarsPage() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
 
   let initialCars: CarSSR[] = [];
   let initialPagination: PaginationSSR = { page: 1, limit: 12, total: 0, totalPages: 1 };
   let initialBrands: string[] = [];
 
+  // Fetch default first-page data server-side (no searchParams — compatible with static export).
+  // Filtered/paginated views are handled client-side via CarListingsGrid.
   try {
-    const page = Math.max(1, parseInt(searchParams.page || "1") || 1);
     const [carsData, brands] = await Promise.all([
-      fetchCarsSSR({
-        page,
-        limit: 12,
-        brand: searchParams.brand,
-        q: searchParams.q,
-        minPrice: searchParams.minPrice,
-        maxPrice: searchParams.maxPrice,
-      }),
+      fetchCarsSSR({ page: 1, limit: 12 }),
       fetchBrandsSSR(),
     ]);
     initialCars = carsData.cars;
