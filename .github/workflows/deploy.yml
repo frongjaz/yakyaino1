@@ -1,4 +1,4 @@
-name: Deploy Next.js App to HostAtom (Production)
+name: Deploy Next.js + PHP API to HostAtom (Production)
 
 on:
   push:
@@ -24,30 +24,38 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Temporarily move API routes (to allow static build)
+      - name: Temporarily move Next.js API routes (static export cannot include them)
         run: |
           if [ -d "app/api" ]; then
             mv app/api .api_backup
           fi
 
-      - name: Build project
+      - name: Build static Next.js
         run: npm run build:root
         env:
           NODE_ENV: production
           IS_STATIC_EXPORT: 'true'
-          NEXT_PUBLIC_API_URL: https://yakyaino1.vercel.app
+          # No NEXT_PUBLIC_API_URL — frontend uses relative /api/* (same domain)
 
-      - name: Restore API routes
+      - name: Restore Next.js API routes
         if: always()
         run: |
           if [ -d ".api_backup" ]; then
             mv .api_backup app/api
           fi
 
-      - name: Verify build output
+      - name: Stage deploy folder (static + PHP API)
         run: |
-          echo "File count in out/: $(find out/ -type f | wc -l)"
-          ls out/ | head -20
+          rm -rf deploy
+          mkdir -p deploy
+          cp -r out/. deploy/
+          cp -r api deploy/api
+          echo "=== deploy/ structure ==="
+          ls -la deploy/
+          echo "=== deploy/api/ ==="
+          ls -la deploy/api/
+          echo "=== Total files ==="
+          find deploy/ -type f | wc -l
 
       - name: Deploy to HostAtom via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -57,15 +65,15 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          local-dir: ./out/
+          local-dir: ./deploy/
           server-dir: domains/checkkub.com/public_html/
           timeout: 300000
           log-level: standard
           exclude: |
             **/.git*
             **/.git*/**
-            **/node_modules/**
             **/.DS_Store
+            **/node_modules/**
             .env.local
             restart-pm2.php
             ecosystem.config.js
