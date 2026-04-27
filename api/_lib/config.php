@@ -43,24 +43,37 @@ function load_env_file(string $path): void {
 }
 
 // Try common locations for .env.local
-$envCandidates = [
-    __DIR__ . '/../../.env.local',     // public_html/.env.local
-    __DIR__ . '/../.env.local',        // public_html/api/.env.local
-    dirname($_SERVER['DOCUMENT_ROOT'] ?? '') . '/.env.local', // sibling of public_html
-];
+$envCandidates = [];
+if (!empty($_SERVER['DOCUMENT_ROOT'])) {
+    $envCandidates[] = $_SERVER['DOCUMENT_ROOT'] . '/.env.local';
+    $envCandidates[] = dirname($_SERVER['DOCUMENT_ROOT']) . '/.env.local';
+}
+$envCandidates[] = __DIR__ . '/../../.env.local';     // public_html/.env.local
+$envCandidates[] = __DIR__ . '/../.env.local';        // public_html/api/.env.local
+$envCandidates[] = __DIR__ . '/.env.local';           // public_html/api/_lib/.env.local
+
 foreach ($envCandidates as $candidate) {
-    if (is_file($candidate)) {
+    if (is_file($candidate) && is_readable($candidate)) {
         load_env_file($candidate);
         break;
     }
 }
 
 function env(string $key, ?string $default = null): ?string {
-    $value = getenv($key);
-    if ($value === false || $value === '') {
-        return $_ENV[$key] ?? $default;
+    // Try $_ENV first (set by load_env_file or web server)
+    if (isset($_ENV[$key]) && $_ENV[$key] !== '') {
+        return $_ENV[$key];
     }
-    return $value;
+    // Fall back to $_SERVER (DirectAdmin/Apache SetEnv stores env vars here)
+    if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') {
+        return $_SERVER[$key];
+    }
+    // Fall back to getenv() (CLI / putenv'd values)
+    $value = getenv($key);
+    if ($value !== false && $value !== '') {
+        return $value;
+    }
+    return $default;
 }
 
 function get_pdo(): PDO {
