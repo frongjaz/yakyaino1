@@ -2,111 +2,42 @@
 import { getImagePath } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+
+const MAPS_EMBED = "https://maps.google.com/maps?q=13.7447016,100.4051157&z=17&output=embed";
+const MAPS_LINK = "https://maps.app.goo.gl/ivoekAEjs6RgP8KB8";
 
 const Contact = () => {
-  const mapRef = useRef<any>(null);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-    if (typeof window !== "undefined") {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-      link.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
-      link.crossOrigin = "";
-      document.head.appendChild(link);
-      return () => {
-        document.head.removeChild(link);
-      };
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isClient || !mapContainerRef.current || mapRef.current || typeof window === "undefined") return;
-
-    import("leaflet").then((L) => {
-      delete (L.default.Icon.Default.prototype as any)._getIconUrl;
-      L.default.Icon.Default.mergeOptions({
-        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-      });
-
-      const map = L.default.map(mapContainerRef.current!).setView([13.7447016, 100.4025408], 17);
-
-      L.default.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-      }).addTo(map);
-
-      const marker = L.default.marker([13.7447016, 100.4025408]).addTo(map);
-      marker.bindPopup("<b>V AUTOCAR</b><br>KCC กาญจนา คาร์ เซนเตอร์").openPopup();
-
-      mapRef.current = map;
-    });
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, [isClient]);
-
   return (
     <section id="contact" className="overflow-hidden bg-gray-50 py-16 md:py-20 lg:py-28">
-      {/* Section Header */}
-      <div className="container px-4 mb-10 text-center">
-        <span className="mb-3 inline-block rounded-full bg-red-100 px-5 py-1.5 text-sm font-semibold text-red-600">
-          ติดต่อเรา
-        </span>
-        <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
-          V.AUTO CAR
-        </h2>
-        <p className="mt-3 text-gray-500 max-w-md mx-auto">
-          KCC กาญจนา คาร์ เซนเตอร์ — ร้านรถยนต์มือสองคุณภาพ ใกล้ The Mall บางแค
-        </p>
-      </div>
 
-      {/* Interactive Map */}
-      <div className="mb-10 w-full shadow-md">
-        <div
-          ref={mapContainerRef}
-          className="relative h-[380px] w-full overflow-hidden md:h-[430px] lg:h-[480px]"
-          style={{ zIndex: 0 }}
-        ></div>
+      {/* Full-width Google Maps */}
+      <div className="relative mb-10 w-full shadow-md">
+        <iframe
+          src={MAPS_EMBED}
+          className="h-[380px] w-full border-0 md:h-[430px] lg:h-[480px]"
+          loading="lazy"
+          allowFullScreen
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+        <Link
+          href={MAPS_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-4 right-4 flex items-center gap-2 rounded-lg bg-white/90 px-4 py-2 text-sm font-semibold text-gray-800 shadow hover:bg-white transition"
+        >
+          <svg className="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+          </svg>
+          เปิดใน Google Maps
+        </Link>
       </div>
 
       <div className="container px-4">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
 
-          {/* Left column: Location image + Address */}
+          {/* Left column: small map + Address */}
           <div className="lg:col-span-3 space-y-5">
-            {/* Directional map image */}
-            <div className="relative h-[260px] w-full overflow-hidden rounded-2xl shadow-md md:h-[300px]">
-              <Image
-                src={getImagePath("/images/map-vautocar.jpg")}
-                alt="แผนที่เส้นทาง V-autocar"
-                fill
-                className="object-cover"
-                unoptimized
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              <Link
-                href="https://maps.google.com/?q=13.7447016,100.4025408"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute bottom-4 right-4 flex items-center gap-2 rounded-lg bg-white/90 px-4 py-2 text-sm font-semibold text-gray-800 shadow hover:bg-white transition"
-              >
-                <svg className="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-                เปิดใน Google Maps
-              </Link>
-            </div>
+            {/* Small Google Maps embed */}
 
             {/* Address card */}
             <div className="rounded-2xl bg-white p-6 shadow-sm">
