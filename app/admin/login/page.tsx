@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiPost } from '@/lib/api';
-import { setSession } from '@/lib/auth-client';
+import { setSession } from '@/lib/auth-client'; // used for fallback path when session token is absent
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -24,9 +24,9 @@ export default function AdminLoginPage() {
       if (data.success) {
         // Store session in localStorage (for cross-domain support)
         if (data.session) {
-          setSession(data.session);
+          // Store raw signed token so api.ts can send it as Bearer without wrapping in JSON
+          localStorage.setItem('admin_session', data.session);
         } else if (data.user) {
-          // Fallback: use user data if session not provided
           setSession({
             userId: data.user.id,
             username: data.user.username,

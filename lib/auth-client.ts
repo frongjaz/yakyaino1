@@ -27,14 +27,26 @@ export function getSession(): Session | null {
   if (typeof window === 'undefined') {
     return null;
   }
-  
+
   try {
-    const sessionStr = localStorage.getItem(SESSION_KEY);
-    if (!sessionStr) {
-      return null;
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+
+    // Legacy format: JSON object string {"userId":...}
+    if (raw.startsWith('{')) {
+      return JSON.parse(raw) as Session;
     }
-    
-    return JSON.parse(sessionStr) as Session;
+
+    // New format: signed base64 token from PHP API — base64(json|signature)
+    const decoded = atob(raw);
+    const pipeIdx = decoded.lastIndexOf('|');
+    const payload = pipeIdx >= 0 ? decoded.substring(0, pipeIdx) : decoded;
+    const data = JSON.parse(payload);
+    return {
+      userId: data.userId ?? data.id,
+      username: data.username,
+      role: data.role,
+    };
   } catch {
     return null;
   }
