@@ -14,11 +14,10 @@ RewriteRule ^(.*)/$ /$1 [L,R=301]
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# Serve Next.js .html pages — MUST be before directory fallback.
-# /cars has both cars.html and a cars/ directory (for [id] routes), so the
-# directory check above would hit cars/ and Apache would 403. Check .html first.
+# Serve Next.js .html pages — handles any depth (admin/dashboard, cars, about…).
+# Must be before dynamic-route rules so multi-segment static pages are served first.
 RewriteCond %{DOCUMENT_ROOT}/$1.html -f
-RewriteRule ^([^/]+)/?$ $1.html [L]
+RewriteRule ^(.+?)/?$ $1.html [L]
 
 # Dynamic routes
 RewriteRule ^blog-details/[^/]+/?$ blog-details/detail.html [L]
