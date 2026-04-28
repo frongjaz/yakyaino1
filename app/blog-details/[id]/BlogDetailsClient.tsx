@@ -6,12 +6,9 @@ import SharePost from "@/components/Blog/SharePost";
 import TagButton from "@/components/Blog/TagButton";
 import Image from "next/image";
 import Script from "next/script";
-import Link from "next/link";
 import { apiGet } from "@/lib/api";
-import { getSession } from "@/lib/auth-client";
 import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import { Blog } from "@/types/blog";
-import Breadcrumb from "@/components/Common/Breadcrumb";
 
 export default function BlogDetailsClient() {
     const params = useParams();
@@ -21,7 +18,6 @@ export default function BlogDetailsClient() {
     const [error, setError] = useState<string | null>(null);
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
     const [blogId, setBlogId] = useState<string | null>(null);
-    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         // Get ID from params or from URL path (for static export compatibility)
@@ -47,14 +43,6 @@ export default function BlogDetailsClient() {
             setLoading(false);
         }
     }, [params]);
-
-    useEffect(() => {
-        // Check if user is admin
-        const session = getSession();
-        if (session && session.role === 'admin') {
-            setIsAdmin(true);
-        }
-    }, []);
 
     useEffect(() => {
         if (blogId && blogId !== 'detail') {
@@ -160,30 +148,25 @@ export default function BlogDetailsClient() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(articleStructuredData) }}
             />
-            <Breadcrumb
-                pageName={blog.title}
-                description={blog.paragraph}
-            />
             <section className="bg-white py-16 md:py-20">
                 <div className="container">
                     <div className="-mx-4 flex flex-wrap justify-center">
                         <div className="w-full px-4 lg:w-8/12">
+                            {/* Back button */}
+                            <button
+                                onClick={() => router.back()}
+                                className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-primary transition-colors"
+                            >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                                ย้อนกลับ
+                            </button>
                             <div>
-                                <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-                                    <h2 className="text-3xl font-bold leading-tight text-black dark:text-white sm:text-4xl sm:leading-tight">
+                                <div className="mb-8">
+                                    <h2 className="text-3xl font-bold leading-tight text-black sm:text-4xl sm:leading-tight">
                                         {blog.title}
                                     </h2>
-                                    {isAdmin && (
-                                        <Link
-                                            href={`/admin/blogs?edit=${blog.id}`}
-                                            className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm font-bold text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                            แก้ไขบทความนี้
-                                        </Link>
-                                    )}
                                 </div>
                                 <div className="mb-10 flex flex-wrap items-center justify-between border-b border-body-color border-opacity-10 pb-4 dark:border-white dark:border-opacity-10">
                                     <div className="flex flex-wrap items-center">

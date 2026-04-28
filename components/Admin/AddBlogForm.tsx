@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { apiPost, getApiUrl, getSessionToken } from '@/lib/api';
 import { getSession } from '@/lib/auth-client';
+import RichTextEditor from '@/components/Admin/RichTextEditor';
 
 export interface BlogData {
   id?: number;
@@ -324,17 +325,14 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
 
       {/* Content (Full Content) */}
       <div>
-        <label htmlFor="content" className="block text-sm font-semibold text-gray-700 mb-2">
-          เนื้อหาเต็ม (รองรับ HTML)
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          เนื้อหาเต็ม
         </label>
-        <textarea
-          id="content"
-          name="content"
+        <RichTextEditor
           value={formData.content}
-          onChange={handleChange}
-          rows={8}
-          placeholder="กรุณากรอกเนื้อหาเต็ม"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
+          onChange={(html) => setFormData(f => ({ ...f, content: html }))}
+          placeholder="กรอกเนื้อหาบทความที่นี่..."
+          minRows={10}
         />
       </div>
 
