@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { apiPost, getApiUrl } from '@/lib/api';
 
-export default function AddCarForm() {
+export default function AddCarForm({ onSuccess }: { onSuccess?: () => void } = {}) {
   const router = useRouter();
   const fileInputRefs = [
     useRef<HTMLInputElement>(null),
@@ -230,7 +230,8 @@ export default function AddCarForm() {
         fileInputRefs.forEach(ref => {
           if (ref.current) ref.current.value = '';
         });
-        router.refresh();
+        if (onSuccess) onSuccess();
+        else router.refresh();
       } else {
         setMessage({ type: 'error', text: data.message || 'เกิดข้อผิดพลาด' });
       }

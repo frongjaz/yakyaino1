@@ -23,13 +23,11 @@ export default function LogoutButton() {
         console.error('Logout API error:', error);
       }
       
-      router.push('/admin/login');
-      router.refresh();
+      window.location.href = '/admin/login';
     } catch (error) {
       console.error('Logout error:', error);
-      // Still redirect even if there's an error
       clearSession();
-      router.push('/admin/login');
+      window.location.href = '/admin/login';
     } finally {
       setLoading(false);
     }

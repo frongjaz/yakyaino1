@@ -1,7 +1,38 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(curl -i -H \"Origin: https://checkkub.com\" -H \"Access-Control-Request-Method: GET\" -X OPTIONS https://yakyai-api.vercel.app/api/brands)",
+      "Bash(curl -i -H \"Origin: https://checkkub.com\" -X OPTIONS https://yakyai-api.vercel.app/api/brands)",
+      "Bash(npx vercel *)",
+      "Bash(curl -i -H \"Origin: https://checkkub.com\" -X OPTIONS https://yakyaino1.vercel.app/api/brands)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh run *)",
+      "Bash(curl -s https://checkkub.com/ -o /dev/null -w \"HTTP status: %{http_code}\\\\n\")",
+      "Bash(curl -s https://checkkub.com/_next/static/ -I)",
+      "Bash(curl -s https://checkkub.com/)",
+      "Bash(curl -s \"https://checkkub.com/_next/static/chunks/472-3340706ff36db266.js\")",
+      "Bash(curl -i -H \"Origin: https://checkkub.com\" https://yakyaino1.vercel.app/api/brands)",
+      "Bash(mysql --version)",
+      "Bash(cat)",
+      "Bash(php /tmp/test_sign.php)",
+      "Bash(openssl rand *)",
+      "Bash(python3 -c 'import urllib.parse; print\\(urllib.parse.quote\\('\\\\''eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoieWFreWFpIiwicm9sZSI6ImFkbWluIiwibG9naW5UaW1lIjoxNzc3MzUxMzQ0NzgyfXwtMjFiODdjNDI='\\\\'', safe='\\\\'''\\\\''\\)\\)')",
+      "Bash(curl -s -X GET https://checkkub.com/api/auth/check -H 'Authorization: Bearer __TRACKED_VAR__' -H 'Content-Type: application/json')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://checkkub.com/cars\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://checkkub.com/blog\")",
+      "Bash(curl -sL -o /dev/null -w \"%{http_code} %{url_effective}\" \"https://checkkub.com/cars\")",
+      "Bash(curl -sL -o /dev/null -w \"%{http_code} %{url_effective}\" \"https://checkkub.com/blog\")",
+      "Bash(curl -sI \"https://checkkub.com/cars\")",
+      "Bash(curl -sI \"https://checkkub.com/cars/\")",
+      "Bash(curl -sL \"https://checkkub.com/api/cars\")",
+      "Bash(curl -sL \"https://checkkub.com/api/blogs\")",
+      "Bash(curl -sI \"https://checkkub.com/api/brands\")",
+      "Bash(curl -sI \"https://checkkub.com/api/cars\")",
+      "Bash(curl -sL -o /dev/null -w \"%{http_code} %{url_effective}\" \"https://checkkub.com/admin/login\")",
+      "Bash(curl -sL -o /dev/null -w \"%{http_code} %{url_effective}\" \"https://checkkub.com/admin/dashboard\")"
     ]
   }
 }

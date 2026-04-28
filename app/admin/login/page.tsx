@@ -34,8 +34,7 @@ export default function AdminLoginPage() {
           });
         }
 
-        router.push('/admin/dashboard');
-        router.refresh();
+        window.location.href = '/admin/dashboard';
       } else {
         setError(data.message || 'เกิดข้อผิดพลาด');
       }

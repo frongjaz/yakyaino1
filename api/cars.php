@@ -15,32 +15,49 @@ require_once __DIR__ . '/_lib/id-encoder.php';
 
 handle_preflight();
 
-// ── Detail: GET /api/cars/{id} ──────────────────────────────────────────────
+// ── Detail / Delete: GET|DELETE /api/cars/{id} ──────────────────────────────
 if (isset($_GET['id']) && $_GET['id'] !== '') {
-    require_method('GET');
-    try {
-        $carId = decode_car_id($_GET['id']);
-        if ($carId === null) {
-            json_error('ID ไม่ถูกต้อง', 400);
-        }
+    $method = require_methods(['GET', 'DELETE']);
 
-        $rows = db_query('SELECT * FROM cars WHERE id = ?', [$carId]);
-        if (empty($rows)) {
-            json_error('ไม่พบข้อมูลรถ', 404);
-        }
-
-        $car = $rows[0];
-        $photoCount = 0;
-        foreach (['image', 'image2', 'image3', 'image4', 'image5'] as $field) {
-            if (!empty($car[$field]) && trim((string) $car[$field]) !== '') {
-                $photoCount++;
+    if ($method === 'DELETE') {
+        require_auth();
+        try {
+            $carId = decode_car_id($_GET['id']);
+            if ($carId === null) {
+                json_error('ID ไม่ถูกต้อง', 400);
             }
+            db_execute('DELETE FROM cars WHERE id = ?', [$carId]);
+            json_success(['message' => 'ลบรถสำเร็จ']);
+        } catch (Throwable $e) {
+            json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
         }
-        $car['photo_count'] = $photoCount;
+    }
 
-        json_success(['data' => $car]);
-    } catch (Throwable $e) {
-        json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
+    if ($method === 'GET') {
+        try {
+            $carId = decode_car_id($_GET['id']);
+            if ($carId === null) {
+                json_error('ID ไม่ถูกต้อง', 400);
+            }
+
+            $rows = db_query('SELECT * FROM cars WHERE id = ?', [$carId]);
+            if (empty($rows)) {
+                json_error('ไม่พบข้อมูลรถ', 404);
+            }
+
+            $car = $rows[0];
+            $photoCount = 0;
+            foreach (['image', 'image2', 'image3', 'image4', 'image5'] as $field) {
+                if (!empty($car[$field]) && trim((string) $car[$field]) !== '') {
+                    $photoCount++;
+                }
+            }
+            $car['photo_count'] = $photoCount;
+
+            json_success(['data' => $car]);
+        } catch (Throwable $e) {
+            json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
+        }
     }
 }
 
