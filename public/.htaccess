@@ -6,25 +6,23 @@ RewriteEngine On
 # Pass all /api/* requests directly to PHP — do NOT rewrite to index.html
 RewriteRule ^api/ - [L]
 
-# 1. จัดการ Trailing Slash
+# Remove trailing slash (only for non-directories)
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
-# 2. ให้ Apache เปิดไฟล์จริงๆ ถ้าไฟล์นั้นมีอยู่
-RewriteCond %{REQUEST_FILENAME} -f [OR]
-RewriteCond %{REQUEST_FILENAME} -d
+# Serve real files as-is (files only, not directories)
+RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# 3. จัดการ SPA Routing สำหรับ Dynamic Routes
-
-# สำหรับ Blog Details: /blog-details/52 -> /blog-details/detail.html
-RewriteRule ^blog-details/[^/]+$ blog-details/detail.html [L]
-
-# สำหรับ Car Details: /cars/encoded-id -> /cars/detail.html
-RewriteRule ^cars/[^/]+$ cars/detail.html [L]
-
-# 4. สำหรับหน้าอื่นๆ ที่หาไม่เจอ ให้ส่งไปที่ index.html
+# Serve Next.js .html pages — MUST be before directory fallback.
+# /cars has both cars.html and a cars/ directory (for [id] routes), so the
+# directory check above would hit cars/ and Apache would 403. Check .html first.
 RewriteCond %{DOCUMENT_ROOT}/$1.html -f
 RewriteRule ^([^/]+)/?$ $1.html [L]
 
+# Dynamic routes
+RewriteRule ^blog-details/[^/]+/?$ blog-details/detail.html [L]
+RewriteRule ^cars/[^/]+/?$ cars/detail.html [L]
+
+# Fallback — all other paths served by Next.js client-side router
 RewriteRule ^ index.html [L]
