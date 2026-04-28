@@ -19,589 +19,229 @@ export default function AddCarForm({ onSuccess }: { onSuccess?: () => void } = {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([null, null, null, null, null]);
   const [selectedFiles, setSelectedFiles] = useState<(File | null)[]>([null, null, null, null, null]);
-  
+
   const [formData, setFormData] = useState({
-    brand: '',
-    model: '',
-    year: '',
-    price: '',
-    image: '',
-    image2: '',
-    image3: '',
-    image4: '',
-    image5: '',
-    photo_count: '0',
-    description: '',
-    mileage: '',
-    color: '',
-    transmission: '',
-    fuel_type: '',
-    engine_size: '',
-    license_plate: '',
+    brand: '', model: '', year: '', price: '',
+    image: '', image2: '', image3: '', image4: '', image5: '',
+    photo_count: '0', description: '', mileage: '', color: '',
+    transmission: '', fuel_type: '', engine_size: '', license_plate: '',
     status: 'available',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleImageSelect = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setMessage({ type: 'error', text: 'กรุณาเลือกไฟล์รูปภาพเท่านั้น' });
-      return;
-    }
-
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      setMessage({ type: 'error', text: 'ขนาดไฟล์ไม่ควรเกิน 10MB' });
-      return;
-    }
-
-    // Store file for later upload
-    const newFiles = [...selectedFiles];
-    newFiles[index] = file;
-    setSelectedFiles(newFiles);
+    if (!file.type.startsWith('image/')) { setMessage({ type: 'error', text: 'กรุณาเลือกไฟล์รูปภาพเท่านั้น' }); return; }
+    if (file.size > 10 * 1024 * 1024) { setMessage({ type: 'error', text: 'ขนาดไฟล์ไม่ควรเกิน 10MB' }); return; }
+    const newFiles = [...selectedFiles]; newFiles[index] = file; setSelectedFiles(newFiles);
     setMessage(null);
-
-    // Show preview immediately
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result as string;
-      const newPreviews = [...imagePreviews];
-      newPreviews[index] = base64String;
-      setImagePreviews(newPreviews);
+      const newPreviews = [...imagePreviews]; newPreviews[index] = reader.result as string; setImagePreviews(newPreviews);
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = (index: number) => {
-    const newFiles = [...selectedFiles];
-    newFiles[index] = null;
-    setSelectedFiles(newFiles);
-    
-    const newPreviews = [...imagePreviews];
-    newPreviews[index] = null;
-    setImagePreviews(newPreviews);
-    
-    const newFormData = { ...formData };
-    if (index === 0) newFormData.image = '';
-    else if (index === 1) newFormData.image2 = '';
-    else if (index === 2) newFormData.image3 = '';
-    else if (index === 3) newFormData.image4 = '';
-    else if (index === 4) newFormData.image5 = '';
-    setFormData(newFormData);
-    
-    if (fileInputRefs[index].current) {
-      fileInputRefs[index].current!.value = '';
-    }
+    const newFiles = [...selectedFiles]; newFiles[index] = null; setSelectedFiles(newFiles);
+    const newPreviews = [...imagePreviews]; newPreviews[index] = null; setImagePreviews(newPreviews);
+    const fd = { ...formData };
+    const keys = ['image', 'image2', 'image3', 'image4', 'image5'] as const;
+    fd[keys[index]] = '';
+    setFormData(fd);
+    if (fileInputRefs[index].current) fileInputRefs[index].current!.value = '';
   };
 
   const uploadImageToFTP = async (file: File): Promise<string> => {
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);
-
-    const uploadUrl = getApiUrl('/api/upload');
     const sessionToken = localStorage.getItem('admin_session');
-    
     const headers: HeadersInit = {};
-    if (sessionToken) {
-      headers['Authorization'] = `Bearer ${encodeURIComponent(sessionToken)}`;
-    }
-
-    const response = await fetch(uploadUrl, {
-      method: 'POST',
-      body: uploadFormData,
-      credentials: 'include',
-      headers,
-    });
-
+    if (sessionToken) headers['Authorization'] = `Bearer ${encodeURIComponent(sessionToken)}`;
+    const response = await fetch(getApiUrl('/api/upload'), { method: 'POST', body: uploadFormData, credentials: 'include', headers });
     if (!response.ok) {
       const errorText = await response.text();
-      let errorData;
-      try {
-        errorData = JSON.parse(errorText);
-      } catch {
-        errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
-      }
-      throw new Error(errorData.message || errorData.error || 'เกิดข้อผิดพลาดในการอัพโหลด');
+      let errorData; try { errorData = JSON.parse(errorText); } catch { errorData = { message: `HTTP ${response.status}` }; }
+      throw new Error(errorData.message || 'เกิดข้อผิดพลาดในการอัพโหลด');
     }
-
     const data = await response.json();
-
-    if (!data.success) {
-      const errorMsg = data.error 
-        ? `${data.message || 'เกิดข้อผิดพลาด'}: ${data.error}`
-        : data.message || 'เกิดข้อผิดพลาดในการอัพโหลด';
-      throw new Error(errorMsg);
-    }
-
+    if (!data.success) throw new Error(data.message || 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ');
     return data.url;
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage(null);
-
+    setLoading(true); setMessage(null);
     try {
-      // Validate that we have at least one file selected
-      const hasFile = selectedFiles.some(file => file !== null);
-      if (!hasFile) {
-        setMessage({ type: 'error', text: 'กรุณาเลือกรูปภาพอย่างน้อย 1 รูป' });
-        setLoading(false);
-        return;
+      if (!selectedFiles.some(f => f !== null)) {
+        setMessage({ type: 'error', text: 'กรุณาเลือกรูปภาพอย่างน้อย 1 รูป' }); setLoading(false); return;
       }
-
-      // Upload all images to FTP
       setUploading(true);
       const imageFields = ['image', 'image2', 'image3', 'image4', 'image5'];
-      const uploadPromises: Promise<{ index: number; url: string }>[] = [];
-      
-      for (let i = 0; i < selectedFiles.length; i++) {
-        if (selectedFiles[i]) {
-          uploadPromises.push(
-            uploadImageToFTP(selectedFiles[i]!).then(url => ({ index: i, url }))
-          );
-        }
-      }
-
+      const uploadPromises = selectedFiles.map((f, i) => f ? uploadImageToFTP(f).then(url => ({ index: i, url })) : null).filter(Boolean) as Promise<{ index: number; url: string }>[];
       let updatedFormData = { ...formData };
-      
       try {
-        const uploadResults = await Promise.all(uploadPromises);
-        
-        // Update formData with uploaded URLs
-        uploadResults.forEach(({ index, url }) => {
-          updatedFormData[imageFields[index] as keyof typeof updatedFormData] = url;
-        });
+        const results = await Promise.all(uploadPromises);
+        results.forEach(({ index, url }) => { updatedFormData[imageFields[index] as keyof typeof updatedFormData] = url; });
         setFormData(updatedFormData);
-        
-        setMessage({ type: 'success', text: `อัพโหลดรูปภาพสำเร็จ (${uploadResults.length} รูป) กำลังบันทึกข้อมูล...` });
       } catch (uploadError: any) {
         setMessage({ type: 'error', text: uploadError.message || 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ' });
-        setUploading(false);
-        setLoading(false);
-        return;
-      } finally {
-        setUploading(false);
-      }
+        setUploading(false); setLoading(false); return;
+      } finally { setUploading(false); }
 
-      // Save car data
       const data = await apiPost('/api/cars', {
         ...updatedFormData,
         year: parseInt(updatedFormData.year),
         price: parseFloat(updatedFormData.price),
-        photo_count: parseInt(updatedFormData.photo_count) || selectedFiles.filter(f => f !== null).length,
+        photo_count: selectedFiles.filter(f => f !== null).length,
         mileage: updatedFormData.mileage ? parseInt(updatedFormData.mileage) : null,
       });
 
       if (data.success) {
         setMessage({ type: 'success', text: 'เพิ่มข้อมูลรถสำเร็จ!' });
-        setFormData({
-          brand: '',
-          model: '',
-          year: '',
-          price: '',
-          image: '',
-          image2: '',
-          image3: '',
-          image4: '',
-          image5: '',
-          photo_count: '0',
-          description: '',
-          mileage: '',
-          color: '',
-          transmission: '',
-          fuel_type: '',
-          engine_size: '',
-          license_plate: '',
-          status: 'available',
-        });
+        setFormData({ brand: '', model: '', year: '', price: '', image: '', image2: '', image3: '', image4: '', image5: '', photo_count: '0', description: '', mileage: '', color: '', transmission: '', fuel_type: '', engine_size: '', license_plate: '', status: 'available' });
         setImagePreviews([null, null, null, null, null]);
         setSelectedFiles([null, null, null, null, null]);
-        fileInputRefs.forEach(ref => {
-          if (ref.current) ref.current.value = '';
-        });
-        if (onSuccess) onSuccess();
-        else router.refresh();
+        fileInputRefs.forEach(ref => { if (ref.current) ref.current.value = ''; });
+        if (onSuccess) onSuccess(); else router.refresh();
       } else {
         setMessage({ type: 'error', text: data.message || 'เกิดข้อผิดพลาด' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
+  const inputCls = "w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10";
+  const labelCls = "mb-1.5 block text-sm font-medium text-gray-700";
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Success/Error Message */}
+    <form onSubmit={handleSubmit} className="space-y-6">
       {message && (
-        <div
-          className={`rounded-lg border p-4 ${
-            message.type === 'success'
-              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300'
-              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
-          }`}
-        >
-          <div className="flex items-center">
-            {message.type === 'success' ? (
-              <svg
-                className="mr-2 h-5 w-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="mr-2 h-5 w-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            )}
-            <p className="text-sm font-medium">{message.text}</p>
-          </div>
+        <div className={`rounded-lg border px-4 py-3 text-sm font-medium flex items-center gap-2 ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+          <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            {message.type === 'success'
+              ? <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              : <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            }
+          </svg>
+          {message.text}
         </div>
       )}
 
-      {/* Image Upload Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-stroke dark:border-stroke-dark">
-          <svg
-            className="h-5 w-5 text-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-          <h3 className="text-lg font-semibold text-dark dark:text-white">
-            รูปภาพรถยนต์
-          </h3>
-        </div>
+      {/* ── รูปภาพ ─────────────────────────────────────────────────────────── */}
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-3">
+        <p className="text-sm font-semibold text-gray-700">📷 รูปภาพรถยนต์</p>
 
-        <div className="space-y-4">
-          {/* Image Upload Fields */}
-          {[0, 1, 2, 3, 4].map((index) => (
+        {/* รูปหลัก */}
+        {[0].map((index) => (
+          <div key={index}>
+            <p className="text-xs font-medium text-gray-500 mb-1.5">
+              รูปหลัก <span className="text-red-500">*</span>
+              {uploading && selectedFiles[index] && <span className="ml-2 text-primary animate-pulse">กำลังอัพโหลด...</span>}
+            </p>
+            <input ref={fileInputRefs[index]} type="file" accept="image/*" onChange={handleImageSelect(index)} disabled={uploading || loading} className="hidden" id={`img-${index}`} />
+            <label htmlFor={`img-${index}`} className={`block cursor-pointer rounded-xl border-2 border-dashed border-gray-300 bg-white hover:border-primary transition-colors ${uploading || loading ? 'opacity-50 pointer-events-none' : ''}`}>
+              {imagePreviews[index] ? (
+                <div className="relative h-44 w-full rounded-xl overflow-hidden">
+                  <Image src={imagePreviews[index]!} alt="preview" fill className="object-contain" unoptimized />
+                  <button type="button" onClick={(e) => { e.preventDefault(); handleRemoveImage(index); }} className="absolute top-2 right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600 shadow">
+                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1.5 py-8 text-gray-400">
+                  <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                  <span className="text-xs">คลิกเพื่ออัพโหลด</span>
+                </div>
+              )}
+            </label>
+          </div>
+        ))}
+
+        {/* รูปเพิ่มเติม 4 รูป */}
+        <div className="grid grid-cols-4 gap-2">
+          {[1, 2, 3, 4].map((index) => (
             <div key={index}>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                รูปภาพ {index === 0 ? 'หลัก' : index + 1} {index === 0 && <span className="text-red-500">*</span>}
-                {uploading && selectedFiles[index] && (
-                  <span className="ml-2 text-xs text-primary">กำลังอัพโหลด...</span>
+              <p className="text-xs text-gray-400 mb-1 text-center">รูป {index + 1}</p>
+              <input ref={fileInputRefs[index]} type="file" accept="image/*" onChange={handleImageSelect(index)} disabled={uploading || loading} className="hidden" id={`img-${index}`} />
+              <label htmlFor={`img-${index}`} className={`block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-white hover:border-primary transition-colors aspect-square ${uploading || loading ? 'opacity-50 pointer-events-none' : ''}`}>
+                {imagePreviews[index] ? (
+                  <div className="relative h-full w-full rounded-lg overflow-hidden">
+                    <Image src={imagePreviews[index]!} alt="preview" fill className="object-cover" unoptimized />
+                    <button type="button" onClick={(e) => { e.preventDefault(); handleRemoveImage(index); }} className="absolute top-1 right-1 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600 shadow">
+                      <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full py-3 text-gray-300">
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
+                  </div>
                 )}
               </label>
-              <div className="flex items-center gap-4">
-                <input
-                  ref={fileInputRefs[index]}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect(index)}
-                  disabled={uploading || loading}
-                  className="hidden"
-                  id={`image-upload-${index}`}
-                />
-                <label
-                  htmlFor={`image-upload-${index}`}
-                  className={`flex-1 cursor-pointer rounded-lg border-2 border-dashed border-stroke dark:border-stroke-dark bg-gray-50 dark:bg-gray-800/50 p-4 text-center hover:border-primary transition-colors ${
-                    uploading || loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    {imagePreviews[index] ? (
-                      <div className="relative w-full h-32 rounded overflow-hidden border border-stroke dark:border-stroke-dark">
-                        <Image
-                          src={imagePreviews[index]!}
-                          alt={`Preview ${index + 1}`}
-                          fill
-                          className="object-contain"
-                          unoptimized
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleRemoveImage(index);
-                          }}
-                          className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        >
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-                        {selectedFiles[index] && (
-                          <div className="absolute bottom-1 left-1 px-2 py-1 bg-blue-500 text-white text-xs rounded">
-                            รออัพโหลด
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <>
-                        <svg
-                          className="h-8 w-8 text-body-color dark:text-body-color-dark"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                          />
-                        </svg>
-                        <p className="text-xs text-body-color dark:text-body-color-dark">
-                          คลิกเพื่ออัพโหลด
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </label>
-              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Basic Information Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-stroke dark:border-stroke-dark">
-          <svg
-            className="h-5 w-5 text-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h3 className="text-lg font-semibold text-dark dark:text-white">
-            ข้อมูลพื้นฐาน
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* ── ข้อมูลพื้นฐาน ──────────────────────────────────────────────────── */}
+      <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-4">
+        <p className="text-sm font-semibold text-gray-700">🚗 ข้อมูลพื้นฐาน</p>
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              ยี่ห้อ <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="brand"
-              required
-              value={formData.brand}
-              onChange={handleChange}
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกยี่ห้อ"
-            />
+            <label className={labelCls}>ยี่ห้อ <span className="text-red-500">*</span></label>
+            <input type="text" name="brand" required value={formData.brand} onChange={handleChange} className={inputCls} placeholder="Toyota" />
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              รุ่น <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="model"
-              required
-              value={formData.model}
-              onChange={handleChange}
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกรุ่น"
-            />
+            <label className={labelCls}>รุ่น <span className="text-red-500">*</span></label>
+            <input type="text" name="model" required value={formData.model} onChange={handleChange} className={inputCls} placeholder="Camry" />
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              ปี <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              name="year"
-              required
-              value={formData.year}
-              onChange={handleChange}
-              min="1900"
-              max="2099"
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกปี"
-            />
+            <label className={labelCls}>ปี <span className="text-red-500">*</span></label>
+            <input type="number" name="year" required value={formData.year} onChange={handleChange} min="1990" max="2099" className={inputCls} placeholder="2023" />
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              ราคา (บาท) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              name="price"
-              required
-              value={formData.price}
-              onChange={handleChange}
-              min="0"
-              step="1000"
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกราคา"
-            />
+            <label className={labelCls}>ราคา (บาท) <span className="text-red-500">*</span></label>
+            <input type="number" name="price" required value={formData.price} onChange={handleChange} min="0" step="1000" className={inputCls} placeholder="500000" />
           </div>
         </div>
       </div>
 
-      {/* Specifications Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-stroke dark:border-stroke-dark">
-          <svg
-            className="h-5 w-5 text-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <h3 className="text-lg font-semibold text-dark dark:text-white">
-            รายละเอียดเทคนิค
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* ── รายละเอียดเทคนิค ────────────────────────────────────────────────── */}
+      <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-4">
+        <p className="text-sm font-semibold text-gray-700">⚙️ รายละเอียดเทคนิค</p>
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              ไมล์ (กม.)
-            </label>
-            <input
-              type="number"
-              name="mileage"
-              value={formData.mileage}
-              onChange={handleChange}
-              min="0"
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกไมล์"
-            />
+            <label className={labelCls}>ไมล์ (กม.)</label>
+            <input type="number" name="mileage" value={formData.mileage} onChange={handleChange} min="0" className={inputCls} placeholder="50000" />
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              สี
-            </label>
-            <input
-              type="text"
-              name="color"
-              value={formData.color}
-              onChange={handleChange}
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกสี"
-            />
+            <label className={labelCls}>สี</label>
+            <input type="text" name="color" value={formData.color} onChange={handleChange} className={inputCls} placeholder="ขาว" />
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              ทะเบียน
-            </label>
-            <input
-              type="text"
-              name="license_plate"
-              value={formData.license_plate}
-              onChange={handleChange}
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกทะเบียน"
-            />
+            <label className={labelCls}>เกียร์</label>
+            <input type="text" name="transmission" value={formData.transmission} onChange={handleChange} className={inputCls} placeholder="ออโต้" />
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              เกียร์
-            </label>
-            <input
-              type="text"
-              name="transmission"
-              value={formData.transmission}
-              onChange={handleChange}
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกเกียร์"
-            />
+            <label className={labelCls}>ประเภทเชื้อเพลิง</label>
+            <input type="text" name="fuel_type" value={formData.fuel_type} onChange={handleChange} className={inputCls} placeholder="เบนซิน" />
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              ประเภทเชื้อเพลิง
-            </label>
-            <input
-              type="text"
-              name="fuel_type"
-              value={formData.fuel_type}
-              onChange={handleChange}
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกประเภทเชื้อเพลิง"
-            />
+            <label className={labelCls}>ขนาดเครื่องยนต์</label>
+            <input type="text" name="engine_size" value={formData.engine_size} onChange={handleChange} className={inputCls} placeholder="2.0" />
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              ขนาดเครื่องยนต์
-            </label>
-            <input
-              type="text"
-              name="engine_size"
-              value={formData.engine_size}
-              onChange={handleChange}
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-              placeholder="กรุณากรอกขนาดเครื่องยนต์"
-            />
+            <label className={labelCls}>ทะเบียน</label>
+            <input type="text" name="license_plate" value={formData.license_plate} onChange={handleChange} className={inputCls} placeholder="กก 1234" />
           </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              สถานะ
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none"
-            >
+          <div className="col-span-2">
+            <label className={labelCls}>สถานะ</label>
+            <select name="status" value={formData.status} onChange={handleChange} className={inputCls}>
               <option value="available">พร้อมขาย</option>
               <option value="sold">ขายแล้ว</option>
               <option value="pending">รอดำเนินการ</option>
@@ -610,117 +250,22 @@ export default function AddCarForm({ onSuccess }: { onSuccess?: () => void } = {
         </div>
       </div>
 
-      {/* Description Section */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-stroke dark:border-stroke-dark">
-          <svg
-            className="h-5 w-5 text-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-            />
-          </svg>
-          <h3 className="text-lg font-semibold text-dark dark:text-white">
-            คำอธิบายเพิ่มเติม
-          </h3>
-        </div>
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-            คำอธิบาย
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-            className="border-stroke dark:text-body-color-dark dark:shadow-two w-full rounded-lg border bg-[#f8f8f8] px-4 py-3 text-base text-body-color outline-none transition-all duration-300 focus:border-primary focus:bg-white dark:border-transparent dark:bg-[#2C303B] dark:focus:border-primary dark:focus:shadow-none resize-none"
-            placeholder="กรุณากรอกคำอธิบาย"
-          />
-        </div>
+      {/* ── คำอธิบาย ──────────────────────────────────────────────────────── */}
+      <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
+        <p className="text-sm font-semibold text-gray-700">📝 คำอธิบายเพิ่มเติม</p>
+        <textarea name="description" value={formData.description} onChange={handleChange} rows={3} className={`${inputCls} resize-none`} placeholder="รายละเอียดเพิ่มเติม..." />
       </div>
 
-      {/* Submit Button */}
-      <div className="pt-4 border-t border-stroke dark:border-stroke-dark">
-        <button
-          type="submit"
-          disabled={loading || uploading}
-          className="w-full flex items-center justify-center rounded-lg bg-primary px-6 py-4 text-base font-semibold text-white shadow-lg hover:bg-primary/90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
-        >
-          {uploading ? (
-            <>
-              <svg
-                className="mr-2 h-5 w-5 animate-spin"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              กำลังอัพโหลดรูปภาพ...
-            </>
-          ) : loading ? (
-            <>
-              <svg
-                className="mr-2 h-5 w-5 animate-spin"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              กำลังบันทึกข้อมูล...
-            </>
-          ) : (
-            <>
-              <svg
-                className="mr-2 h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-              บันทึกข้อมูลรถยนต์
-            </>
-          )}
-        </button>
-      </div>
+      {/* ── Submit ─────────────────────────────────────────────────────────── */}
+      <button type="submit" disabled={loading || uploading}
+        className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white shadow-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+      >
+        {(uploading || loading) ? (
+          <><svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>{uploading ? 'กำลังอัพโหลดรูป...' : 'กำลังบันทึก...'}</>
+        ) : (
+          <><svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>บันทึกข้อมูลรถยนต์</>
+        )}
+      </button>
     </form>
   );
 }

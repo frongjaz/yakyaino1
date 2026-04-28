@@ -391,8 +391,8 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
       </div>
 
       {/* Author Info */}
-      <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-stroke-dark space-y-4">
-        <h4 className="text-sm font-bold text-dark dark:text-white uppercase tracking-wider">ข้อมูลผู้เขียน</h4>
+      <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+        <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider">ข้อมูลผู้เขียน</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="author_name" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
@@ -427,8 +427,8 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
       </div>
 
       {/* Publishing Info */}
-      <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-stroke-dark space-y-4">
-        <h4 className="text-sm font-bold text-dark dark:text-white uppercase tracking-wider">ข้อมูลการเผยแพร่</h4>
+      <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+        <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider">ข้อมูลการเผยแพร่</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="publish_date" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
