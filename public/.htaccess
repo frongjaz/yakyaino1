@@ -3,6 +3,9 @@
 
 RewriteEngine On
 
+# Pass all /api/* requests directly to PHP — do NOT rewrite to index.html
+RewriteRule ^api/ - [L]
+
 # 1. จัดการ Trailing Slash
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
@@ -13,7 +16,6 @@ RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
 # 3. จัดการ SPA Routing สำหรับ Dynamic Routes
-# มาร์คหน้าดีเทลเป็น 'detail.html' (จากการใช้ generateStaticParams ในโค้ด)
 
 # สำหรับ Blog Details: /blog-details/52 -> /blog-details/detail.html
 RewriteRule ^blog-details/[^/]+$ blog-details/detail.html [L]
