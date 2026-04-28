@@ -89,23 +89,10 @@ export async function apiFetch(
   }
 
   try {
-    // Determine if this is a cross-domain request
-    let isCrossDomain = false;
-    if (typeof window !== 'undefined') {
-      try {
-        const targetUrl = new URL(url, window.location.origin);
-        isCrossDomain = targetUrl.origin !== window.location.origin;
-      } catch (e) {
-        // Fallback
-      }
-    }
-
     const response = await fetch(url, {
       ...options,
       mode: 'cors',
-      // If cross-domain, use 'same-origin' to avoid complex CORS preflight issues 
-      // since we use Authorization header anyway. Use 'include' only for same-domain.
-      credentials: isCrossDomain ? 'same-origin' : 'include',
+      credentials: 'include', // always include cookies (same-domain cookie auth)
       headers,
     });
 

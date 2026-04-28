@@ -53,6 +53,16 @@ try {
 
     $signedSession = sign_session($sessionPayload);
 
+    // Set HttpOnly cookie so the browser sends it automatically on same-domain requests.
+    // This is the primary auth mechanism — no need to manage Bearer tokens in JS.
+    setcookie('admin_session', $signedSession, [
+        'expires'  => time() + (7 * 24 * 3600),
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+
     json_success([
         'message' => 'เข้าสู่ระบบสำเร็จ',
         'user' => [
