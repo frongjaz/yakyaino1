@@ -5,12 +5,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { apiGet, apiDelete } from '@/lib/api';
 import { getSession, clearSession } from '@/lib/auth-client';
-import AddCarForm from '@/components/Admin/AddCarForm';
-import AddBlogForm from '@/components/Admin/AddBlogForm';
+import AddCarForm, { CarFormData } from '@/components/Admin/AddCarForm';
+import AddBlogForm, { BlogData } from '@/components/Admin/AddBlogForm';
 import { getImagePath } from '@/lib/utils';
 
 interface Session { userId: number; username: string; role: string }
-interface Car { id: number; brand: string; model: string; year: number; price: number; image: string; status: string; created_at: string }
+interface Car {
+  id: number; brand: string; model: string; year: number; price: number;
+  image: string; image2?: string; image3?: string; image4?: string; image5?: string;
+  status: string; created_at: string; description?: string; mileage?: number;
+  color?: string; transmission?: string; fuel_type?: string; engine_size?: string; license_plate?: string;
+}
 interface Blog { id: number; title: string; paragraph: string; image: string; status: string; createdAt: string; author: { name: string } }
 
 type Tab = 'cars' | 'blogs';
@@ -45,6 +50,9 @@ export default function AdminDashboardPage() {
   const [blogsLoading, setBlogsLoading] = useState(false);
   const [showAddBlog, setShowAddBlog] = useState(false);
   const [deletingBlogId, setDeletingBlogId] = useState<number | null>(null);
+
+  const [editingCar, setEditingCar] = useState<Car | null>(null);
+  const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
 
   // ── auth ─────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -214,6 +222,17 @@ export default function AdminDashboardPage() {
               </div>
             )}
 
+            {editingCar && (
+              <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+                <h3 className="font-semibold text-gray-700 mb-4">แก้ไขรถ: {editingCar.brand} {editingCar.model}</h3>
+                <AddCarForm
+                  initialData={editingCar as CarFormData}
+                  onSuccess={() => { setEditingCar(null); fetchCars(); }}
+                  onCancel={() => setEditingCar(null)}
+                />
+              </div>
+            )}
+
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               {carsLoading ? (
                 <div className="p-8 text-center text-gray-400 text-sm">กำลังโหลด...</div>
@@ -248,13 +267,21 @@ export default function AdminDashboardPage() {
                           <td className="px-4 py-3 text-gray-600">{formatPrice(car.price)} ฿</td>
                           <td className="px-4 py-3"><StatusBadge status={car.status} /></td>
                           <td className="px-4 py-3 text-right">
-                            <button
-                              onClick={() => deleteCar(car.id)}
-                              disabled={deletingCarId === car.id}
-                              className="text-xs px-3 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
-                            >
-                              {deletingCarId === car.id ? '...' : 'ลบ'}
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => { setShowAddCar(false); setEditingCar(editingCar?.id === car.id ? null : car); }}
+                                className={`text-xs px-3 py-1.5 rounded transition-colors ${editingCar?.id === car.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                              >
+                                {editingCar?.id === car.id ? 'ปิด' : 'แก้ไข'}
+                              </button>
+                              <button
+                                onClick={() => deleteCar(car.id)}
+                                disabled={deletingCarId === car.id}
+                                className="text-xs px-3 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
+                              >
+                                {deletingCarId === car.id ? '...' : 'ลบ'}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -283,6 +310,17 @@ export default function AdminDashboardPage() {
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="font-semibold text-gray-700 mb-4">เพิ่มบทความใหม่</h3>
                 <AddBlogForm onSuccess={() => { setShowAddBlog(false); fetchBlogs(); }} />
+              </div>
+            )}
+
+            {editingBlog && (
+              <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+                <h3 className="font-semibold text-gray-700 mb-4">แก้ไขบทความ: {editingBlog.title}</h3>
+                <AddBlogForm
+                  initialData={{ ...editingBlog, author_name: editingBlog.author?.name } as BlogData}
+                  onSuccess={() => { setEditingBlog(null); fetchBlogs(); }}
+                  onCancel={() => setEditingBlog(null)}
+                />
               </div>
             )}
 
@@ -318,13 +356,21 @@ export default function AdminDashboardPage() {
                           <td className="px-4 py-3 text-gray-500">{blog.author?.name}</td>
                           <td className="px-4 py-3"><StatusBadge status={blog.status} /></td>
                           <td className="px-4 py-3 text-right">
-                            <button
-                              onClick={() => deleteBlog(blog.id)}
-                              disabled={deletingBlogId === blog.id}
-                              className="text-xs px-3 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
-                            >
-                              {deletingBlogId === blog.id ? '...' : 'ลบ'}
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => { setShowAddBlog(false); setEditingBlog(editingBlog?.id === blog.id ? null : blog); }}
+                                className={`text-xs px-3 py-1.5 rounded transition-colors ${editingBlog?.id === blog.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                              >
+                                {editingBlog?.id === blog.id ? 'ปิด' : 'แก้ไข'}
+                              </button>
+                              <button
+                                onClick={() => deleteBlog(blog.id)}
+                                disabled={deletingBlogId === blog.id}
+                                className="text-xs px-3 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
+                              >
+                                {deletingBlogId === blog.id ? '...' : 'ลบ'}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

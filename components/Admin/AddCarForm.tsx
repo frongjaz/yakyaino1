@@ -3,9 +3,21 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { apiPost, getApiUrl } from '@/lib/api';
+import { apiPost, apiPut, getApiUrl } from '@/lib/api';
 
-export default function AddCarForm({ onSuccess }: { onSuccess?: () => void } = {}) {
+export interface CarFormData {
+  id?: number;
+  brand: string; model: string; year: number | string; price: number | string;
+  image: string; image2?: string; image3?: string; image4?: string; image5?: string;
+  description?: string; mileage?: number | string; color?: string;
+  transmission?: string; fuel_type?: string; engine_size?: string;
+  license_plate?: string; status: string;
+}
+
+interface Props { onSuccess?: () => void; onCancel?: () => void; initialData?: CarFormData }
+
+export default function AddCarForm({ onSuccess, onCancel, initialData }: Props = {}) {
+  const isEdit = !!initialData?.id;
   const router = useRouter();
   const fileInputRefs = [
     useRef<HTMLInputElement>(null),
@@ -17,15 +29,34 @@ export default function AddCarForm({ onSuccess }: { onSuccess?: () => void } = {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([null, null, null, null, null]);
+  const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([
+    initialData?.image || null,
+    initialData?.image2 || null,
+    initialData?.image3 || null,
+    initialData?.image4 || null,
+    initialData?.image5 || null,
+  ]);
   const [selectedFiles, setSelectedFiles] = useState<(File | null)[]>([null, null, null, null, null]);
 
   const [formData, setFormData] = useState({
-    brand: '', model: '', year: '', price: '',
-    image: '', image2: '', image3: '', image4: '', image5: '',
-    photo_count: '0', description: '', mileage: '', color: '',
-    transmission: '', fuel_type: '', engine_size: '', license_plate: '',
-    status: 'available',
+    brand: initialData?.brand || '',
+    model: initialData?.model || '',
+    year: initialData?.year?.toString() || '',
+    price: initialData?.price?.toString() || '',
+    image: initialData?.image || '',
+    image2: initialData?.image2 || '',
+    image3: initialData?.image3 || '',
+    image4: initialData?.image4 || '',
+    image5: initialData?.image5 || '',
+    photo_count: '0',
+    description: initialData?.description || '',
+    mileage: initialData?.mileage?.toString() || '',
+    color: initialData?.color || '',
+    transmission: initialData?.transmission || '',
+    fuel_type: initialData?.fuel_type || '',
+    engine_size: initialData?.engine_size || '',
+    license_plate: initialData?.license_plate || '',
+    status: initialData?.status || 'available',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -77,36 +108,48 @@ export default function AddCarForm({ onSuccess }: { onSuccess?: () => void } = {
     e.preventDefault();
     setLoading(true); setMessage(null);
     try {
-      if (!selectedFiles.some(f => f !== null)) {
+      const hasAnyImage = selectedFiles.some(f => f !== null) || imagePreviews.some(p => p !== null);
+      if (!isEdit && !hasAnyImage) {
         setMessage({ type: 'error', text: 'กรุณาเลือกรูปภาพอย่างน้อย 1 รูป' }); setLoading(false); return;
       }
-      setUploading(true);
-      const imageFields = ['image', 'image2', 'image3', 'image4', 'image5'];
-      const uploadPromises = selectedFiles.map((f, i) => f ? uploadImageToFTP(f).then(url => ({ index: i, url })) : null).filter(Boolean) as Promise<{ index: number; url: string }>[];
-      let updatedFormData = { ...formData };
-      try {
-        const results = await Promise.all(uploadPromises);
-        results.forEach(({ index, url }) => { updatedFormData[imageFields[index] as keyof typeof updatedFormData] = url; });
-        setFormData(updatedFormData);
-      } catch (uploadError: any) {
-        setMessage({ type: 'error', text: uploadError.message || 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ' });
-        setUploading(false); setLoading(false); return;
-      } finally { setUploading(false); }
 
-      const data = await apiPost('/api/cars', {
+      // Upload only newly-selected files; keep existing URLs for unchanged slots
+      const imageFields = ['image', 'image2', 'image3', 'image4', 'image5'];
+      let updatedFormData = { ...formData };
+
+      if (selectedFiles.some(f => f !== null)) {
+        setUploading(true);
+        const uploadPromises = selectedFiles.map((f, i) => f ? uploadImageToFTP(f).then(url => ({ index: i, url })) : null).filter(Boolean) as Promise<{ index: number; url: string }>[];
+        try {
+          const results = await Promise.all(uploadPromises);
+          results.forEach(({ index, url }) => { updatedFormData[imageFields[index] as keyof typeof updatedFormData] = url; });
+          setFormData(updatedFormData);
+        } catch (uploadError: any) {
+          setMessage({ type: 'error', text: uploadError.message || 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ' });
+          setUploading(false); setLoading(false); return;
+        } finally { setUploading(false); }
+      }
+
+      const payload = {
         ...updatedFormData,
         year: parseInt(updatedFormData.year),
         price: parseFloat(updatedFormData.price),
-        photo_count: selectedFiles.filter(f => f !== null).length,
+        photo_count: imagePreviews.filter(p => p !== null).length,
         mileage: updatedFormData.mileage ? parseInt(updatedFormData.mileage) : null,
-      });
+      };
+
+      const data = isEdit
+        ? await apiPut(`/api/cars/${initialData!.id}`, payload)
+        : await apiPost('/api/cars', payload);
 
       if (data.success) {
-        setMessage({ type: 'success', text: 'เพิ่มข้อมูลรถสำเร็จ!' });
-        setFormData({ brand: '', model: '', year: '', price: '', image: '', image2: '', image3: '', image4: '', image5: '', photo_count: '0', description: '', mileage: '', color: '', transmission: '', fuel_type: '', engine_size: '', license_plate: '', status: 'available' });
-        setImagePreviews([null, null, null, null, null]);
-        setSelectedFiles([null, null, null, null, null]);
-        fileInputRefs.forEach(ref => { if (ref.current) ref.current.value = ''; });
+        setMessage({ type: 'success', text: isEdit ? 'อัพเดทรถสำเร็จ!' : 'เพิ่มข้อมูลรถสำเร็จ!' });
+        if (!isEdit) {
+          setFormData({ brand: '', model: '', year: '', price: '', image: '', image2: '', image3: '', image4: '', image5: '', photo_count: '0', description: '', mileage: '', color: '', transmission: '', fuel_type: '', engine_size: '', license_plate: '', status: 'available' });
+          setImagePreviews([null, null, null, null, null]);
+          setSelectedFiles([null, null, null, null, null]);
+          fileInputRefs.forEach(ref => { if (ref.current) ref.current.value = ''; });
+        }
         if (onSuccess) onSuccess(); else router.refresh();
       } else {
         setMessage({ type: 'error', text: data.message || 'เกิดข้อผิดพลาด' });
@@ -257,15 +300,22 @@ export default function AddCarForm({ onSuccess }: { onSuccess?: () => void } = {
       </div>
 
       {/* ── Submit ─────────────────────────────────────────────────────────── */}
+      <div className="flex gap-3">
+      {onCancel && (
+        <button type="button" onClick={onCancel}
+          className="flex-1 rounded-xl border border-gray-200 bg-gray-50 py-3.5 text-sm font-bold text-gray-600 hover:bg-gray-100 transition-all"
+        >ยกเลิก</button>
+      )}
       <button type="submit" disabled={loading || uploading}
-        className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white shadow-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+        className="flex-[2] rounded-xl bg-primary py-3.5 text-sm font-bold text-white shadow-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
       >
         {(uploading || loading) ? (
           <><svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>{uploading ? 'กำลังอัพโหลดรูป...' : 'กำลังบันทึก...'}</>
         ) : (
-          <><svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>บันทึกข้อมูลรถยนต์</>
+          <><svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{isEdit ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูลรถยนต์'}</>
         )}
       </button>
+      </div>
     </form>
   );
 }

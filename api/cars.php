@@ -17,7 +17,7 @@ handle_preflight();
 
 // ── Detail / Delete: GET|DELETE /api/cars/{id} ──────────────────────────────
 if (isset($_GET['id']) && $_GET['id'] !== '') {
-    $method = require_methods(['GET', 'DELETE']);
+    $method = require_methods(['GET', 'DELETE', 'PUT']);
 
     if ($method === 'DELETE') {
         require_auth();
@@ -28,6 +28,32 @@ if (isset($_GET['id']) && $_GET['id'] !== '') {
             }
             db_execute('DELETE FROM cars WHERE id = ?', [$carId]);
             json_success(['message' => 'ลบรถสำเร็จ']);
+        } catch (Throwable $e) {
+            json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
+        }
+    }
+
+    if ($method === 'PUT') {
+        require_auth();
+        try {
+            $body = get_json_body();
+            $allowed = ['brand','model','year','price','image','image2','image3','image4','image5',
+                        'photo_count','description','mileage','color','transmission',
+                        'fuel_type','engine_size','license_plate','status'];
+            $sets = []; $params = [];
+            foreach ($allowed as $f) {
+                if (array_key_exists($f, $body)) {
+                    $sets[] = "$f = ?";
+                    if (in_array($f, ['year','photo_count'])) $params[] = (int)$body[$f];
+                    elseif ($f === 'price') $params[] = (float)$body[$f];
+                    elseif ($f === 'mileage') $params[] = ($body[$f] !== null && $body[$f] !== '') ? (int)$body[$f] : null;
+                    else $params[] = $body[$f] ?? null;
+                }
+            }
+            if (empty($sets)) json_error('ไม่มีข้อมูลที่จะอัพเดท', 400);
+            $params[] = $carId;
+            db_execute('UPDATE cars SET ' . implode(', ', $sets) . ' WHERE id = ?', $params);
+            json_success(['message' => 'อัพเดทรถสำเร็จ']);
         } catch (Throwable $e) {
             json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
         }

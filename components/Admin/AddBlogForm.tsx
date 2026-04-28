@@ -290,7 +290,7 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
 
       {/* Title */}
       <div>
-        <label htmlFor="title" className="block text-sm font-semibold text-dark dark:text-white mb-2">
+        <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-2">
           หัวข้อบทความ <span className="text-red-500">*</span>
         </label>
         <input
@@ -301,13 +301,13 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
           onChange={handleChange}
           required
           placeholder="กรุณากรอกหัวข้อบทความ"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all shadow-sm"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
         />
       </div>
 
       {/* Paragraph (Summary) */}
       <div>
-        <label htmlFor="paragraph" className="block text-sm font-semibold text-dark dark:text-white mb-2">
+        <label htmlFor="paragraph" className="block text-sm font-semibold text-gray-700 mb-2">
           เนื้อหาย่อ (แสดงในหน้ารวมบทความ) <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -318,13 +318,13 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
           required
           rows={3}
           placeholder="กรุณากรอกเนื้อหาย่อ"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all shadow-sm"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
         />
       </div>
 
       {/* Content (Full Content) */}
       <div>
-        <label htmlFor="content" className="block text-sm font-semibold text-dark dark:text-white mb-2">
+        <label htmlFor="content" className="block text-sm font-semibold text-gray-700 mb-2">
           เนื้อหาเต็ม (รองรับ HTML)
         </label>
         <textarea
@@ -334,13 +334,13 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
           onChange={handleChange}
           rows={8}
           placeholder="กรุณากรอกเนื้อหาเต็ม"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all shadow-sm"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
         />
       </div>
 
       {/* Image Upload */}
       <div>
-        <label className="block text-sm font-semibold text-dark dark:text-white mb-2">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
           รูปภาพหน้าปก <span className="text-red-500">*</span>
         </label>
         <div className="space-y-4">
@@ -348,7 +348,7 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-dark dark:text-white rounded-lg border border-gray-300 dark:border-stroke-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 text-sm font-medium"
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm font-medium"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -367,7 +367,7 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
 
           {imagePreview && (
             <div className="relative inline-block mt-2">
-              <div className="relative h-48 w-80 rounded-xl overflow-hidden shadow-md border border-gray-200 dark:border-stroke-dark">
+              <div className="relative h-48 w-80 rounded-xl overflow-hidden shadow-md border border-gray-200">
                 <Image
                   src={imagePreview}
                   alt="Preview"
@@ -395,7 +395,7 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
         <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider">ข้อมูลผู้เขียน</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="author_name" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+            <label htmlFor="author_name" className="block text-xs font-semibold text-gray-500 mb-1">
               ชื่อผู้เขียน <span className="text-red-500">*</span>
             </label>
             <input
@@ -406,11 +406,11 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
               onChange={handleChange}
               required
               placeholder="กรอกชื่อผู้เขียน"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
             />
           </div>
           <div>
-            <label htmlFor="author_designation" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+            <label htmlFor="author_designation" className="block text-xs font-semibold text-gray-500 mb-1">
               ตำแหน่งผู้เขียน
             </label>
             <input
@@ -420,7 +420,7 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
               value={formData.author_designation}
               onChange={handleChange}
               placeholder="เช่น: บรรณาธิการ"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
             />
           </div>
         </div>
@@ -431,7 +431,7 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
         <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider">ข้อมูลการเผยแพร่</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="publish_date" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+            <label htmlFor="publish_date" className="block text-xs font-semibold text-gray-500 mb-1">
               วันที่แสดงผล (เช่น: ก.พ. 2025)
             </label>
             <input
@@ -441,11 +441,11 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
               value={formData.publish_date}
               onChange={handleChange}
               placeholder="ระบุวันที่ต้องการให้แสดง"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
             />
           </div>
           <div>
-            <label htmlFor="date_published" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+            <label htmlFor="date_published" className="block text-xs font-semibold text-gray-500 mb-1">
               วันที่เผยแพร่ (ระบุเพื่อจัดลำดับ)
             </label>
             <input
@@ -454,14 +454,14 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
               name="date_published"
               value={formData.date_published}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="tags" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+            <label htmlFor="tags" className="block text-xs font-semibold text-gray-500 mb-1">
               แท็ก (คั่นด้วยเครื่องหมายจุลภาค)
             </label>
             <input
@@ -471,11 +471,11 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
               value={formData.tags}
               onChange={handleChange}
               placeholder="SUV, EV, ตลาดรถ"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
             />
           </div>
           <div>
-            <label htmlFor="status" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+            <label htmlFor="status" className="block text-xs font-semibold text-gray-500 mb-1">
               สถานะบทความ
             </label>
             <select
@@ -483,7 +483,7 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none dark:bg-dark dark:border-stroke-dark dark:text-white transition-all"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white text-gray-800 transition-all"
             >
               <option value="draft">Draft (ฉบับร่าง)</option>
               <option value="published">Published (เผยแพร่)</option>
@@ -493,12 +493,12 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
       </div>
 
       {/* Submit Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100 dark:border-stroke-dark">
+      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 py-3.5 px-6 rounded-xl font-bold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-stroke-dark"
+            className="flex-1 py-3.5 px-6 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all border border-gray-200"
           >
             ยกเลิก
           </button>
