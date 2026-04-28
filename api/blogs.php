@@ -1,7 +1,10 @@
 <?php
 /**
- * GET  /api/blogs — list blog posts
- * POST /api/blogs — create new blog post (admin only)
+ * GET    /api/blogs       — list blog posts
+ * GET    /api/blogs/{id}  — single blog (routed here by .htaccess as ?id=)
+ * POST   /api/blogs       — create (admin only)
+ * PUT    /api/blogs/{id}  — update (admin only)
+ * DELETE /api/blogs/{id}  — delete (admin only)
  */
 
 declare(strict_types=1);
@@ -12,7 +15,6 @@ require_once __DIR__ . '/_lib/config.php';
 require_once __DIR__ . '/_lib/auth.php';
 
 handle_preflight();
-$method = require_methods(['GET', 'POST']);
 
 function transform_blog(array $blog): array {
     $tags = [];
@@ -22,7 +24,6 @@ function transform_blog(array $blog): array {
             $tags = $decoded;
         }
     }
-
     return [
         'id' => $blog['id'],
         'title' => $blog['title'],
@@ -44,6 +45,81 @@ function transform_blog(array $blog): array {
     ];
 }
 
+// ── Detail / Update / Delete: /api/blogs/{id} ────────────────────────────────
+if (isset($_GET['id']) && $_GET['id'] !== '') {
+    $blogId = $_GET['id'];
+    if (preg_match('/^\d+$/', $blogId) !== 1) {
+        json_error('ID ไม่ถูกต้อง', 400);
+    }
+
+    $method = require_methods(['GET', 'PUT', 'DELETE']);
+
+    if ($method === 'GET') {
+        try {
+            $rows = db_query('SELECT * FROM blogs WHERE id = ?', [$blogId]);
+            if (empty($rows)) {
+                json_error('ไม่พบข้อมูลบทความ', 404);
+            }
+            json_success(['data' => transform_blog($rows[0])]);
+        } catch (Throwable $e) {
+            json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
+        }
+    }
+
+    if ($method === 'PUT') {
+        require_auth();
+        try {
+            $body = get_json_body();
+            $tagsJson = null;
+            if (!empty($body['tags']) && is_array($body['tags'])) {
+                $tagsJson = json_encode($body['tags'], JSON_UNESCAPED_UNICODE);
+            }
+            $datePublished = null;
+            if (!empty($body['date_published'])) {
+                $ts = strtotime($body['date_published']);
+                $datePublished = $ts !== false ? date('Y-m-d H:i:s', $ts) : null;
+            }
+            db_execute(
+                "UPDATE blogs SET
+                    title = ?, paragraph = ?, content = ?, image = ?,
+                    author_name = ?, author_image = ?, author_designation = ?,
+                    tags = ?, publish_date = ?, date_published = ?, date_modified = NOW(), status = ?
+                WHERE id = ?",
+                [
+                    $body['title'] ?? '',
+                    $body['paragraph'] ?? '',
+                    $body['content'] ?? null,
+                    $body['image'] ?? '',
+                    $body['author_name'] ?? '',
+                    $body['author_image'] ?? null,
+                    $body['author_designation'] ?? null,
+                    $tagsJson,
+                    $body['publish_date'] ?? null,
+                    $datePublished,
+                    $body['status'] ?? 'draft',
+                    $blogId,
+                ]
+            );
+            json_success(['message' => 'อัปเดตบทความสำเร็จ']);
+        } catch (Throwable $e) {
+            json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
+        }
+    }
+
+    if ($method === 'DELETE') {
+        require_auth();
+        try {
+            db_execute('DELETE FROM blogs WHERE id = ?', [$blogId]);
+            json_success(['message' => 'ลบบทความสำเร็จ']);
+        } catch (Throwable $e) {
+            json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
+        }
+    }
+}
+
+// ── List / Create ─────────────────────────────────────────────────────────────
+$method = require_methods(['GET', 'POST']);
+
 if ($method === 'GET') {
     try {
         $status = $_GET['status'] ?? 'published';
@@ -61,16 +137,13 @@ if ($method === 'GET') {
         }
 
         $sql .= ' ORDER BY date_published DESC, created_at DESC';
-
         $blogs = db_query($sql, $params);
 
-        // Fallback: if no published blogs, show all blogs (for non-admin)
         if (empty($blogs) && !$admin) {
             $blogs = db_query('SELECT * FROM blogs ORDER BY created_at DESC', []);
         }
 
-        $transformed = array_map('transform_blog', $blogs);
-        json_success(['data' => $transformed]);
+        json_success(['data' => array_map('transform_blog', $blogs)]);
     } catch (Throwable $e) {
         json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
     }
@@ -91,7 +164,6 @@ if ($method === 'POST') {
         if (!empty($body['tags']) && is_array($body['tags'])) {
             $tagsJson = json_encode($body['tags'], JSON_UNESCAPED_UNICODE);
         }
-
         $datePublished = null;
         if (!empty($body['date_published'])) {
             $ts = strtotime($body['date_published']);

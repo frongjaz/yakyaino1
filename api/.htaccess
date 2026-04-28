@@ -6,11 +6,11 @@ RewriteRule ^_lib/ - [F,L]
 RewriteRule ^\.env - [F,L]
 RewriteRule ^.*\.htaccess$ - [F,L]
 
-# Dynamic routes: /api/cars/{id} -> cars/detail.php?id={id}
-RewriteRule ^cars/([^/]+)/?$ cars/detail.php?id=$1 [L,QSA]
+# Dynamic routes: /api/cars/{id} -> cars.php?id={id}
+RewriteRule ^cars/([^/]+)/?$ cars.php?id=$1 [L,QSA]
 
-# Dynamic routes: /api/blogs/{id} -> blogs/detail.php?id={id}
-RewriteRule ^blogs/([0-9]+)/?$ blogs/detail.php?id=$1 [L,QSA]
+# Dynamic routes: /api/blogs/{id} -> blogs.php?id={id}
+RewriteRule ^blogs/([0-9]+)/?$ blogs.php?id=$1 [L,QSA]
 
 # Auth subroutes
 RewriteRule ^auth/login/?$ auth/login.php [L,QSA]

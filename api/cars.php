@@ -1,7 +1,8 @@
 <?php
 /**
- * GET  /api/cars — list with filters/pagination
- * POST /api/cars — create new car (admin only)
+ * GET    /api/cars        — list with filters/pagination
+ * GET    /api/cars/{id}   — single car (routed here by .htaccess as ?id=)
+ * POST   /api/cars        — create new car (admin only)
  */
 
 declare(strict_types=1);
@@ -10,8 +11,40 @@ require_once __DIR__ . '/_lib/cors.php';
 require_once __DIR__ . '/_lib/utils.php';
 require_once __DIR__ . '/_lib/config.php';
 require_once __DIR__ . '/_lib/auth.php';
+require_once __DIR__ . '/_lib/id-encoder.php';
 
 handle_preflight();
+
+// ── Detail: GET /api/cars/{id} ──────────────────────────────────────────────
+if (isset($_GET['id']) && $_GET['id'] !== '') {
+    require_method('GET');
+    try {
+        $carId = decode_car_id($_GET['id']);
+        if ($carId === null) {
+            json_error('ID ไม่ถูกต้อง', 400);
+        }
+
+        $rows = db_query('SELECT * FROM cars WHERE id = ?', [$carId]);
+        if (empty($rows)) {
+            json_error('ไม่พบข้อมูลรถ', 404);
+        }
+
+        $car = $rows[0];
+        $photoCount = 0;
+        foreach (['image', 'image2', 'image3', 'image4', 'image5'] as $field) {
+            if (!empty($car[$field]) && trim((string) $car[$field]) !== '') {
+                $photoCount++;
+            }
+        }
+        $car['photo_count'] = $photoCount;
+
+        json_success(['data' => $car]);
+    } catch (Throwable $e) {
+        json_error('เกิดข้อผิดพลาด', 500, $e->getMessage());
+    }
+}
+
+// ── List / Create ────────────────────────────────────────────────────────────
 $method = require_methods(['GET', 'POST']);
 
 function compute_photo_count(array $car): int {
@@ -64,11 +97,9 @@ if ($method === 'GET') {
             $whereParams[] = $containsTerm;
         }
 
-        // Total count
         $countRows = db_query("SELECT COUNT(*) as total FROM cars $whereSql", $whereParams);
         $total = (int) ($countRows[0]['total'] ?? 0);
 
-        // Build SELECT with ORDER BY
         $sql = "SELECT * FROM cars $whereSql";
         $params = $whereParams;
 
