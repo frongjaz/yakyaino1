@@ -317,7 +317,7 @@ export default function AdminDashboardPage() {
               <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
                 <h3 className="font-semibold text-gray-700 mb-4">แก้ไขบทความ: {editingBlog.title}</h3>
                 <AddBlogForm
-                  initialData={{ ...editingBlog, author_name: editingBlog.author?.name } as BlogData}
+                  initialData={{ ...editingBlog, author_name: editingBlog.author?.name } as unknown as BlogData}
                   onSuccess={() => { setEditingBlog(null); fetchBlogs(); }}
                   onCancel={() => setEditingBlog(null)}
                 />
