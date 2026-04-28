@@ -2,13 +2,14 @@ RewriteEngine On
 RewriteBase /api/
 
 # Block direct access to library/config files
-RewriteRule ^_lib/.*$ - [F,L]
+RewriteRule ^_lib/ - [F,L]
+RewriteRule ^\.env - [F,L]
 RewriteRule ^.*\.htaccess$ - [F,L]
 
-# Dynamic routes: /api/cars/{id} -> /api/cars/detail.php?id={id}
+# Dynamic routes: /api/cars/{id} -> cars/detail.php?id={id}
 RewriteRule ^cars/([^/]+)/?$ cars/detail.php?id=$1 [L,QSA]
 
-# Dynamic routes: /api/blogs/{id} -> /api/blogs/detail.php?id={id}
+# Dynamic routes: /api/blogs/{id} -> blogs/detail.php?id={id}
 RewriteRule ^blogs/([0-9]+)/?$ blogs/detail.php?id=$1 [L,QSA]
 
 # Auth subroutes
@@ -21,12 +22,4 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([^/]+)/?$ $1.php [L,QSA]
 
-# CORS preflight: respond 204 quickly for OPTIONS
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^(.*)$ $1 [R=204,L]
-
-# Prevent directory listing
-Options -Indexes
-
-# Default character set
 AddDefaultCharset UTF-8
