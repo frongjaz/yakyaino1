@@ -3,6 +3,10 @@
 
 RewriteEngine On
 
+# Redirect non-www to www (301 permanent)
+RewriteCond %{HTTP_HOST} ^checkkub\.com$ [NC]
+RewriteRule ^(.*)$ https://www.checkkub.com/$1 [R=301,L]
+
 # Pass all /api/* requests directly to PHP — do NOT rewrite to index.html
 RewriteRule ^api/ - [L]
 

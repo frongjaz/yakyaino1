@@ -1,10 +1,13 @@
 RewriteEngine On
 RewriteBase /
 
+# Redirect non-www to www (301 permanent)
+RewriteCond %{HTTP_HOST} ^checkkub\.com$ [NC]
+RewriteRule ^(.*)$ https://www.checkkub.com/$1 [R=301,L]
+
 # Check if the request is for a physical file or directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 # Forward all other requests to the Node.js app running on port 3000
-# Note: You might need to change 'localhost' to '127.0.0.1' if localhost is blocked
 RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
