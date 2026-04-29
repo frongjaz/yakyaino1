@@ -1,7 +1,7 @@
 import { getImagePath } from "@/lib/utils";
 import { Blog } from "@/types/blog";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
 const getBlogData = (): Blog[] => [
   {

@@ -8,7 +8,7 @@ import Script from "next/script";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://v-autocar.co.th"),
+  metadataBase: new URL("https://www.checkkub.com"),
   title: "ขายรถ รับซื้อรถ | CheckKub - ต้องการขายรถ รับซื้อรถทุกประเภท",
   description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รวดเร็ว โปร่งใส ราคายุติธรรม ชำระเงินทันที. เรารับซื้อรถมือสอง รถฟลีต รถบริษัททั่วประเทศ. ขายรถให้เรา รับซื้อรถที่ไหนดี CheckKub พร้อมให้บริการ.",
   keywords: [
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ขายรถ รับซื้อรถ | CheckKub - ต้องการขายรถ รับซื้อรถทุกประเภท",
     description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รวดเร็ว โปร่งใส ราคายุติธรรม ชำระเงินทันที",
-    url: "https://v-autocar.co.th/sell",
+    url: "https://www.checkkub.com/sell",
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 };
 
 export default function SellPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
   const structuredData = [
     {

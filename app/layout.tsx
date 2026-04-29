@@ -8,7 +8,7 @@ import "../styles/index.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://v-autocar.co.th"),
+  metadataBase: new URL("https://www.checkkub.com"),
   title: {
     default: "ขายรถ รับซื้อรถ | CheckKub",
     template: "%s | CheckKub",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true },
   },
-  alternates: { canonical: "https://v-autocar.co.th" },
+  alternates: { canonical: "https://www.checkkub.com" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

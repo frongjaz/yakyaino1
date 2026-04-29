@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://v-autocar.co.th';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.checkkub.com';
 
 async function fetchCarIds(): Promise<string[]> {
   try {

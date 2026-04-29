@@ -16,7 +16,7 @@ export default function BlogDetailsClient() {
     const [blog, setBlog] = useState<Blog | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
     const [blogId, setBlogId] = useState<string | null>(null);
 
     useEffect(() => {

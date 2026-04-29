@@ -5,7 +5,7 @@ import Script from "next/script";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://v-autocar.co.th"),
+  metadataBase: new URL("https://www.checkkub.com"),
   title: "ติดต่อ CheckKub | ขายรถ รับซื้อรถ - ส่งรายละเอียดรถเพื่อรับข้อเสนอ",
   description:
     "ต้องการขายรถ? รับซื้อรถ? ติดต่อ CheckKub เพื่อรับข้อเสนอรับซื้อรถ. กรอกข้อมูลรถหรือโทรหาเราเพื่อรับข้อเสนอรับซื้อรถจำนวนมากจากทีม CheckKub ได้ทันที.",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: "ติดต่อ CheckKub | ขายรถ รับซื้อรถ",
     description:
       "ต้องการขายรถ? รับซื้อรถ? ติดต่อ CheckKub เพื่อรับข้อเสนอรับซื้อรถ",
-    url: "https://v-autocar.co.th/contact",
+    url: "https://www.checkkub.com/contact",
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 };
 
 const ContactPage = () => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
   const structuredData = {
     "@context": "https://schema.org",

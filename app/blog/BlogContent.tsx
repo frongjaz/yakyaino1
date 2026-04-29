@@ -11,7 +11,7 @@ export default function BlogContent() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
   useEffect(() => {
     fetchBlogs();

@@ -7,7 +7,7 @@ import { Metadata } from "next";
 import { fetchCarsSSR, fetchBrandsSSR, CarSSR, PaginationSSR } from "@/lib/fetchCars";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://v-autocar.co.th"),
+  metadataBase: new URL("https://www.checkkub.com"),
   title: "ขายรถ รับซื้อรถ | CheckKub - รับซื้อรถมือสอง",
   description: "ขายรถ รับซื้อรถ - ค้นหาและดูรถยนต์มือสองทั้งหมดที่มีจำหน่าย. CheckKub รับซื้อรถมือสองทุกประเภท ราคายุติธรรม. สำหรับผู้ที่ต้องการขายรถ.",
   keywords: [
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ขายรถ รับซื้อรถ | CheckKub - รับซื้อรถมือสอง",
     description: "ขายรถ รับซื้อรถ - ค้นหาและดูรถยนต์มือสองทั้งหมดที่มีจำหน่าย",
-    url: "https://v-autocar.co.th/cars",
+    url: "https://www.checkkub.com/cars",
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AllCarsPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
   let initialCars: CarSSR[] = [];
   let initialPagination: PaginationSSR = { page: 1, limit: 12, total: 0, totalPages: 1 };

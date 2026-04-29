@@ -8,7 +8,7 @@ import Script from "next/script";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://v-autocar.co.th"),
+  metadataBase: new URL("https://www.checkkub.com"),
   title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1 Founder ของ CheckKub",
   description:
     "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถจำนวนมาก. คุณชัยต้องการซื้อรถจำนวนมากและพร้อมดูแลคุณตั้งแต่การประเมินจนถึงปิดการขาย.",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1 Founder ของ CheckKub",
     description:
       "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub",
-    url: "https://v-autocar.co.th/about",
+    url: "https://www.checkkub.com/about",
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 const AboutPage = () => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://checkkub.com";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
   const structuredData = [
     {

@@ -4,7 +4,7 @@ import HomePageContent from "@/components/HomePageContent";
 import { fetchCarsSSR } from "@/lib/fetchCars";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://v-autocar.co.th"),
+  metadataBase: new URL("https://www.checkkub.com"),
   title: "ขายรถ รับซื้อรถ | CheckKub - ต้องการขายรถ รับซื้อรถทุกประเภท",
   description:
     "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ. ขายรถให้เรา ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที. คุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดังต้องการซื้อรถจำนวนมาก.",
@@ -39,11 +39,11 @@ export const metadata: Metadata = {
     title: "ขายรถ รับซื้อรถ | CheckKub - ต้องการขายรถ รับซื้อรถทุกประเภท",
     description:
       "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ. ขายรถให้เรา ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที.",
-    url: "https://v-autocar.co.th/",
+    url: "https://www.checkkub.com/",
     siteName: "CheckKub",
     images: [
       {
-        url: "https://v-autocar.co.th/images/video/car2.jpg",
+        url: "https://www.checkkub.com/images/video/car2.jpg",
         width: 1200,
         height: 630,
         alt: "ขายรถ รับซื้อรถ - CheckKub",
@@ -57,12 +57,12 @@ export const metadata: Metadata = {
     title: "ขายรถ รับซื้อรถ | CheckKub",
     description:
       "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที.",
-    images: ["https://v-autocar.co.th/images/video/car2.jpg"],
+    images: ["https://www.checkkub.com/images/video/car2.jpg"],
   },
 };
 
 export default async function Home() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://v-autocar.co.th";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
   let initialCars: { id?: string | number; name: string; image: string }[] = [];
   try {
@@ -146,9 +146,9 @@ export default async function Home() {
       "@type": ["AutoDealer", "Organization"],
       name: "CheckKub",
       alternateName: "Check-Kub",
-      image: "https://v-autocar.co.th/images/video/car2.jpg",
-      url: "https://v-autocar.co.th/",
-      logo: "https://v-autocar.co.th/images/logo/logo.svg",
+      image: "https://www.checkkub.com/images/video/car2.jpg",
+      url: "https://www.checkkub.com/",
+      logo: "https://www.checkkub.com/images/logo/logo.svg",
       telephone: "+66-2-123-4567",
       email: "sales@v-autocar.com",
       description:
