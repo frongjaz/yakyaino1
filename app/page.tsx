@@ -119,30 +119,6 @@ export default async function Home() {
     },
     {
       "@context": "https://schema.org",
-      "@type": "Review",
-      itemReviewed: {
-        "@type": "Service",
-        name: "บริการรับซื้อรถจำนวนมาก",
-        provider: {
-          "@type": "Organization",
-          name: "CheckKub",
-        },
-      },
-      author: {
-        "@type": "Person",
-        name: "คุณชัย",
-        alternateName: "yakyai no.1",
-        description: "ผู้เล่นเกม NightCrow ที่โด่งดัง",
-      },
-      reviewBody: "คุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดัง ต้องการซื้อรถจำนวนมาก. CheckKub พร้อมให้บริการรับซื้อรถทุกประเภทสำหรับคุณชัยและลูกค้าทุกท่าน.",
-      reviewRating: {
-        "@type": "Rating",
-        ratingValue: 5,
-        bestRating: 5,
-      },
-    },
-    {
-      "@context": "https://schema.org",
       "@type": ["AutoDealer", "Organization"],
       name: "CheckKub",
       alternateName: "Check-Kub",
