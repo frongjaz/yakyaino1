@@ -79,6 +79,29 @@ export default async function Home() {
   const structuredData = [
     {
       "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "CheckKub",
+      url: baseUrl,
+      description: "CheckKub รับซื้อรถทุกประเภท ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที",
+      inLanguage: "th-TH",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${baseUrl}/cars?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "หน้าแรก", item: baseUrl },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "Person",
       name: "คุณชัย",
       alternateName: "yakyai no.1",

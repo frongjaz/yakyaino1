@@ -47,6 +47,50 @@ export default function SellPage() {
   const structuredData = [
     {
       "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: "วิธีขายรถกับ CheckKub",
+      description: "ขั้นตอนการขายรถให้กับ CheckKub อย่างง่ายดาย ประเมินราคารวดเร็ว ชำระเงินทันที",
+      totalTime: "P1D",
+      estimatedCost: {
+        "@type": "MonetaryAmount",
+        currency: "THB",
+        value: "0",
+      },
+      supply: [
+        { "@type": "HowToSupply", name: "สำเนาทะเบียนรถ" },
+        { "@type": "HowToSupply", name: "บัตรประชาชนเจ้าของรถ" },
+        { "@type": "HowToSupply", name: "เล่มทะเบียนรถ" },
+      ],
+      step: [
+        {
+          "@type": "HowToStep",
+          position: 1,
+          name: "ส่งข้อมูลรถให้ทีม CheckKub",
+          text: "ส่งรูปถ่ายและข้อมูลรถ เช่น ยี่ห้อ รุ่น ปี เลขไมล์ สภาพรถ ผ่านช่องทาง LINE, Facebook หรือเว็บไซต์",
+          url: `${baseUrl}/sell`,
+        },
+        {
+          "@type": "HowToStep",
+          position: 2,
+          name: "รับใบเสนอราคาภายใน 24 ชั่วโมง",
+          text: "ทีมผู้เชี่ยวชาญของ CheckKub จะประเมินราคาและส่งข้อเสนอภายใน 24 ชั่วโมง ไม่มีค่าใช้จ่าย",
+        },
+        {
+          "@type": "HowToStep",
+          position: 3,
+          name: "นัดตรวจสภาพรถ",
+          text: "หากตกลงราคาได้ ทีมงานจะนัดหมายตรวจสภาพรถ ณ สถานที่ที่คุณสะดวก ทั่วประเทศ",
+        },
+        {
+          "@type": "HowToStep",
+          position: 4,
+          name: "โอนเงินทันทีหลังตรวจสภาพ",
+          text: "เมื่อตรวจสภาพรถเรียบร้อย CheckKub จะชำระเงินทันทีภายใน 1-3 วันทำการ พร้อมดูแลเอกสารโอนกรรมสิทธิ์ครบ",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "Service",
       serviceType: ["ขายรถ", "รับซื้อรถ", "ต้องการขายรถ"],
       name: "บริการขายรถ รับซื้อรถ",
@@ -104,6 +148,15 @@ export default function SellPage() {
     },
   ];
 
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "หน้าแรก", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: "ขายรถ รับซื้อรถ", item: `${baseUrl}/sell` },
+    ],
+  };
+
   return (
     <>
       {structuredData.map((data, index) => (
@@ -114,6 +167,11 @@ export default function SellPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />
       ))}
+      <Script
+        id="sell-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
       <ScrollUp />
       <SellHero />
       <SellBenefits />

@@ -59,12 +59,26 @@ const ContactPage = () => {
     },
   };
 
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "หน้าแรก", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: "ติดต่อเรา", item: `${baseUrl}/contact` },
+    ],
+  };
+
   return (
     <>
       <Script
         id="contact-page-structured-data"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <Script
+        id="contact-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
       <Contact />
     </>

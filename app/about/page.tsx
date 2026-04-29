@@ -88,6 +88,15 @@ const AboutPage = () => {
     },
   ];
 
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "หน้าแรก", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: "เกี่ยวกับเรา", item: `${baseUrl}/about` },
+    ],
+  };
+
   return (
     <>
       {structuredData.map((data, index) => (
@@ -98,6 +107,11 @@ const AboutPage = () => {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />
       ))}
+      <Script
+        id="about-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
       <AboutHero />
       <AboutUsContent />
       <HistorySection />

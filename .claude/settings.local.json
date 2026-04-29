@@ -32,7 +32,10 @@
       "Bash(curl -sI \"https://checkkub.com/api/brands\")",
       "Bash(curl -sI \"https://checkkub.com/api/cars\")",
       "Bash(curl -sL -o /dev/null -w \"%{http_code} %{url_effective}\" \"https://checkkub.com/admin/login\")",
-      "Bash(curl -sL -o /dev/null -w \"%{http_code} %{url_effective}\" \"https://checkkub.com/admin/dashboard\")"
+      "Bash(curl -sL -o /dev/null -w \"%{http_code} %{url_effective}\" \"https://checkkub.com/admin/dashboard\")",
+      "Bash(xargs cat *)",
+      "Bash(git rm *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/sell)"
     ]
   }
 }
