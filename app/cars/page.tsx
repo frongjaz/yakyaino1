@@ -74,37 +74,6 @@ export default async function AllCarsPage() {
     ],
   };
 
-  const faqData = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: "CheckKub รับซื้อรถยี่ห้ออะไรบ้าง?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "CheckKub รับซื้อรถทุกยี่ห้อ ไม่ว่าจะเป็น Toyota, Honda, Isuzu, Mitsubishi, Ford, Chevrolet, BMW, Mercedes-Benz, Mazda, Nissan และทุกแบรนด์อื่นๆ ทั้งรถเก๋ง รถกระบะ รถ SUV และรถบรรทุก",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "รถมือสองอายุมากขายได้ไหม?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "CheckKub รับซื้อรถมือสองทุกอายุ ไม่ว่าจะเป็นรถใหม่หรือรถเก่า ขอเพียงสภาพรถดีและเอกสารครบ ทีมงานจะประเมินราคาที่ยุติธรรมตามสภาพจริง",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "ขายรถมือสองที่ CheckKub ได้เงินเมื่อไหร่?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "หลังตกลงราคาและตรวจสภาพรถเรียบร้อย CheckKub จะโอนเงินให้ภายใน 1-3 วันทำการ เร็วกว่าการขายผ่านเต็นท์ทั่วไปมาก",
-        },
-      },
-    ],
-  };
-
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -133,11 +102,6 @@ export default async function AllCarsPage() {
         id="cars-breadcrumb"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
-      />
-      <Script
-        id="cars-faq"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqData) }}
       />
       <AllCarsHero />
       {carouselCars.length > 0 && <CarCarousel cars={carouselCars} />}
