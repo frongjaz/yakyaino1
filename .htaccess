@@ -1,13 +1,19 @@
 RewriteEngine On
 RewriteBase /
 
-# Redirect non-www to www (301 permanent)
+# Force HTTPS + www in one pass (covers all combinations)
+# Fires if: HTTP (not HTTPS) OR non-www host
+RewriteCond %{HTTPS} off [OR]
 RewriteCond %{HTTP_HOST} ^checkkub\.com$ [NC]
 RewriteRule ^(.*)$ https://www.checkkub.com/$1 [R=301,L]
 
-# Check if the request is for a physical file or directory
-RewriteCond %{REQUEST_FILENAME} !-f
+# Remove trailing slash (non-directories only)
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [R=301,L]
 
-# Forward all other requests to the Node.js app running on port 3000
+# Serve static files directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Forward everything else to Node.js on port 3000
 RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
