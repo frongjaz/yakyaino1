@@ -115,10 +115,12 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
           <h2 className="mb-8 text-2xl font-bold text-gray-900">รถที่เกี่ยวข้อง</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {Array.from({ length: count }).map((_, index) => (
-              <div key={index} className="animate-pulse">
-                <div className="aspect-[4/3] w-full bg-gray-300 rounded-lg mb-4"></div>
-                <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              <div key={index} className="animate-pulse overflow-hidden rounded-xl bg-[#242424]">
+                <div className="w-full bg-[#333]" style={{ paddingBottom: "66.66%" }}></div>
+                <div className="p-4 space-y-2">
+                  <div className="h-3 bg-[#333] rounded w-1/3"></div>
+                  <div className="h-4 bg-[#333] rounded w-2/3"></div>
+                </div>
               </div>
             ))}
           </div>
@@ -134,16 +136,16 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
   return (
     <section className="bg-white py-12">
       <div className="container mx-auto px-4">
-        <h2 className="mb-8 text-2xl font-bold text-gray-900">รถที่เกี่ยวข้อง</h2>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <h2 className="mb-6 text-2xl font-bold text-gray-900">รถที่เกี่ยวข้อง</h2>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {relatedCars.map((car) => (
             <Link
               key={car.id}
               href={`/cars/${encodeCarId(car.id)}`}
-              className="group relative block overflow-hidden rounded-lg bg-gray-800 transition hover:shadow-lg cursor-pointer"
+              className="group block overflow-hidden rounded-xl bg-[#242424] shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-white/5 hover:border-[#EF4444]/30"
             >
               {/* Car Image */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
+              <div className="relative w-full overflow-hidden bg-[#111]" style={{ paddingBottom: "66.66%" }}>
                 <Image
                   src={getImagePath(car.image)}
                   alt={`${car.brand} ${car.model}`}
@@ -154,62 +156,43 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
                     const t = e.target as HTMLImageElement;
                     if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
                   }}
+                  unoptimized
                 />
-                
-                {/* Photo Count Badge */}
-                <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-lg bg-black/60 backdrop-blur-sm px-2.5 py-1.5 border border-white/20 shadow-lg">
-                  <svg
-                    className="h-3 w-3 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                      clipRule="evenodd"
-                    />
+                <div className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-md bg-black/70 backdrop-blur-sm px-2 py-1">
+                  <svg className="h-3 w-3 text-white/80" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-xs font-medium text-white">
-                    {car.photo_count || 0}
-                  </span>
+                  <span className="text-xs text-white/90">{car.photo_count || 0}</span>
                 </div>
-
-                {/* Year Badge */}
-                <div className="absolute right-4 top-4 z-10 rounded-md bg-[#EF4444] px-3 py-1.5 text-sm font-bold text-white">
+                <div className="absolute right-3 top-3 z-10 rounded-md bg-[#EF4444] px-2.5 py-1 text-sm font-bold text-white">
                   {car.year}
                 </div>
+                <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#242424] to-transparent z-10 pointer-events-none" />
               </div>
 
               {/* Car Info */}
-              <div className="bg-gray-800 p-4">
-                <h3 className="mb-1 text-lg font-bold uppercase text-[#EF4444]">
-                  {car.brand}
-                </h3>
-                <p className="mb-3 text-sm text-white">
-                  {car.model} {car.year}
-                </p>
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex-1"></div>
-                  <p className="text-xl font-bold text-[#EF4444]">
+              <div className="p-4 pt-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <h3 className="text-xs font-semibold uppercase tracking-widest text-[#EF4444] mb-0.5">
+                      {car.brand}
+                    </h3>
+                    <p className="text-sm font-medium text-white/90 truncate">
+                      {car.model} {car.year}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-lg font-bold text-[#EF4444] tabular-nums">
                     {formatPrice(car.price)}
                   </p>
                 </div>
-                <div className="mb-3 h-px bg-gray-700"></div>
-                <div className="flex items-center justify-between text-sm text-white transition group-hover:text-gray-300">
-                  <span>ดูทั้งหมด</span>
-                  <svg
-                    className="h-4 w-4 text-[#EF4444]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+                <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
+                  <span className="text-xs text-white/40">ราคา (บาท)</span>
+                  <div className="flex items-center gap-1 text-xs font-medium text-white/60 group-hover:text-[#EF4444] transition-colors">
+                    <span>ดูทั้งหมด</span>
+                    <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </Link>

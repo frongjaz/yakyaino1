@@ -140,7 +140,6 @@ const CarSpecifications = ({
         ))}
         <hr className="my-4 border-gray-200" />
         <div className="flex items-center gap-3">
-      
           <div className="flex-1">
             <div className="inline-flex items-center rounded-full border border-[#EF4444] bg-white px-4 py-2">
               <p className="text-sm font-medium text-black">

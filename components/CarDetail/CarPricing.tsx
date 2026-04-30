@@ -26,14 +26,8 @@ const CarPricing = ({ price, monthlyPayment }: CarPricingProps) => {
           </p>
         )}
       </div>
-      
-      {/* Action Icons */}
       <div className="flex gap-3">
-        {/* Share Icon */}
         <Image src={getImagePath("/images/logo/car_page_printredIcon-28.svg")} alt="Share" width={50} height={50} />
-      
-        
-        {/* Print Icon */}
         <Image src={getImagePath("/images/logo/car_page_shareredIcon-29.svg")} alt="Share" width={50} height={50} />
       </div>
     </div>
