@@ -29,7 +29,9 @@ $id     = isset($_GET['id']) && $_GET['id'] !== '' ? (int) $_GET['id'] : null;
 
 // ── Single banner: GET|PUT|DELETE /api/banners/{id} ─────────────────────────
 if ($id !== null) {
-    $method = require_methods(['GET', 'PUT', 'DELETE']);
+    if (!in_array($method, ['GET', 'PUT', 'DELETE'], true)) {
+        json_error('Method not allowed', 405);
+    }
 
     if ($method === 'GET') {
         try {
