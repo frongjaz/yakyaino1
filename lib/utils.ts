@@ -12,10 +12,17 @@ export const LOGO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 export function getImagePath(imagePath: string): string {
   if (!imagePath) return "/images/placeholder.jpg";
 
-  // If it's already a full URL, return as is
+  // Strip localhost origin so stored URLs like http://localhost:3000/images/x.jpg
+  // become /images/x.jpg and go through the normal path resolution below
+  const localhostMatch = imagePath.match(/^https?:\/\/localhost(:\d+)?(\/.*)?$/);
+  if (localhostMatch) {
+    imagePath = localhostMatch[2] || "/";
+  }
+
+  // External URL — return as-is
   if (imagePath.startsWith("http")) return imagePath;
 
-  // Ensure path starts with a slash for internal processing
+  // Ensure path starts with a slash
   const pathWithSlash = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 
   // In production, use full URL to checkkub.com
@@ -23,7 +30,6 @@ export function getImagePath(imagePath: string): string {
     return `https://checkkub.com${pathWithSlash}`;
   }
 
-  // Local development: use relative path so images load from public folder
   return pathWithSlash;
 }
 

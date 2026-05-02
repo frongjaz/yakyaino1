@@ -7,6 +7,7 @@ import { apiGet, apiDelete } from '@/lib/api';
 import { getSession, clearSession } from '@/lib/auth-client';
 import AddCarForm, { CarFormData } from '@/components/Admin/AddCarForm';
 import AddBlogForm, { BlogData } from '@/components/Admin/AddBlogForm';
+import AddBannerForm, { BannerFormData } from '@/components/Admin/AddBannerForm';
 import { getImagePath } from '@/lib/utils';
 
 interface Session { userId: number; username: string; role: string }
@@ -17,8 +18,9 @@ interface Car {
   color?: string; transmission?: string; fuel_type?: string; engine_size?: string; license_plate?: string;
 }
 interface Blog { id: number; title: string; paragraph: string; image: string; status: string; createdAt: string; author: { name: string } }
+interface Banner { id: number; image_url: string; alt_text: string; link_url?: string | null; sort_order: number; is_active: number; created_at: string }
 
-type Tab = 'cars' | 'blogs';
+type Tab = 'cars' | 'blogs' | 'banners';
 
 function formatPrice(n: number) {
   return new Intl.NumberFormat('th-TH').format(n);
@@ -50,6 +52,12 @@ export default function AdminDashboardPage() {
   const [blogsLoading, setBlogsLoading] = useState(false);
   const [showAddBlog, setShowAddBlog] = useState(false);
   const [deletingBlogId, setDeletingBlogId] = useState<number | null>(null);
+
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [bannersLoading, setBannersLoading] = useState(false);
+  const [showAddBanner, setShowAddBanner] = useState(false);
+  const [deletingBannerId, setDeletingBannerId] = useState<number | null>(null);
+  const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
 
   const [editingCar, setEditingCar] = useState<Car | null>(null);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
@@ -93,7 +101,16 @@ export default function AdminDashboardPage() {
     setBlogsLoading(false);
   }, []);
 
-  useEffect(() => { if (session) { fetchCars(); fetchBlogs(); } }, [session, fetchCars, fetchBlogs]);
+  const fetchBanners = useCallback(async () => {
+    setBannersLoading(true);
+    try {
+      const d = await apiGet<{ success: boolean; data: Banner[] }>('/api/banners?admin=true');
+      if (d.success) setBanners(d.data ?? []);
+    } catch {}
+    setBannersLoading(false);
+  }, []);
+
+  useEffect(() => { if (session) { fetchCars(); fetchBlogs(); fetchBanners(); } }, [session, fetchCars, fetchBlogs, fetchBanners]);
 
   // ── delete car ────────────────────────────────────────────────────────────
   const deleteCar = async (id: number) => {
@@ -106,6 +123,19 @@ export default function AdminDashboardPage() {
       alert('ลบไม่สำเร็จ: ' + (e.message ?? ''));
     }
     setDeletingCarId(null);
+  };
+
+  // ── delete banner ─────────────────────────────────────────────────────────
+  const deleteBanner = async (id: number) => {
+    if (!confirm(`ยืนยันลบ banner ID ${id}?`)) return;
+    setDeletingBannerId(id);
+    try {
+      await apiDelete(`/api/banners/${id}`);
+      setBanners(prev => prev.filter(b => b.id !== id));
+    } catch (e: any) {
+      alert('ลบไม่สำเร็จ: ' + (e.message ?? ''));
+    }
+    setDeletingBannerId(null);
   };
 
   // ── delete blog ───────────────────────────────────────────────────────────
@@ -177,19 +207,17 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <div className="hidden sm:flex bg-white rounded-xl border border-gray-200 p-4 items-center gap-3">
-            <div className="text-3xl">✅</div>
+            <div className="text-3xl">🖼️</div>
             <div>
-              <div className="text-2xl font-bold text-gray-800">
-                {cars.filter(c => c.status === 'available').length}
-              </div>
-              <div className="text-xs text-gray-500">รถพร้อมขาย</div>
+              <div className="text-2xl font-bold text-gray-800">{banners.filter(b => b.is_active).length}</div>
+              <div className="text-xs text-gray-500">Banner ที่ใช้งาน</div>
             </div>
           </div>
         </div>
 
         {/* ── Tab Bar ──────────────────────────────────────────────────────── */}
         <div className="flex gap-1 bg-gray-100 p-1 rounded-lg mb-4 w-fit">
-          {(['cars', 'blogs'] as Tab[]).map(t => (
+          {(['cars', 'blogs', 'banners'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -197,7 +225,7 @@ export default function AdminDashboardPage() {
                 tab === t ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              {t === 'cars' ? '🚗 รถยนต์' : '📝 บทความ'}
+              {t === 'cars' ? '🚗 รถยนต์' : t === 'blogs' ? '📝 บทความ' : '🖼️ Banner'}
             </button>
           ))}
         </div>
@@ -376,6 +404,89 @@ export default function AdminDashboardPage() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Banners Tab ──────────────────────────────────────────────────── */}
+        {tab === 'banners' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-gray-700">Banner หน้าแรก ({banners.length})</h2>
+              <button
+                onClick={() => { setEditingBanner(null); setShowAddBanner(v => !v); }}
+                className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors"
+              >
+                {showAddBanner ? '✕ ปิดฟอร์ม' : '+ เพิ่ม Banner'}
+              </button>
+            </div>
+
+            {showAddBanner && !editingBanner && (
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 className="font-semibold text-gray-700 mb-4">เพิ่ม Banner ใหม่</h3>
+                <AddBannerForm onSuccess={() => { setShowAddBanner(false); fetchBanners(); }} />
+              </div>
+            )}
+
+            {editingBanner && (
+              <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+                <h3 className="font-semibold text-gray-700 mb-4">แก้ไข Banner ID: {editingBanner.id}</h3>
+                <AddBannerForm
+                  initialData={editingBanner as BannerFormData}
+                  onSuccess={() => { setEditingBanner(null); fetchBanners(); }}
+                  onCancel={() => setEditingBanner(null)}
+                />
+              </div>
+            )}
+
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              {bannersLoading ? (
+                <div className="p-8 text-center text-gray-400 text-sm">กำลังโหลด...</div>
+              ) : banners.length === 0 ? (
+                <div className="p-8 text-center text-gray-400 text-sm">ยังไม่มี Banner</div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {banners.map(banner => (
+                    <div key={banner.id} className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
+                      <div className="relative w-24 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                        <Image
+                          src={getImagePath(banner.image_url)}
+                          alt={banner.alt_text || 'banner'}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                          onError={e => { (e.target as HTMLImageElement).src = '/images/404.svg'; }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-800 truncate">{banner.alt_text || '(ไม่มี alt text)'}</div>
+                        <div className="text-xs text-gray-400 truncate">
+                          {banner.link_url ? `→ ${banner.link_url}` : 'ไม่มีลิงก์'}
+                          {' · '}ลำดับ: {banner.sort_order}
+                        </div>
+                      </div>
+                      <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${banner.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {banner.is_active ? 'เปิด' : 'ปิด'}
+                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => { setShowAddBanner(false); setEditingBanner(editingBanner?.id === banner.id ? null : banner); }}
+                          className={`text-xs px-3 py-1.5 rounded transition-colors ${editingBanner?.id === banner.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}
+                        >
+                          {editingBanner?.id === banner.id ? 'ปิด' : 'แก้ไข'}
+                        </button>
+                        <button
+                          onClick={() => deleteBanner(banner.id)}
+                          disabled={deletingBannerId === banner.id}
+                          className="text-xs px-3 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 transition-colors"
+                        >
+                          {deletingBannerId === banner.id ? '...' : 'ลบ'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

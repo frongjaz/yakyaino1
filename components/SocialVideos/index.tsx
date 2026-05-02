@@ -4,97 +4,78 @@ import Script from "next/script";
 
 interface TikTokVideo {
   url: string;
-  title: string;
-  thumbnail?: string;
 }
+
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+  </svg>
+);
+
+const TIKTOK_VIDEOS: TikTokVideo[] = [
+  { url: "https://www.tiktok.com/@v_autocar/video/7456310987864526088" },
+  { url: "https://www.tiktok.com/@v_autocar/video/7456310987864526088" },
+  { url: "https://www.tiktok.com/@v_autocar/video/7281662392226925826" },
+];
+
+const getVideoId = (url: string) => url.match(/\/video\/(\d+)/)?.[1] ?? null;
+const getUsername = (url: string) => url.match(/@([^/]+)/)?.[1] ?? "v_autocar";
 
 const SocialVideos = () => {
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
-  const tiktokVideos: TikTokVideo[] = [
-    {
-      url: "https://www.tiktok.com/@v_autocar/video/7456310987864526088",
-      title: "",
-    },
-    {
-      url: "https://www.tiktok.com/@v_autocar/video/7456310987864526088",
-      title: "",
-    },
-    {
-      url: "https://www.tiktok.com/@v_autocar/video/7281662392226925826",
-      title: "",
-    },
-  ];
-
-
-  // ฟังก์ชันสำหรับดึง video ID จาก URL
-  const getVideoId = (url: string) => {
-    const match = url.match(/\/video\/(\d+)/);
-    return match ? match[1] : null;
-  };
-
-  // ฟังก์ชันสำหรับดึง username และ video ID จาก URL
-  const getTikTokEmbedUrl = (url: string) => {
-    const match = url.match(/@([^/]+)\/video\/(\d+)/);
-    if (match) {
-      return `https://www.tiktok.com/@${match[1]}/video/${match[2]}`;
-    }
-    return url;
-  };
-
-  // ฟังก์ชันสำหรับดึง username จาก URL
-  const getUsername = (url: string) => {
-    const match = url.match(/@([^/]+)/);
-    return match ? match[1] : "v_autocar";
-  };
-
-  // Render embed เมื่อ script โหลดเสร็จ
   useEffect(() => {
     if (scriptLoaded && typeof window !== "undefined" && window.tiktokEmbed) {
-      const timer = setTimeout(() => {
-        window.tiktokEmbed?.lib.render();
-      }, 100);
+      const timer = setTimeout(() => window.tiktokEmbed?.lib.render(), 100);
       return () => clearTimeout(timer);
     }
   }, [scriptLoaded]);
 
   return (
-    <section className="bg-[#2C2C2C] py-16 md:py-20">
+    <section className="bg-[#111111] py-16 md:py-20">
       <Script
         src="https://www.tiktok.com/embed.js"
         strategy="lazyOnload"
-        onLoad={() => {
-          setScriptLoaded(true);
-        }}
+        onLoad={() => setScriptLoaded(true)}
       />
       <div className="container px-4">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {tiktokVideos.map((video, index) => {
-            const videoId = getVideoId(video.url);
-            const embedUrl = getTikTokEmbedUrl(video.url);
 
+        {/* Header */}
+        <div className="mb-10 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5">
+            <TikTokIcon className="h-4 w-4 text-white/80" />
+            <span className="text-sm font-medium text-white/50">@v_autocar</span>
+          </div>
+          <h2 className="text-2xl font-bold text-white md:text-3xl">วิดีโอล่าสุดของเรา</h2>
+          <p className="mt-2 text-sm text-white/40">คลิปรถมือสองคุณภาพดี อัปเดตสม่ำเสมอ</p>
+        </div>
+
+        {/* Videos */}
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {TIKTOK_VIDEOS.map((video, index) => {
+            const videoId = getVideoId(video.url);
+            const username = getUsername(video.url);
             return (
-              <div key={index} className="flex justify-center w-full">
-                <div className="relative w-full max-w-full md:max-w-[400px] overflow-hidden rounded-lg flex items-center justify-center" style={{ minHeight: "400px" }}>
+              <div key={index} className="flex justify-center">
+                <div
+                  className="w-full max-w-[340px] overflow-hidden rounded-2xl bg-[#1c1c1c] shadow-2xl ring-1 ring-white/8"
+                  style={{ minHeight: "560px" }}
+                >
                   <blockquote
                     className="tiktok-embed"
-                    cite={embedUrl}
+                    cite={video.url}
                     data-video-id={videoId || undefined}
                     data-embed-from="embed_page"
-                    style={{
-                      maxWidth: "100%",
-                      minWidth: "100%",
-                      width: "100%",
-                    }}
+                    style={{ maxWidth: "100%", minWidth: "100%", width: "100%" }}
                   >
                     <section>
                       <a
                         target="_blank"
                         rel="noreferrer"
-                        title={`@${getUsername(video.url)}`}
-                        href={`https://www.tiktok.com/@${getUsername(video.url)}?refer=embed`}
+                        title={`@${username}`}
+                        href={`https://www.tiktok.com/@${username}?refer=embed`}
                       >
-                        @{getUsername(video.url)}
+                        @{username}
                       </a>
                     </section>
                   </blockquote>
@@ -104,41 +85,32 @@ const SocialVideos = () => {
           })}
         </div>
 
-        {/* TikTok Button */}
-        <div className="mt-8 text-center">
+        {/* CTA */}
+        <div className="mt-10 text-center">
           <a
             href="https://www.tiktok.com/@v_autocar"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-[#EF4444] bg-[#1a1a1a] px-6 py-3 font-semibold text-white transition hover:bg-[#2a2a2a]"
+            className="group inline-flex items-center gap-3 rounded-xl bg-white px-8 py-3.5 font-bold text-black shadow-lg transition hover:scale-105 hover:shadow-2xl"
           >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="text-white"
-            >
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-            </svg>
-            TIKTOK
+            <span className="relative flex h-6 w-6 shrink-0">
+              <TikTokIcon className="absolute inset-0 h-6 w-6 translate-x-[1.5px] translate-y-[1.5px] text-[#69C9D0]" />
+              <TikTokIcon className="absolute inset-0 h-6 w-6 -translate-x-[1.5px] -translate-y-[1.5px] text-[#EE1D52]" />
+              <TikTokIcon className="relative h-6 w-6 text-black" />
+            </span>
+            ดูวิดีโอทั้งหมดบน TikTok
           </a>
         </div>
+
       </div>
     </section>
   );
 };
 
-// เพิ่ม type declaration สำหรับ window.tiktokEmbed
 declare global {
   interface Window {
-    tiktokEmbed?: {
-      lib: {
-        render: () => void;
-      };
-    };
+    tiktokEmbed?: { lib: { render: () => void } };
   }
 }
 
 export default SocialVideos;
-
