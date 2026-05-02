@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { apiGet, apiDelete } from '@/lib/api';
+import { apiGet, apiDelete, apiDeleteTunnel } from '@/lib/api';
 import { getSession, clearSession } from '@/lib/auth-client';
 import AddCarForm, { CarFormData } from '@/components/Admin/AddCarForm';
 import AddBlogForm, { BlogData } from '@/components/Admin/AddBlogForm';
@@ -130,7 +130,7 @@ export default function AdminDashboardPage() {
     if (!confirm(`ยืนยันลบ banner ID ${id}?`)) return;
     setDeletingBannerId(id);
     try {
-      await apiDelete(`/api/banners/${id}`);
+      await apiDeleteTunnel(`/api/banners/${id}`);
       setBanners(prev => prev.filter(b => b.id !== id));
     } catch (e: any) {
       alert('ลบไม่สำเร็จ: ' + (e.message ?? ''));

@@ -17,7 +17,14 @@ require_once __DIR__ . '/_lib/auth.php';
 
 handle_preflight();
 
+// Apache blocks PUT/DELETE on shared hosting — support X-HTTP-Method-Override tunneled via POST
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+if ($method === 'POST') {
+    $override = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? '';
+    if ($override !== '') {
+        $method = strtoupper($override);
+    }
+}
 $id     = isset($_GET['id']) && $_GET['id'] !== '' ? (int) $_GET['id'] : null;
 
 // ── Single banner: GET|PUT|DELETE /api/banners/{id} ─────────────────────────

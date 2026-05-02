@@ -209,3 +209,28 @@ export async function apiDelete<T = any>(endpoint: string): Promise<T> {
   return handleResponse(response, url);
 }
 
+/**
+ * PUT via POST + X-HTTP-Method-Override (for Apache shared hosting that blocks PUT/DELETE)
+ */
+export async function apiPutTunnel<T = any>(endpoint: string, data?: any): Promise<T> {
+  const url = getApiUrl(endpoint);
+  const response = await apiFetch(endpoint, {
+    method: 'POST',
+    body: data ? JSON.stringify(data) : undefined,
+    headers: { 'X-HTTP-Method-Override': 'PUT' },
+  });
+  return handleResponse(response, url);
+}
+
+/**
+ * DELETE via POST + X-HTTP-Method-Override (for Apache shared hosting that blocks PUT/DELETE)
+ */
+export async function apiDeleteTunnel<T = any>(endpoint: string): Promise<T> {
+  const url = getApiUrl(endpoint);
+  const response = await apiFetch(endpoint, {
+    method: 'POST',
+    headers: { 'X-HTTP-Method-Override': 'DELETE' },
+  });
+  return handleResponse(response, url);
+}
+

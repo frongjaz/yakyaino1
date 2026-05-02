@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
-import { apiPost, apiPut, getApiUrl } from '@/lib/api';
+import { apiPost, apiPutTunnel, getApiUrl } from '@/lib/api';
 import { getImagePath } from '@/lib/utils';
 
 export interface BannerFormData {
@@ -92,7 +92,7 @@ export default function AddBannerForm({ onSuccess, onCancel, initialData }: Prop
       };
 
       if (isEdit && initialData?.id) {
-        await apiPut(`/api/banners/${initialData.id}`, payload);
+        await apiPutTunnel(`/api/banners/${initialData.id}`, payload);
         setMessage({ type: 'success', text: 'แก้ไข banner เรียบร้อย' });
       } else {
         await apiPost('/api/banners', payload);
