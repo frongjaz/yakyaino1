@@ -18,7 +18,7 @@ interface Car {
   color?: string; transmission?: string; fuel_type?: string; engine_size?: string; license_plate?: string;
 }
 interface Blog { id: number; title: string; paragraph: string; image: string; status: string; createdAt: string; author: { name: string } }
-interface Banner { id: number; image_url: string; alt_text: string; link_url?: string | null; sort_order: number; is_active: number; created_at: string }
+interface Banner { id: number; image_url: string; alt_text: string; sort_order: number; is_active: number; created_at: string }
 
 type Tab = 'cars' | 'blogs' | 'banners';
 
@@ -463,8 +463,7 @@ export default function AdminDashboardPage() {
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-gray-800 truncate">{banner.alt_text || '(ไม่มี alt text)'}</div>
                         <div className="text-xs text-gray-400 truncate">
-                          {banner.link_url ? `→ ${banner.link_url}` : 'ไม่มีลิงก์'}
-                          {' · '}ลำดับ: {banner.sort_order}
+                          ลำดับ: {banner.sort_order}
                         </div>
                       </div>
                       <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${banner.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>

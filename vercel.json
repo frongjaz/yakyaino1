@@ -13,6 +13,9 @@
     },
     "app/api/cars/[id]/route.ts": {
       "maxDuration": 30
+    },
+    "app/api/banners/**": {
+      "maxDuration": 30
     }
   },
   "headers": [

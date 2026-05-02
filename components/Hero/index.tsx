@@ -2,14 +2,12 @@
 import { getImagePath } from "@/lib/utils";
 import { apiGet } from "@/lib/api";
 import Image from "next/image";
-import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 
 interface Banner {
   id: number;
   image_url: string;
   alt_text: string;
-  link_url?: string | null;
   sort_order: number;
   is_active: number;
 }
@@ -18,7 +16,6 @@ const FALLBACK: Banner = {
   id: 0,
   image_url: "/images/hero/HomeBanner.png",
   alt_text: "ขายรถให้เรา... จบไวภายใน 15 นาที",
-  link_url: null,
   sort_order: 0,
   is_active: 1,
 };
@@ -77,11 +74,7 @@ const Hero = () => {
   return (
     <section id="home" className="pt-[82px] md:pt-[90px] lg:pt-0">
       <div className="relative w-full max-w-full overflow-hidden">
-        {slide.link_url ? (
-          <Link href={slide.link_url} aria-label={slide.alt_text}>
-            {BannerImage}
-          </Link>
-        ) : BannerImage}
+        {BannerImage}
 
         {/* Arrows — แสดงเมื่อมีมากกว่า 1 slide */}
         {slides.length > 1 && (

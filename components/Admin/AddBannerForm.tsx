@@ -9,7 +9,6 @@ export interface BannerFormData {
   id?: number;
   image_url: string;
   alt_text: string;
-  link_url?: string | null;
   sort_order: number;
   is_active: number;
 }
@@ -32,7 +31,6 @@ export default function AddBannerForm({ onSuccess, onCancel, initialData }: Prop
   const [formData, setFormData] = useState({
     image_url: initialData?.image_url || '',
     alt_text: initialData?.alt_text || '',
-    link_url: initialData?.link_url || '',
     sort_order: (initialData?.sort_order ?? 0).toString(),
     is_active: initialData?.is_active ?? 1,
   });
@@ -89,7 +87,6 @@ export default function AddBannerForm({ onSuccess, onCancel, initialData }: Prop
       const payload = {
         image_url: imageUrl,
         alt_text: formData.alt_text,
-        link_url: formData.link_url || null,
         sort_order: parseInt(formData.sort_order) || 0,
         is_active: formData.is_active,
       };
@@ -167,22 +164,8 @@ export default function AddBannerForm({ onSuccess, onCancel, initialData }: Prop
         />
       </div>
 
-      {/* Link URL */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-          ลิงก์เมื่อคลิก <span className="text-gray-400 font-normal">(ไม่บังคับ)</span>
-        </label>
-        <input
-          type="text"
-          name="link_url"
-          value={formData.link_url}
-          onChange={handleChange}
-          placeholder="เช่น: /cars หรือ https://..."
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
-        />
-      </div>
 
-      <div className="grid grid-cols-2 gap-4">
+<div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">ลำดับการแสดง</label>
           <input
