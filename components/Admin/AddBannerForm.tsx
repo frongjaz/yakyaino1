@@ -92,7 +92,7 @@ export default function AddBannerForm({ onSuccess, onCancel, initialData }: Prop
       };
 
       if (isEdit && initialData?.id) {
-        await apiPutTunnel(`/api/banners/${initialData.id}`, payload);
+        await apiPutTunnel(`/api/banners?id=${initialData.id}`, payload);
         setMessage({ type: 'success', text: 'แก้ไข banner เรียบร้อย' });
       } else {
         await apiPost('/api/banners', payload);

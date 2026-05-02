@@ -130,7 +130,7 @@ export default function AdminDashboardPage() {
     if (!confirm(`ยืนยันลบ banner ID ${id}?`)) return;
     setDeletingBannerId(id);
     try {
-      await apiDeleteTunnel(`/api/banners/${id}`);
+      await apiDeleteTunnel(`/api/banners?id=${id}`);
       setBanners(prev => prev.filter(b => b.id !== id));
     } catch (e: any) {
       alert('ลบไม่สำเร็จ: ' + (e.message ?? ''));
