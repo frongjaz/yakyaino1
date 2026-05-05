@@ -8,8 +8,17 @@ import { apiGet } from "@/lib/api";
 const HowToSell = () => {
   const router = useRouter();
   const [selectedBrand, setSelectedBrand] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(3000000);
+  const PRICE_MIN = 0;
+  const PRICE_MAX = 3000000;
+
+  const formatPrice = (v: number) =>
+    v >= 1000000
+      ? `${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}ล้าน`
+      : v >= 1000
+      ? `${(v / 1000).toFixed(0)}K`
+      : v.toString();
   const [advancedSearch, setAdvancedSearch] = useState("");
   const [carBrands, setCarBrands] = useState<string[]>([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
@@ -80,154 +89,155 @@ const HowToSell = () => {
 
                 {/* Right side - Search Form */}
                 <div className="flex justify-center lg:justify-end">
-                  <div className="w-full max-w-full rounded-2xl border-2 border-[#EF4444]/80 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 p-5 shadow-2xl shadow-[#EF4444]/20 backdrop-blur-md transition-all duration-300 hover:border-[#EF4444] hover:shadow-[#EF4444]/30 sm:max-w-md sm:p-7 md:p-9">
-                    <div className="mb-5 flex items-center gap-3 sm:mb-6">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#EF4444] to-[#DC2626] shadow-lg">
-                        <svg
-                          className="h-6 w-6 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
+                  <div className="w-full max-w-full rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 p-6 sm:max-w-md sm:p-8">
+                    {/* Header */}
+                    <div className="mb-6">
+                      <div className="mb-1 flex items-center gap-2">
+                        <span className="h-px flex-1 bg-[#EF4444]/40"></span>
+                        <span className="text-[10px] font-semibold uppercase tracking-widest text-[#EF4444]">CheckKub</span>
+                        <span className="h-px flex-1 bg-[#EF4444]/40"></span>
                       </div>
-                      <h3 className="text-xl font-bold text-white sm:text-2xl md:text-3xl">
-                        <span className="bg-gradient-to-r from-[#EF4444] to-[#FF6B6B] bg-clip-text text-transparent">
-                          ผู้นำมาตรฐานรถมือสอง
-                        </span>
+                      <h3 className="mt-3 text-2xl font-bold text-white sm:text-3xl">
+                        ค้นหารถที่ใช่
+                        <span className="text-[#EF4444]">.</span>
                       </h3>
+                      <p className="mt-1 text-sm text-white/50">รถมือสองคุณภาพดี ราคาโปร่งใส</p>
                     </div>
-                    <form 
-                      className="space-y-4 sm:space-y-5"
+
+                    <form
+                      className="space-y-4"
                       onSubmit={(e) => {
                         e.preventDefault();
                         const params = new URLSearchParams();
-                        
-                        if (selectedBrand && selectedBrand !== "") {
-                          params.set("brand", selectedBrand);
-                        }
-                        
-                        if (minPrice && minPrice !== "") {
-                          params.set("minPrice", minPrice);
-                        }
-                        
-                        if (maxPrice && maxPrice !== "") {
-                          params.set("maxPrice", maxPrice);
-                        }
-                        
+                        if (selectedBrand) params.set("brand", selectedBrand);
+                        if (minPrice > PRICE_MIN) params.set("minPrice", minPrice.toString());
+                        if (maxPrice < PRICE_MAX) params.set("maxPrice", maxPrice.toString());
                         const queryString = params.toString();
                         router.push(`/cars${queryString ? `?${queryString}` : ""}`);
                       }}
                     >
+                      {/* Brand select */}
                       <div>
-                        <label className="mb-2.5 block text-sm font-semibold text-white/90">
-                          ยี่ห้อรถที่ต้องการ
+                        <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-white/40">
+                          ยี่ห้อรถ
                         </label>
                         <div className="relative">
                           <select
                             value={selectedBrand}
                             onChange={(e) => setSelectedBrand(e.target.value)}
                             disabled={loadingBrands}
-                            className="w-full appearance-none rounded-xl border-2 border-[#EF4444]/50 bg-gray-700/80 px-4 py-3 pr-10 text-white backdrop-blur-sm transition-all duration-300 placeholder:text-gray-400 hover:border-[#EF4444] focus:border-[#EF4444] focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#EF4444]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full appearance-none rounded-lg border border-white/10 bg-white/5 px-4 py-3 pr-10 text-sm text-white transition-colors hover:border-white/20 focus:border-[#EF4444]/60 focus:bg-white/8 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                           >
-                            <option value="" className="bg-gray-800">
-                              {loadingBrands ? "กำลังโหลด..." : "เลือกยี่ห้อ"}
+                            <option value="" className="bg-gray-900">
+                              {loadingBrands ? "กำลังโหลด..." : "ทุกยี่ห้อ"}
                             </option>
                             {carBrands.map((brand) => (
-                              <option key={brand} value={brand} className="bg-gray-800">
+                              <option key={brand} value={brand} className="bg-gray-900">
                                 {brand}
                               </option>
                             ))}
                           </select>
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-                            <svg
-                              className="h-5 w-5 text-[#EF4444] transition-transform duration-200"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 9l-7 7-7-7"
-                              />
+                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/30">
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                        <div>
-                          <label className="mb-2.5 block text-sm font-semibold text-white/90">
-                            ราคาต่ำสุด
-                          </label>
-                          <div className="relative">
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                              <span className="text-sm">฿</span>
-                            </div>
-                            <input
-                              type="number"
-                              value={minPrice}
-                              onChange={(e) => setMinPrice(e.target.value)}
-                              placeholder="0"
-                              className="w-full appearance-none rounded-xl border-2 border-[#EF4444]/50 bg-gray-700/80 px-4 py-3 pl-8 pr-4 text-white backdrop-blur-sm transition-all duration-300 placeholder:text-gray-400 hover:border-[#EF4444] focus:border-[#EF4444] focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#EF4444]/30"
-                            />
+
+                      {/* Price range */}
+                      <div>
+                        <label className="mb-3 block text-xs font-medium uppercase tracking-wider text-white/40">
+                          งบประมาณ
+                        </label>
+
+                        {/* Price badges */}
+                        <div className="mb-4 flex items-center gap-2">
+                          <div className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-center">
+                            <p className="text-[10px] text-white/30 mb-0.5">ต่ำสุด</p>
+                            <p className="text-sm font-bold text-white">
+                              ฿{minPrice.toLocaleString('th-TH')}
+                            </p>
+                          </div>
+                          <div className="text-white/20 text-sm">—</div>
+                          <div className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-center">
+                            <p className="text-[10px] text-white/30 mb-0.5">สูงสุด</p>
+                            <p className="text-sm font-bold text-[#EF4444]">
+                              {maxPrice >= PRICE_MAX ? `฿${maxPrice.toLocaleString('th-TH')}+` : `฿${maxPrice.toLocaleString('th-TH')}`}
+                            </p>
                           </div>
                         </div>
-                        <div>
-                          <label className="mb-2.5 block text-sm font-semibold text-white/90">
-                            ราคาสูงสุด
-                          </label>
-                          <div className="relative">
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                              <span className="text-sm">฿</span>
-                            </div>
-                            <input
-                              type="number"
-                              value={maxPrice}
-                              onChange={(e) => setMaxPrice(e.target.value)}
-                              placeholder="0"
-                              className="w-full appearance-none rounded-xl border-2 border-[#EF4444]/50 bg-gray-700/80 px-4 py-3 pl-8 pr-4 text-white backdrop-blur-sm transition-all duration-300 placeholder:text-gray-400 hover:border-[#EF4444] focus:border-[#EF4444] focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#EF4444]/30"
-                            />
-                          </div>
+
+                        {/* Dual range slider */}
+                        <div className="relative h-8 flex items-center px-1">
+                          {/* Track bg */}
+                          <div className="absolute inset-x-1 h-[3px] rounded-full bg-white/10"></div>
+                          {/* Active track */}
+                          <div
+                            className="absolute h-[3px] rounded-full bg-gradient-to-r from-[#EF4444]/80 to-[#EF4444]"
+                            style={{
+                              left: `calc(${(minPrice / PRICE_MAX) * 100}% + 4px)`,
+                              right: `calc(${100 - (maxPrice / PRICE_MAX) * 100}% + 4px)`,
+                            }}
+                          />
+                          {/* Min input */}
+                          <input
+                            type="range"
+                            min={PRICE_MIN}
+                            max={PRICE_MAX}
+                            step={50000}
+                            value={minPrice}
+                            onChange={(e) => {
+                              const v = Number(e.target.value);
+                              if (v < maxPrice - 50000) setMinPrice(v);
+                            }}
+                            className="range-thumb absolute inset-x-0 w-full appearance-none bg-transparent"
+                            style={{ zIndex: minPrice > PRICE_MAX * 0.9 ? 5 : 3 }}
+                          />
+                          {/* Max input */}
+                          <input
+                            type="range"
+                            min={PRICE_MIN}
+                            max={PRICE_MAX}
+                            step={50000}
+                            value={maxPrice}
+                            onChange={(e) => {
+                              const v = Number(e.target.value);
+                              if (v > minPrice + 50000) setMaxPrice(v);
+                            }}
+                            className="range-thumb absolute inset-x-0 w-full appearance-none bg-transparent"
+                            style={{ zIndex: 4 }}
+                          />
+                        </div>
+
+                        <div className="mt-1 flex justify-between text-[10px] text-white/20 px-1">
+                          <span>฿0</span>
+                          <span>฿1.5M</span>
+                          <span>฿3M+</span>
                         </div>
                       </div>
-                      <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+
+                      {/* Submit */}
+                      <button
+                        type="submit"
+                        className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-[#EF4444] py-3.5 text-sm font-bold text-white transition-all duration-200 hover:bg-[#DC2626] active:scale-95"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        ค้นหารถ
+                      </button>
+
+                      <p className="text-center text-xs text-white/25">
+                        หรือ{" "}
                         <button
                           type="button"
-                          className="text-xs text-white/80 underline-offset-2 transition-all hover:text-[#EF4444] hover:underline sm:text-sm"
+                          onClick={() => router.push("/cars")}
+                          className="text-white/40 underline underline-offset-2 hover:text-white/60 transition-colors"
                         >
-                          เครื่องมือการค้นหาขั้นสูง
+                          ดูรถทั้งหมด
                         </button>
-                        <button
-                          type="submit"
-                          className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-[#EF4444] to-[#DC2626] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#EF4444]/30 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#EF4444]/40 sm:w-auto"
-                        >
-                          <span className="relative z-10 flex items-center justify-center gap-2">
-                            <svg
-                              className="h-5 w-5 transition-transform group-hover:scale-110"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                              />
-                            </svg>
-                            ค้นหา
-                          </span>
-                          <div className="absolute inset-0 bg-gradient-to-r from-[#DC2626] to-[#EF4444] opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-                        </button>
-                      </div>
+                      </p>
                     </form>
                   </div>
                 </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Script from 'next/script';
 import CarDetailBreadcrumb from "@/components/CarDetail/CarDetailBreadcrumb";
 import CarImageGallery from "@/components/CarDetail/CarImageGallery";
 import CarSpecifications from "@/components/CarDetail/CarSpecifications";
@@ -10,6 +11,7 @@ import CarContactSection from "@/components/CarDetail/CarContactSection";
 import RelatedCars from "@/components/CarDetail/RelatedCars";
 import { apiGet } from '@/lib/api';
 import { decodeCarId, encodeCarId } from '@/lib/id-encoder';
+import { toggleCompare, isInCompare, COMPARE_EVENT, MAX_COMPARE, getCompareCars } from '@/lib/compareStore';
 
 interface CarData {
     id: number;
@@ -39,6 +41,7 @@ export default function CarDetailsClient() {
     const [car, setCar] = useState<CarData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [inCompare, setInCompare] = useState(false);
 
     useEffect(() => {
         // Get ID from params or from URL path (for static export compatibility)
@@ -72,6 +75,26 @@ export default function CarDetailsClient() {
             setLoading(false);
         }
     }, [params]);
+
+    useEffect(() => {
+        if (!car) return;
+        setInCompare(isInCompare(car.id));
+        const update = () => setInCompare(isInCompare(car.id));
+        window.addEventListener(COMPARE_EVENT, update);
+        return () => window.removeEventListener(COMPARE_EVENT, update);
+    }, [car]);
+
+    const handleToggleCompare = () => {
+        if (!car) return;
+        toggleCompare({
+            id: car.id,
+            brand: car.brand,
+            model: car.model,
+            year: car.year,
+            image: car.image,
+            price: car.price,
+        });
+    };
 
     const fetchCarData = async (id: string) => {
         try {
@@ -159,8 +182,40 @@ export default function CarDetailsClient() {
         totalPhotos: allImages.length > 0 ? allImages.length : (car.photo_count || 1),
     };
 
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.checkkub.com';
+    const carUrl = `${baseUrl}/cars/${encodeCarId(car.id)}`;
+    const imageUrl = car.image?.startsWith('http') ? car.image : `${baseUrl}${car.image}`;
+
+    const vehicleSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Car',
+        name: `${car.brand} ${car.model} ปี ${car.year}`,
+        brand: { '@type': 'Brand', name: car.brand },
+        model: car.model,
+        modelDate: car.year.toString(),
+        ...(car.color && { color: car.color }),
+        ...(car.mileage && { mileageFromOdometer: { '@type': 'QuantitativeValue', value: car.mileage, unitCode: 'KMT' } }),
+        ...(car.fuel_type && { fuelType: car.fuel_type }),
+        ...(car.transmission && { vehicleTransmission: car.transmission }),
+        image: imageUrl,
+        url: carUrl,
+        offers: {
+            '@type': 'Offer',
+            price: car.price,
+            priceCurrency: 'THB',
+            availability: 'https://schema.org/InStock',
+            seller: { '@type': 'AutoDealer', name: 'CheckKub', url: baseUrl },
+        },
+        description: `${car.brand} ${car.model} ปี ${car.year} สภาพดี ราคา ${new Intl.NumberFormat('th-TH').format(car.price)} บาท`,
+    };
+
     return (
         <>
+            <Script
+                id={`car-schema-${car.id}`}
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(vehicleSchema) }}
+            />
             <CarDetailBreadcrumb
                 brand={carData.brand}
                 model={carData.model}
@@ -198,6 +253,25 @@ export default function CarDetailsClient() {
                                     price={carData.price}
                                     monthlyPayment={carData.monthlyPayment}
                                 />
+                                <button
+                                    onClick={handleToggleCompare}
+                                    disabled={!inCompare && getCompareCars().length >= MAX_COMPARE}
+                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border transition-all duration-200 ${
+                                        inCompare
+                                            ? 'bg-[#EF4444]/10 border-[#EF4444] text-[#EF4444] hover:bg-[#EF4444]/20'
+                                            : 'bg-white border-gray-300 text-gray-600 hover:border-[#EF4444] hover:text-[#EF4444] disabled:opacity-40 disabled:cursor-not-allowed'
+                                    }`}
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                            d={inCompare
+                                                ? "M5 13l4 4L19 7"
+                                                : "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                            }
+                                        />
+                                    </svg>
+                                    {inCompare ? 'เพิ่มในรายการเปรียบเทียบแล้ว' : 'เพิ่มเปรียบเทียบ'}
+                                </button>
                                 {car.description && (
                                     <div className="mt-6">
                                         <h3 className="mb-3 text-xl font-bold text-gray-900">คำอธิบาย</h3>

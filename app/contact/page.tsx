@@ -28,11 +28,13 @@ export const metadata: Metadata = {
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
+    images: [{ url: "https://www.checkkub.com/images/video/car2.jpg", width: 1200, height: 630, alt: "ติดต่อ CheckKub" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "ติดต่อ CheckKub | ขายรถ รับซื้อรถ",
     description: "ต้องการขายรถ? รับซื้อรถ? ติดต่อ CheckKub",
+    images: ["https://www.checkkub.com/images/video/car2.jpg"],
   },
 };
 

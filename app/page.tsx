@@ -76,6 +76,53 @@ export default async function Home() {
     console.error("[SSR] Failed to fetch initial cars for homepage:", error);
   }
   
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "ซื้อรถมือสองที่ไหนดี?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "CheckKub มีรถมือสองคุณภาพดีหลากหลายรุ่น ทุกคันผ่านการตรวจสภาพอย่างละเอียด ราคายุติธรรม โปร่งใส พร้อมบริการหลังการขาย ดูรถทั้งหมดได้ที่ checkkub.com/cars",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "ซื้อรถมือสองต้องระวังอะไรบ้าง?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "ควรตรวจสอบประวัติรถ เลขไมล์ สภาพตัวถัง และเครื่องยนต์ ที่ CheckKub ทุกคันผ่านการตรวจสอบโดยทีมผู้เชี่ยวชาญ และมีเอกสารครบถ้วน",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "ขายรถมือสองได้ที่ไหน?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "ขายรถให้ CheckKub ได้เลย เรารับซื้อรถทุกประเภท ประเมินราคารวดเร็วภายใน 24 ชั่วโมง ชำระเงินทันที ไม่มีค่าใช้จ่าย รับซื้อทั่วประเทศ",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "ต้องการขายรถต้องทำอย่างไร?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "ส่งรูปและข้อมูลรถมาที่ CheckKub ผ่าน LINE, Facebook หรือเว็บไซต์ ทีมงานจะประเมินราคาและติดต่อกลับภายใน 24 ชั่วโมง หากตกลงราคาได้จะนัดตรวจสภาพและโอนเงินทันที",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "รับซื้อรถทุกยี่ห้อไหม?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "CheckKub รับซื้อรถทุกยี่ห้อ ทุกรุ่น ทั้ง Toyota, Honda, Mazda, Isuzu, Ford, BMW, Mercedes-Benz และอื่นๆ รับซื้อทั้งรถส่วนบุคคล รถฟลีต และรถบริษัท",
+        },
+      },
+    ],
+  };
+
   const structuredData = [
     {
       "@context": "https://schema.org",
@@ -216,6 +263,11 @@ export default async function Home() {
 
   return (
     <>
+      <Script
+        id="home-faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {structuredData.map((data, index) => (
         <Script
           key={index}

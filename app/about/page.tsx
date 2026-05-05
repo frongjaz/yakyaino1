@@ -37,11 +37,13 @@ export const metadata: Metadata = {
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
+    images: [{ url: "https://www.checkkub.com/images/video/car2.jpg", width: 1200, height: 630, alt: "เกี่ยวกับ CheckKub" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1",
     description: "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดัง",
+    images: ["https://www.checkkub.com/images/video/car2.jpg"],
   },
 };
 

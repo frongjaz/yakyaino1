@@ -13,6 +13,8 @@ const SellBanner = () => {
               src={getImagePath("/images/hero/5467894.png")}
               alt="Mercedes-Benz CLA-Class"
               fill
+              priority
+              fetchPriority="high"
               className="h-full w-full object-contain"
             />
           </div>

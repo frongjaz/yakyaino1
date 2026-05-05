@@ -15,6 +15,12 @@ const menuData: Menu[] = [
   },
   {
     id: 3,
+    title: "เปรียบเทียบรถ",
+    path: "/compare",
+    newTab: false,
+  },
+  {
+    id: 7,
     title: "บทความ",
     path: "/blog",
     newTab: false,

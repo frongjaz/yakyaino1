@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { encodeCarId } from '@/lib/id-encoder';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.checkkub.com';
 
@@ -34,15 +35,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/sell`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/cars`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${baseUrl}/compare`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
   ];
 
   const carRoutes: MetadataRoute.Sitemap = carIds.map((id) => ({
-    url: `${baseUrl}/cars/${id}`,
+    url: `${baseUrl}/cars/${encodeCarId(id)}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
-    priority: 0.6,
+    priority: 0.8,
   }));
 
   const blogRoutes: MetadataRoute.Sitemap = blogIds.map((id) => ({

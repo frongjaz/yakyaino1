@@ -2,34 +2,96 @@
 
 RewriteEngine On
 
-# Force HTTPS + www in one pass (covers all combinations)
+# ── HTTPS + www in one pass ──────────────────────────────────────────────────
+# Fix: ใช้ %{REQUEST_URI} แทน $1 เพื่อป้องกัน double-redirect กับ trailing-slash rule
 RewriteCond %{HTTPS} off [OR]
 RewriteCond %{HTTP_HOST} ^checkkub\.com$ [NC]
-RewriteRule ^(.*)$ https://www.checkkub.com/$1 [R=301,L]
+RewriteRule ^ https://www.checkkub.com%{REQUEST_URI} [R=301,L]
 
-# API routes with ID parameter — must come BEFORE the generic api/ rule
+# ── HSTS (cache HTTPS upgrade in browser for 1 year) ─────────────────────────
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+</IfModule>
+
+# ── API routes ───────────────────────────────────────────────────────────────
 RewriteRule ^api/banners/([0-9]+)/?$ api/banners.php?id=$1 [QSA,L]
 RewriteRule ^api/cars/([^/]+)/?$     api/cars.php?id=$1    [QSA,L]
 RewriteRule ^api/blogs/([0-9]+)/?$   api/blogs.php?id=$1   [QSA,L]
-
-# Pass all /api/* requests directly to PHP
 RewriteRule ^api/ - [L]
 
-# Remove trailing slash (non-directories only)
+# ── Remove trailing slash (non-directories) ──────────────────────────────────
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [R=301,L]
 
-# Serve real files as-is
+# ── Serve real files as-is ───────────────────────────────────────────────────
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# Serve Next.js .html pages
+# ── Next.js .html pages ──────────────────────────────────────────────────────
 RewriteCond %{DOCUMENT_ROOT}/$1.html -f
 RewriteRule ^(.+?)/?$ $1.html [L]
 
-# Dynamic routes
+# ── Dynamic routes ───────────────────────────────────────────────────────────
 RewriteRule ^blog-details/[^/]+/?$ blog-details/detail.html [L]
 RewriteRule ^cars/[^/]+/?$ cars/detail.html [L]
 
-# Fallback
+# ── Fallback ─────────────────────────────────────────────────────────────────
 RewriteRule ^ index.html [L]
+
+# ── Cache headers ────────────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # HTML — short cache (content changes)
+  ExpiresByType text/html                     "access plus 1 hour"
+
+  # CSS / JS — 1 year (filenames include content hash)
+  ExpiresByType text/css                      "access plus 1 year"
+  ExpiresByType application/javascript        "access plus 1 year"
+  ExpiresByType text/javascript               "access plus 1 year"
+
+  # Images — 1 year
+  ExpiresByType image/jpeg                    "access plus 1 year"
+  ExpiresByType image/png                     "access plus 1 year"
+  ExpiresByType image/gif                     "access plus 1 year"
+  ExpiresByType image/webp                    "access plus 1 year"
+  ExpiresByType image/avif                    "access plus 1 year"
+  ExpiresByType image/svg+xml                 "access plus 1 year"
+  ExpiresByType image/x-icon                  "access plus 1 year"
+
+  # Fonts — 1 year
+  ExpiresByType font/woff2                    "access plus 1 year"
+  ExpiresByType font/woff                     "access plus 1 year"
+  ExpiresByType application/font-woff2        "access plus 1 year"
+  ExpiresByType application/font-woff         "access plus 1 year"
+
+  # Default
+  ExpiresDefault                              "access plus 1 week"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # CSS/JS with content hash → immutable
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Images → long cache
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|avif|svg|ico)$">
+    Header set Cache-Control "public, max-age=31536000"
+  </FilesMatch>
+
+  # Fonts → immutable
+  <FilesMatch "\.(woff2|woff|ttf|otf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # HTML → revalidate
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# ── Compression ──────────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/json text/xml application/xml image/svg+xml font/woff2 font/woff
+</IfModule>

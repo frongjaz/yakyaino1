@@ -5,6 +5,7 @@ import CarListingsGrid from "@/components/AllCarsPage/CarListingsGrid";
 import Script from "next/script";
 import { Metadata } from "next";
 import { fetchCarsSSR, fetchBrandsSSR, CarSSR, PaginationSSR } from "@/lib/fetchCars";
+import { encodeCarId } from "@/lib/id-encoder";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
@@ -29,11 +30,13 @@ export const metadata: Metadata = {
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
+    images: [{ url: "https://www.checkkub.com/images/video/car2.jpg", width: 1200, height: 630, alt: "รถมือสอง CheckKub" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "ขายรถ รับซื้อรถ | CheckKub",
     description: "ค้นหาและดูรถยนต์มือสองทั้งหมดที่มีจำหน่าย",
+    images: ["https://www.checkkub.com/images/video/car2.jpg"],
   },
 };
 
@@ -77,18 +80,16 @@ export default async function AllCarsPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "รายการขายรถ รับซื้อรถ",
-    description: "รายการรถยนต์มือสองทั้งหมดที่ CheckKub รับซื้อและจำหน่าย สำหรับผู้ที่ต้องการขายรถ",
+    name: "รถยนต์มือสอง CheckKub",
+    description: "รายการรถยนต์มือสองคุณภาพดีที่ CheckKub รับซื้อและจำหน่าย",
     url: `${baseUrl}/cars`,
-    itemListElement: {
+    numberOfItems: initialPagination.total || initialCars.length,
+    itemListElement: initialCars.map((car, index) => ({
       "@type": "ListItem",
-      position: 1,
-      item: {
-        "@type": "Product",
-        name: "ขายรถ รับซื้อรถมือสอง",
-        description: "CheckKub รับซื้อและจำหน่ายรถยนต์มือสองทุกประเภท สำหรับผู้ที่ต้องการขายรถ",
-      },
-    },
+      position: index + 1,
+      url: `${baseUrl}/cars/${encodeCarId(car.id)}`,
+      name: `${car.brand} ${car.model} ปี ${car.year}`,
+    })),
   };
 
   return (

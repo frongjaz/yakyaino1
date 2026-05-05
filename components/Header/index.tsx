@@ -120,11 +120,11 @@ const Header = () => {
   return (
     <>
       <header
-        className={`header left-0 top-0 z-40 flex w-full items-center ${
+        className={`header left-0 top-0 z-40 flex w-full items-center transition-all duration-300 ${
           sticky
-            ? "fixed z-[9999] bg-[#2C2C2C]/95 backdrop-blur-md shadow-lg transition-all duration-300"
+            ? "fixed z-[9999] bg-[#2C2C2C]/95 backdrop-blur-md shadow-lg"
             : "absolute bg-[#2C2C2C]"
-        }`}
+        } ${navbarOpen ? "lg:flex hidden" : ""}`}
       >
         {/* Red top border */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#EF4444] via-[#DC2626] to-[#EF4444]"></div>
@@ -429,27 +429,30 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Mobile Menu - Full Screen Overlay */}
+      {/* Mobile Menu - Compact Side Drawer */}
       <nav
         id="navbarCollapseMobile"
-        className={`lg:hidden fixed top-0 left-0 w-full h-screen bg-gradient-to-br from-[#2C2C2C] via-[#1a1a1a] to-[#2C2C2C] z-40 transform transition-transform duration-300 ease-in-out ${
+        className={`lg:hidden fixed top-0 right-0 w-[260px] h-full bg-[#1e1e1e] z-40 transform transition-transform duration-300 ease-in-out shadow-2xl ${
           navbarOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-full">
-          {/* Mobile Menu Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-700/50 bg-gradient-to-r from-[#EF4444]/10 to-transparent">
+        {/* Red top border */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#EF4444] via-[#DC2626] to-[#EF4444]"></div>
+
+        <div className="flex flex-col h-full pt-1">
+          {/* Drawer Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
             <Link
               href="/"
               onClick={handleNavLinkClick}
-              className="flex items-center gap-2 transition-transform hover:scale-105 duration-300"
+              className="flex items-center"
             >
               <Image
                 src={getImagePath("/images/logo/checkkub.png")}
                 alt="CheckKub"
-                width={140}
-                height={56}
-                className="h-auto w-auto object-contain"
+                width={100}
+                height={40}
+                className="h-8 w-auto object-contain"
                 onError={(e) => {
                   const t = e.target as HTMLImageElement;
                   if (t && t.src !== LOGO_PLACEHOLDER) t.src = LOGO_PLACEHOLDER;
@@ -458,47 +461,32 @@ const Header = () => {
             </Link>
             <button
               onClick={navbarToggleHandler}
-              className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors duration-300"
+              className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors duration-200"
               aria-label="Close Menu"
             >
-              <svg
-                className="w-7 h-7"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          {/* Mobile Menu Items */}
-          <ul className="flex flex-col gap-2 p-6 overflow-y-auto">
+          {/* Menu Items */}
+          <ul className="flex flex-col p-3 overflow-y-auto">
             {menuData.map((menuItem, index) => (
               <li key={index}>
                 <Link
                   href={menuItem.path || "#"}
                   onClick={handleNavLinkClick}
-                  className={`group relative block px-6 py-4 text-lg font-medium rounded-xl transition-all duration-300 ${
+                  className={`flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                     usePathName === menuItem.path
-                      ? "text-white bg-[#EF4444] shadow-lg shadow-[#EF4444]/30"
-                      : "text-gray-300 hover:text-white hover:bg-white/5"
+                      ? "text-white bg-[#EF4444]/90"
+                      : "text-gray-400 hover:text-white hover:bg-white/8"
                   }`}
                 >
-                  <span className="relative z-10 flex items-center gap-3">
-                    {usePathName === menuItem.path && (
-                      <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                    )}
-                    <span>{menuItem.title}</span>
-                  </span>
-                  {usePathName !== menuItem.path && (
-                    <span className="absolute inset-0 bg-gradient-to-r from-[#EF4444]/0 via-[#EF4444]/10 to-[#EF4444]/0 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity duration-300"></span>
+                  {usePathName === menuItem.path && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
                   )}
+                  {menuItem.title}
                 </Link>
               </li>
             ))}

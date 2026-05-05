@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 
 interface TikTokVideo {
@@ -22,7 +22,28 @@ const getVideoId = (url: string) => url.match(/\/video\/(\d+)/)?.[1] ?? null;
 const getUsername = (url: string) => url.match(/@([^/]+)/)?.[1] ?? "v_autocar";
 
 const SocialVideos = () => {
+  const [inView, setInView] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Only load TikTok embed when section scrolls into view
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (scriptLoaded && typeof window !== "undefined" && window.tiktokEmbed) {
@@ -32,14 +53,17 @@ const SocialVideos = () => {
   }, [scriptLoaded]);
 
   return (
-    <section className="bg-[#111111] py-16 md:py-20">
-      <Script
-        src="https://www.tiktok.com/embed.js"
-        strategy="lazyOnload"
-        onLoad={() => setScriptLoaded(true)}
-      />
-      <div className="container px-4">
+    <section ref={sectionRef} className="bg-[#111111] py-16 md:py-20">
+      {/* Load embed.js only after section is near viewport */}
+      {inView && (
+        <Script
+          src="https://www.tiktok.com/embed.js"
+          strategy="lazyOnload"
+          onLoad={() => setScriptLoaded(true)}
+        />
+      )}
 
+      <div className="container px-4">
         {/* Header */}
         <div className="mb-10 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5">
@@ -61,24 +85,31 @@ const SocialVideos = () => {
                   className="w-full max-w-[340px] overflow-hidden rounded-2xl bg-[#1c1c1c] shadow-2xl ring-1 ring-white/8"
                   style={{ minHeight: "560px" }}
                 >
-                  <blockquote
-                    className="tiktok-embed"
-                    cite={video.url}
-                    data-video-id={videoId || undefined}
-                    data-embed-from="embed_page"
-                    style={{ maxWidth: "100%", minWidth: "100%", width: "100%" }}
-                  >
-                    <section>
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
-                        title={`@${username}`}
-                        href={`https://www.tiktok.com/@${username}?refer=embed`}
-                      >
-                        @{username}
-                      </a>
-                    </section>
-                  </blockquote>
+                  {inView ? (
+                    <blockquote
+                      className="tiktok-embed"
+                      cite={video.url}
+                      data-video-id={videoId || undefined}
+                      data-embed-from="embed_page"
+                      style={{ maxWidth: "100%", minWidth: "100%", width: "100%" }}
+                    >
+                      <section>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          title={`@${username}`}
+                          href={`https://www.tiktok.com/@${username}?refer=embed`}
+                        >
+                          @{username}
+                        </a>
+                      </section>
+                    </blockquote>
+                  ) : (
+                    // Placeholder while not in view
+                    <div className="flex h-full min-h-[560px] items-center justify-center">
+                      <TikTokIcon className="h-10 w-10 text-white/10" />
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -101,7 +132,6 @@ const SocialVideos = () => {
             ดูวิดีโอทั้งหมดบน TikTok
           </a>
         </div>
-
       </div>
     </section>
   );
