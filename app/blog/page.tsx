@@ -1,5 +1,6 @@
 import SingleBlog from "@/components/Blog/SingleBlog";
 import Breadcrumb from "@/components/Common/Breadcrumb";
+import BlogContent from "./BlogContent";
 import { fetchBlogsSSR } from "@/lib/fetchBlogs";
 import { Metadata } from "next";
 
@@ -97,9 +98,9 @@ export default async function Blog() {
         description="รวมบทวิเคราะห์ราคา เทคนิคเตรียมรถ และกรณีศึกษาการขายรถจำนวนมากเพื่อช่วยให้คุณตัดสินใจได้อย่างมั่นใจ."
       />
 
-      <section className="bg-white py-16 md:py-20">
-        <div className="container mx-auto px-4">
-          {blogs.length > 0 ? (
+      {blogs.length > 0 ? (
+        <section className="bg-white py-16 md:py-20">
+          <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {blogs.map((blog) => (
                 <div key={blog.id} className="w-full">
@@ -107,13 +108,11 @@ export default async function Blog() {
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="py-16 text-center">
-              <p className="text-gray-500">ยังไม่มีบทความในขณะนี้ กรุณากลับมาใหม่ภายหลัง</p>
-            </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      ) : (
+        <BlogContent initialBlogs={[]} />
+      )}
     </>
   );
 }

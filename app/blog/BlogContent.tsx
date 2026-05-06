@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import SingleBlog from "@/components/Blog/SingleBlog";
-import Breadcrumb from "@/components/Common/Breadcrumb";
 import Script from "next/script";
 import { apiGet } from "@/lib/api";
 import { Blog } from "@/types/blog";
@@ -13,7 +12,7 @@ interface Props {
 
 export default function BlogContent({ initialBlogs = [] }: Props) {
   const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
-  const [loading, setLoading] = useState(initialBlogs.length === 0);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
@@ -83,15 +82,13 @@ export default function BlogContent({ initialBlogs = [] }: Props) {
 
   return (
     <>
-      <Script
-        id="blog-structured-data"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
-      <Breadcrumb
-        pageName="บทความและอัปเดตราคา"
-        description="รวมบทวิเคราะห์ราคา เทคนิคเตรียมรถ และกรณีศึกษาการขายรถจำนวนมากเพื่อช่วยให้คุณตัดสินใจได้อย่างมั่นใจ."
-      />
+      {blogs.length > 0 && (
+        <Script
+          id="blog-structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      )}
 
       <section className="bg-white py-16 md:py-20">
         <div className="container mx-auto px-4">
