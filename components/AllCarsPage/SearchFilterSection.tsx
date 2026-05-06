@@ -226,7 +226,7 @@ const SearchFilterSection = ({ initialBrands }: SearchFilterSectionProps = {}) =
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
-          src={getImagePath("/images/about/S__5800084_0.jpg")}
+          src={getImagePath("/images/about/S__5800084_0.webp")}
           alt="Car Dealership Background"
           fill
           className="h-full w-full object-cover"

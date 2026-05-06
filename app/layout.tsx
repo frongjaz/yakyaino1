@@ -25,7 +25,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html suppressHydrationWarning lang="th">
-      <head />
+      <head>
+        <link rel="preconnect" href="https://www.checkkub.com" />
+        <link rel="dns-prefetch" href="https://www.checkkub.com" />
+      </head>
       <body className={`bg-[#FCFCFC] dark:bg-black ${inter.className}`}>
         <Providers>
           <ConditionalLayout>

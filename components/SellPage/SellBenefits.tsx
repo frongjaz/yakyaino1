@@ -9,7 +9,7 @@ const SellBenefits = () => {
       alt: "Car washing and detailing",
     },
     {
-      src: "/images/about/S__5800061.jpg",
+      src: "/images/about/S__5800061.webp",
       alt: "Car dealership lot",
     },
     {

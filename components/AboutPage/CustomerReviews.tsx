@@ -5,15 +5,15 @@ import Image from "next/image";
 const CustomerReviews = () => {
   const reviews = [
     {
-      image: "/images/about/S__5800084_0.jpg",
+      image: "/images/about/S__5800084_0.webp",
       alt: "Customer Review 1",
     },
     {
-      image: "/images/about/S__5800062.jpg",
+      image: "/images/about/S__5800062.webp",
       alt: "Customer Review 2",
     },
     {
-      image: "/images/about/S__5800061.jpg",
+      image: "/images/about/S__5800061.webp",
       alt: "Customer Review 3",
     },
   ];

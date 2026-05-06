@@ -14,7 +14,7 @@ interface Banner {
 
 const FALLBACK: Banner = {
   id: 0,
-  image_url: "/images/hero/HomeBanner.png",
+  image_url: "/images/hero/HomeBanner.webp",
   alt_text: "ขายรถให้เรา... จบไวภายใน 15 นาที",
   sort_order: 0,
   is_active: 1,

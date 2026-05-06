@@ -5,15 +5,15 @@ import Image from "next/image";
 const AboutUsContent = () => {
   const images = [
     {
-      src: "/images/about/S__5800084_0.jpg",
+      src: "/images/about/S__5800084_0.webp",
       alt: "Car Dealership Showroom 1",
     },
     {
-      src: "/images/about/S__5800062.jpg",
+      src: "/images/about/S__5800062.webp",
       alt: "Car Dealership Showroom 2",
     },
     {
-      src: "/images/about/S__5800061.jpg",
+      src: "/images/about/S__5800061.webp",
       alt: "Car Dealership Showroom 3",
     },
   ];

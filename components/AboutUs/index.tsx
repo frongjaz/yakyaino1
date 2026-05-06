@@ -5,15 +5,15 @@ import Link from "next/link";
 const AboutUs = () => {
   const images = [
     {
-      src: "/images/about/S__5800084_0.jpg",
+      src: "/images/about/S__5800084_0.webp",
       alt: "Car Dealership Showroom 1",
     },
     {
-      src: "/images/about/S__5800061.jpg",
+      src: "/images/about/S__5800061.webp",
       alt: "Car Dealership Showroom 2",
     },
     {
-      src: "/images/about/S__5800062.jpg",
+      src: "/images/about/S__5800062.webp",
       alt: "Car Dealership Showroom 3",
     },
   ];
@@ -47,7 +47,7 @@ const AboutUs = () => {
         <div className="mt-8 text-center">
           <Link
             href="/about"
-            className="inline-block rounded-full border-2 border-[#EF4444] bg-white px-8 py-3 font-semibold text-[#EF4444] transition hover:bg-[#EF4444] hover:text-white"
+            className="inline-block rounded-full border-2 border-[#DC2626] bg-white px-8 py-3 font-semibold text-[#DC2626] transition hover:bg-[#DC2626] hover:text-white"
           >
             อ่านต่อ
           </Link>

@@ -71,7 +71,7 @@ const SocialVideos = () => {
             <span className="text-sm font-medium text-white/50">@v_autocar</span>
           </div>
           <h2 className="text-2xl font-bold text-white md:text-3xl">วิดีโอล่าสุดของเรา</h2>
-          <p className="mt-2 text-sm text-white/40">คลิปรถมือสองคุณภาพดี อัปเดตสม่ำเสมอ</p>
+          <p className="mt-2 text-sm text-white/60">คลิปรถมือสองคุณภาพดี อัปเดตสม่ำเสมอ</p>
         </div>
 
         {/* Videos */}

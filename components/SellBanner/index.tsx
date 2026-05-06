@@ -10,7 +10,7 @@ const SellBanner = () => {
           {/* Left side - Car image */}
           <div className="relative h-[200px] w-full md:h-[250px]">
             <Image
-              src={getImagePath("/images/hero/5467894.png")}
+              src={getImagePath("/images/hero/5467894.webp")}
               alt="Mercedes-Benz CLA-Class"
               fill
               priority

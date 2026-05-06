@@ -276,6 +276,19 @@ export default async function Home() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />
       ))}
+      {/* Preload LCP images — hoisted to <head> by React */}
+      <link
+        rel="preload"
+        as="image"
+        href="/images/hero/sky-suspension-high-road-freeway.webp"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/images/hero/HomeBanner.webp"
+        fetchPriority="high"
+      />
       <HomePageContent initialCars={initialCars} />
     </>
   );

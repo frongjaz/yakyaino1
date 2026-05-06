@@ -57,7 +57,7 @@ const HowToSell = () => {
           {/* Background Image with fade effect */}
           <div className="absolute inset-0">
             <Image
-              src={getImagePath("/images/hero/sky-suspension-high-road-freeway.jpg")}
+              src={getImagePath("/images/hero/sky-suspension-high-road-freeway.webp")}
               alt="Highway Background"
               fill
               priority
@@ -77,7 +77,7 @@ const HowToSell = () => {
                 <div className="relative h-[280px] w-full overflow-hidden sm:h-[350px] md:h-[400px] lg:h-[500px]">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#EF4444]/5 to-transparent"></div>
                   <Image
-                    src={getImagePath("/images/hero/123.png")}
+                    src={getImagePath("/images/hero/123.webp")}
                     alt="Ferrari Car"
                     fill
                     className="scale-x-[-1] object-contain object-center transition-transform duration-500 hover:scale-x-[-1.05] lg:object-left"
@@ -118,7 +118,7 @@ const HowToSell = () => {
                     >
                       {/* Brand select */}
                       <div>
-                        <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-white/40">
+                        <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-white/60">
                           ยี่ห้อรถ
                         </label>
                         <div className="relative">
@@ -137,7 +137,7 @@ const HowToSell = () => {
                               </option>
                             ))}
                           </select>
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/30">
+                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/55">
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
@@ -147,21 +147,21 @@ const HowToSell = () => {
 
                       {/* Price range */}
                       <div>
-                        <label className="mb-3 block text-xs font-medium uppercase tracking-wider text-white/40">
+                        <label className="mb-3 block text-xs font-medium uppercase tracking-wider text-white/60">
                           งบประมาณ
                         </label>
 
                         {/* Price badges */}
                         <div className="mb-4 flex items-center gap-2">
                           <div className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-center">
-                            <p className="text-[10px] text-white/30 mb-0.5">ต่ำสุด</p>
+                            <p className="text-[10px] text-white/55 mb-0.5">ต่ำสุด</p>
                             <p className="text-sm font-bold text-white">
                               ฿{minPrice.toLocaleString('th-TH')}
                             </p>
                           </div>
-                          <div className="text-white/20 text-sm">—</div>
+                          <div className="text-white/50 text-sm">—</div>
                           <div className="flex-1 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-center">
-                            <p className="text-[10px] text-white/30 mb-0.5">สูงสุด</p>
+                            <p className="text-[10px] text-white/55 mb-0.5">สูงสุด</p>
                             <p className="text-sm font-bold text-[#EF4444]">
                               {maxPrice >= PRICE_MAX ? `฿${maxPrice.toLocaleString('th-TH')}+` : `฿${maxPrice.toLocaleString('th-TH')}`}
                             </p>
@@ -210,7 +210,7 @@ const HowToSell = () => {
                           />
                         </div>
 
-                        <div className="mt-1 flex justify-between text-[10px] text-white/20 px-1">
+                        <div className="mt-1 flex justify-between text-[10px] text-white/50 px-1">
                           <span>฿0</span>
                           <span>฿1.5M</span>
                           <span>฿3M+</span>
@@ -220,7 +220,7 @@ const HowToSell = () => {
                       {/* Submit */}
                       <button
                         type="submit"
-                        className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-[#EF4444] py-3.5 text-sm font-bold text-white transition-all duration-200 hover:bg-[#DC2626] active:scale-95"
+                        className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-[#DC2626] py-3.5 text-sm font-bold text-white transition-all duration-200 hover:bg-[#B91C1C] active:scale-95"
                       >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -228,12 +228,12 @@ const HowToSell = () => {
                         ค้นหารถ
                       </button>
 
-                      <p className="text-center text-xs text-white/25">
+                      <p className="text-center text-xs text-white/55">
                         หรือ{" "}
                         <button
                           type="button"
                           onClick={() => router.push("/cars")}
-                          className="text-white/40 underline underline-offset-2 hover:text-white/60 transition-colors"
+                          className="text-white/70 underline underline-offset-2 hover:text-white transition-colors"
                         >
                           ดูรถทั้งหมด
                         </button>
@@ -285,7 +285,7 @@ const HowToSell = () => {
             <div className="relative h-[350px] w-full overflow-hidden rounded-2xl md:h-[450px] lg:h-[600px]">
               <div className="absolute inset-0 bg-gradient-to-br from-[#EF4444]/10 via-transparent to-[#EF4444]/5"></div>
               <Image
-                src={getImagePath("/images/hero/21312.png")}
+                src={getImagePath("/images/hero/21312.webp")}
                 alt="Professional"
                 fill
                 className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"

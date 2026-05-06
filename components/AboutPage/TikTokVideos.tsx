@@ -5,18 +5,18 @@ import Image from "next/image";
 const TikTokVideos = () => {
   const videos = [
     {
-      thumbnail: "/images/about/S__5800084_0.jpg",
+      thumbnail: "/images/about/S__5800084_0.webp",
       title: "POV เมื่อลูกค้านัดมาดูรถ",
       alt: "POV When a customer makes an appointment to see a car",
     },
     {
-      thumbnail: "/images/about/S__5800062.jpg",
+      thumbnail: "/images/about/S__5800062.webp",
       title: "BENZ E 250 YEAR:2012 399,900",
       subtitle: "ประวัติศูนย์บริการครบทุกระยะ>>>",
       alt: "BENZ E 250",
     },
     {
-      thumbnail: "/images/about/S__5800061.jpg",
+      thumbnail: "/images/about/S__5800061.webp",
       title: "POV เมื่อลูกค้าบอกจะเข้ามาจองรถ",
       alt: "POV When a customer says they will come to reserve a car",
     },
