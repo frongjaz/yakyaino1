@@ -2,6 +2,9 @@
 const nextConfig = {
   // Enable static export ONLY when building for HostAtom
   output: process.env.IS_STATIC_EXPORT === 'true' ? 'export' : undefined,
+  experimental: {
+    optimizeCss: true,
+  },
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '',
   images: {
