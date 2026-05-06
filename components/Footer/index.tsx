@@ -5,16 +5,16 @@ import Link from "next/link";
 
 const Footer = () => {
   const carBrands = [
-    "โตโยต้า",
-    "ฮอนด้า",
-    "มาสด้า",
-    "มิตซูบิชิ",
-    "นิสสัน",
-    "อีซูซุ",
-    "ฟอร์ด",
-    "ซูซูกิ",
-    "เชฟโรเลต",
-    "เอ็มจี",
+    { label: "โตโยต้า", value: "Toyota" },
+    { label: "ฮอนด้า", value: "Honda" },
+    { label: "มาสด้า", value: "Mazda" },
+    { label: "มิตซูบิชิ", value: "Mitsubishi" },
+    { label: "นิสสัน", value: "Nissan" },
+    { label: "อีซูซุ", value: "Isuzu" },
+    { label: "ฟอร์ด", value: "Ford" },
+    { label: "ซูซูกิ", value: "Suzuki" },
+    { label: "เชฟโรเลต", value: "Chevrolet" },
+    { label: "เอ็มจี", value: "MG" },
   ];
 
   return (
@@ -70,10 +70,10 @@ const Footer = () => {
                 {carBrands.map((brand, index) => (
                   <Link
                     key={index}
-                    href="#"
+                    href={`/cars?brand=${encodeURIComponent(brand.value)}`}
                     className="border-b border-white/20 pb-2 text-sm text-white transition hover:text-[#EF4444]"
                   >
-                    {brand}
+                    {brand.label}
                   </Link>
                 ))}
               </div>
@@ -87,7 +87,7 @@ const Footer = () => {
               <ul className="space-y-2">
                   <li>
                     <Link
-                    href="#"
+                    href="/sell"
                     className="block border-b border-white/20 pb-2 text-sm text-white transition hover:text-[#EF4444]"
                     >
                     ขายรถ
@@ -95,10 +95,26 @@ const Footer = () => {
                   </li>
                   <li>
                     <Link
-                    href="#"
+                    href="/cars"
                     className="block border-b border-white/20 pb-2 text-sm text-white transition hover:text-[#EF4444]"
                     >
                     รถทั้งหมด
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                    href="/blog"
+                    className="block border-b border-white/20 pb-2 text-sm text-white transition hover:text-[#EF4444]"
+                    >
+                    บทความ
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                    href="/about"
+                    className="block border-b border-white/20 pb-2 text-sm text-white transition hover:text-[#EF4444]"
+                    >
+                    เกี่ยวกับเรา
                     </Link>
                   </li>
                 </ul>

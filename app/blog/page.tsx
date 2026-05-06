@@ -1,6 +1,7 @@
 import BlogContent from './BlogContent';
 import Script from "next/script";
 import { Metadata } from "next";
+import { fetchBlogsSSR } from "@/lib/fetchBlogs";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
@@ -29,16 +30,25 @@ export const metadata: Metadata = {
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
+    images: [{ url: "https://www.checkkub.com/images/video/car2.jpg", width: 1200, height: 630, alt: "บทความ CheckKub" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "บทความ | ขายรถ รับซื้อรถ - CheckKub",
     description: "บทความเกี่ยวกับขายรถ รับซื้อรถ",
+    images: ["https://www.checkkub.com/images/video/car2.jpg"],
   },
 };
 
-const Blog = () => {
+export default async function Blog() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
+
+  let initialBlogs = [];
+  try {
+    initialBlogs = await fetchBlogsSSR();
+  } catch (error) {
+    console.error("[SSR] Failed to fetch initial blogs:", error);
+  }
 
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -56,9 +66,7 @@ const Blog = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
-      <BlogContent />
+      <BlogContent initialBlogs={initialBlogs} />
     </>
   );
-};
-
-export default Blog;
+}

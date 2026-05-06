@@ -7,14 +7,20 @@ import Script from "next/script";
 import { apiGet } from "@/lib/api";
 import { Blog } from "@/types/blog";
 
-export default function BlogContent() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  initialBlogs?: Blog[];
+}
+
+export default function BlogContent({ initialBlogs = [] }: Props) {
+  const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
+  const [loading, setLoading] = useState(initialBlogs.length === 0);
   const [error, setError] = useState<string | null>(null);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
   useEffect(() => {
-    fetchBlogs();
+    if (initialBlogs.length === 0) {
+      fetchBlogs();
+    }
   }, []);
 
   const fetchBlogs = async () => {

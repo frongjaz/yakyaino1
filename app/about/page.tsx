@@ -9,30 +9,26 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
-  title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1 Founder ของ CheckKub",
+  title: "เกี่ยวกับ CheckKub | บริษัทรับซื้อรถ ขายรถมือสองทั่วประเทศ",
   description:
-    "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถจำนวนมาก. คุณชัยต้องการซื้อรถจำนวนมากและพร้อมดูแลคุณตั้งแต่การประเมินจนถึงปิดการขาย.",
+    "CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถและขายรถมือสองคุณภาพดี. ทีมงานมืออาชีพพร้อมประเมินราคายุติธรรม ชำระเงินทันที ดูแลเอกสารครบจบในที่เดียว.",
   keywords: [
     "เกี่ยวกับ CheckKub",
     "ขายรถ",
     "รับซื้อรถ",
     "ต้องการขายรถ",
     "บริษัทรับซื้อรถ",
-    "คุณชัย",
-    "yakyai no.1",
-    "NightCrow",
-    "เกม NightCrow",
-    "คุณชัยคือใคร",
-    "yakyai no.1 คือใคร",
-    "คุณชัยต้องการซื้อรถ",
+    "รับซื้อรถมือสอง",
+    "ขายรถมือสอง",
+    "รับซื้อรถทั่วประเทศ",
   ],
   alternates: {
     canonical: "/about",
   },
   openGraph: {
-    title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1 Founder ของ CheckKub",
+    title: "เกี่ยวกับ CheckKub | บริษัทรับซื้อรถ ขายรถมือสองทั่วประเทศ",
     description:
-      "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub",
+      "CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถและขายรถมือสองคุณภาพดี ประเมินราคายุติธรรม ชำระเงินทันที",
     url: "https://www.checkkub.com/about",
     siteName: "CheckKub",
     type: "website",
@@ -41,8 +37,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "เกี่ยวกับ CheckKub | คุณชัย yakyai no.1",
-    description: "รู้จักกับคุณชัย (yakyai no.1) ผู้เล่นเกม NightCrow ที่โด่งดัง",
+    title: "เกี่ยวกับ CheckKub | บริษัทรับซื้อรถ ขายรถมือสอง",
+    description: "CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถและขายรถมือสองคุณภาพดีทั่วประเทศ",
     images: ["https://www.checkkub.com/images/video/car2.jpg"],
   },
 };
@@ -64,10 +60,9 @@ const AboutPage = () => {
         founder: {
           "@type": "Person",
           name: "คุณชัย",
-          alternateName: "yakyai no.1",
-          description: "คุณชัย หรือ yakyai no.1 เป็นผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub. คุณชัยต้องการซื้อรถจำนวนมาก.",
+          description: "คุณชัย เป็น Founder ของ CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถและขายรถมือสองจำนวนมากทั่วประเทศ.",
           jobTitle: "Founder of CheckKub",
-          knowsAbout: ["NightCrow", "เกม NightCrow", "yakyai no.1"],
+          knowsAbout: ["รับซื้อรถ", "ขายรถมือสอง", "รับซื้อรถฟลีต"],
         },
       },
     },
@@ -75,10 +70,9 @@ const AboutPage = () => {
       "@context": "https://schema.org",
       "@type": "Person",
       name: "คุณชัย",
-      alternateName: "yakyai no.1",
-      description: "คุณชัย หรือ yakyai no.1 เป็นผู้เล่นเกม NightCrow ที่โด่งดังและเป็น Founder ของ CheckKub. คุณชัยต้องการซื้อรถจำนวนมาก.",
+      description: "คุณชัย เป็น Founder ของ CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถและขายรถมือสองจำนวนมากทั่วประเทศ.",
       jobTitle: "Founder of CheckKub",
-      knowsAbout: ["NightCrow", "เกม NightCrow", "yakyai no.1", "รับซื้อรถจำนวนมาก"],
+      knowsAbout: ["รับซื้อรถ", "ขายรถมือสอง", "รับซื้อรถฟลีต", "รับซื้อรถจำนวนมาก"],
       affiliation: {
         "@type": "Organization",
         name: "CheckKub",
