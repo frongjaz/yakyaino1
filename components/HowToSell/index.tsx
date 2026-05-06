@@ -78,7 +78,7 @@ const HowToSell = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#EF4444]/5 to-transparent"></div>
                   <Image
                     src={getImagePath("/images/hero/123.webp")}
-                    alt="Ferrari Car"
+                    alt="รถมือสองหรูราคาพรีเมียม — CheckKub รับซื้อรถทุกระดับ"
                     fill
                     className="scale-x-[-1] object-contain object-center transition-transform duration-500 hover:scale-x-[-1.05] lg:object-left"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -286,7 +286,7 @@ const HowToSell = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-[#EF4444]/10 via-transparent to-[#EF4444]/5"></div>
               <Image
                 src={getImagePath("/images/hero/21312.webp")}
-                alt="Professional"
+                alt="ทีมงาน CheckKub ผู้เชี่ยวชาญประเมินราคารถและรับซื้อรถมือสอง"
                 fill
                 className="h-full w-full object-contain transition-transform duration-500 hover:scale-105"
                 sizes="(max-width: 768px) 100vw, 50vw"

@@ -7,6 +7,7 @@ import Image from "next/image";
 import menuData from "./menuData";
 import { apiGet } from "@/lib/api";
 import { encodeCarId } from "@/lib/id-encoder";
+import { hasSession } from "@/lib/auth-client";
 
 interface SearchCar {
   id: number;
@@ -19,6 +20,16 @@ interface SearchCar {
 
 const Header = () => {
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(hasSession());
+  }, []);
+
+  const visibleMenu = menuData.filter(
+    (item) => item.path !== "/admin/dashboard" || isAdmin
+  );
+
   // Navbar toggle
   const [navbarOpen, setNavbarOpen] = useState(false);
   const navbarToggleHandler = () => {
@@ -164,7 +175,7 @@ const Header = () => {
                 className="navbar flex visible static w-auto border-none bg-transparent p-0 opacity-100"
               >
                 <ul className="flex items-center gap-1">
-                  {menuData.map((menuItem, index) => (
+                  {visibleMenu.map((menuItem, index) => (
                     <li key={index} className="flex items-center">
                       {index > 0 && (
                         <span className="h-4 w-[1px] bg-gray-500/50 mx-2"></span>
@@ -472,7 +483,7 @@ const Header = () => {
 
           {/* Menu Items */}
           <ul className="flex flex-col p-3 overflow-y-auto">
-            {menuData.map((menuItem, index) => (
+            {visibleMenu.map((menuItem, index) => (
               <li key={index}>
                 <Link
                   href={menuItem.path || "#"}

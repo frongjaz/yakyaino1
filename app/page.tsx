@@ -5,7 +5,7 @@ import { fetchCarsSSR } from "@/lib/fetchCars";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
-  title: "ขายรถ รับซื้อรถ | CheckKub - ต้องการขายรถ รับซื้อรถทุกประเภท",
+  title: { absolute: "ขายรถ รับซื้อรถ | CheckKub — รับซื้อรถทุกประเภท ราคายุติธรรม" },
   description:
     "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รถมือสอง รถบริษัท และฟลีตรถทั่วประเทศ. ขายรถให้เรา ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที.",
   keywords: [
@@ -114,6 +114,14 @@ export default async function Home() {
           text: "CheckKub รับซื้อรถทุกยี่ห้อ ทุกรุ่น ทั้ง Toyota, Honda, Mazda, Isuzu, Ford, BMW, Mercedes-Benz และอื่นๆ รับซื้อทั้งรถส่วนบุคคล รถฟลีต และรถบริษัท",
         },
       },
+      {
+        "@type": "Question",
+        name: "รับซื้อรถฟลีตคืออะไร?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "รถฟลีต คือรถที่องค์กรหรือบริษัทเป็นเจ้าของหลายคัน เช่น รถของบริษัทเช่ารถ รถของพนักงานองค์กร หรือรถขนส่ง CheckKub รับซื้อรถฟลีตจำนวนมากพร้อมกัน ราคาดี จัดการเอกสารครบ",
+        },
+      },
     ],
   };
 
@@ -159,7 +167,7 @@ export default async function Home() {
     },
     {
       "@context": "https://schema.org",
-      "@type": ["AutoDealer", "Organization"],
+      "@type": ["LocalBusiness", "AutoDealer", "Organization"],
       name: "CheckKub",
       alternateName: "Check-Kub",
       image: "https://www.checkkub.com/images/video/car2.jpg",

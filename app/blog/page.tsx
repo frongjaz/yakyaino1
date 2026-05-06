@@ -5,7 +5,7 @@ import { fetchBlogsSSR } from "@/lib/fetchBlogs";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
-  title: "บทความ | ขายรถ รับซื้อรถ - CheckKub",
+  title: { absolute: "บทความขายรถ รถมือสอง | CheckKub" },
   description:
     "บทความเกี่ยวกับขายรถ รับซื้อรถ - ติดตามข่าวสารและบทวิเคราะห์จากทีม CheckKub เพื่อวางแผนการขายรถให้ได้ราคาดีที่สุด. รวมบทความเกี่ยวกับราคาตลาดรถ เทคนิคเตรียมรถ และกรณีศึกษาการขายรถจำนวนมาก.",
   keywords: [
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     canonical: "/blog",
   },
   openGraph: {
-    title: "บทความ | ขายรถ รับซื้อรถ - CheckKub",
+    title: "บทความขายรถ รถมือสอง | CheckKub",
     description:
       "บทความเกี่ยวกับขายรถ รับซื้อรถ - ติดตามข่าวสารและบทวิเคราะห์จากทีม CheckKub",
     url: "https://www.checkkub.com/blog",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "บทความ | ขายรถ รับซื้อรถ - CheckKub",
+    title: "บทความขายรถ รถมือสอง | CheckKub",
     description: "บทความเกี่ยวกับขายรถ รับซื้อรถ",
     images: ["https://www.checkkub.com/images/video/car2.jpg"],
   },

@@ -100,6 +100,16 @@ const Hero = () => {
           </>
         )}
 
+        {/* H1 overlay — always visible, targets primary keyword */}
+        <div className="absolute bottom-0 inset-x-0 z-10 bg-gradient-to-t from-black/75 via-black/30 to-transparent px-6 pb-10 pt-16 lg:px-12">
+          <h1 className="text-xl font-bold text-white drop-shadow-lg md:text-2xl lg:text-3xl">
+            รับซื้อรถ — ขายรถมือสองคุณภาพดี
+            <span className="mt-1 block text-sm font-normal text-white/80 md:text-base">
+              ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที ทั่วประเทศ
+            </span>
+          </h1>
+        </div>
+
         {/* Dots */}
         {slides.length > 1 && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">

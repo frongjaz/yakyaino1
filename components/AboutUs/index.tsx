@@ -6,15 +6,15 @@ const AboutUs = () => {
   const images = [
     {
       src: "/images/about/S__5800084_0.webp",
-      alt: "Car Dealership Showroom 1",
+      alt: "โชว์รูมรถมือสอง CheckKub — รถคุณภาพดีหลากหลายรุ่นพร้อมให้บริการ",
     },
     {
       src: "/images/about/S__5800061.webp",
-      alt: "Car Dealership Showroom 2",
+      alt: "รถมือสองคุณภาพดีที่ CheckKub ตรวจสภาพครบทุกคัน พร้อมเอกสารครบถ้วน",
     },
     {
       src: "/images/about/S__5800062.webp",
-      alt: "Car Dealership Showroom 3",
+      alt: "ทีมงาน CheckKub ผู้เชี่ยวชาญด้านรับซื้อรถและขายรถมือสองทั่วประเทศ",
     },
   ];
 

@@ -9,6 +9,7 @@ import ScrollUp from "@/components/Common/ScrollUp";
 import Hero from "@/components/Hero";
 import SellBanner from "@/components/SellBanner";
 import SocialVideos from "@/components/SocialVideos";
+import FAQ from "@/components/FAQ";
 import CarDetailContent from '@/components/CarDetail/CarDetailContent';
 
 interface HomePageContentProps {
@@ -44,6 +45,7 @@ export default function HomePageContent({ initialCars }: HomePageContentProps) {
       <SellBanner />
       <HowToSell />
       <AboutUs />
+      <FAQ />
       <SocialVideos />
     </>
   );

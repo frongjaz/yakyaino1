@@ -24,14 +24,14 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     const car = data?.data;
     if (!car) return {};
 
-    const title = `${car.brand} ${car.model} ปี ${car.year} | CheckKub - ซื้อรถมือสอง`;
+    const title = `${car.brand} ${car.model} ปี ${car.year} — ซื้อรถมือสอง | CheckKub`;
     const description = `${car.brand} ${car.model} ปี ${car.year}${car.mileage ? ` เลขไมล์ ${new Intl.NumberFormat('th-TH').format(car.mileage)} กม.` : ''}${car.color ? ` สี${car.color}` : ''}${car.transmission ? ` เกียร์${car.transmission}` : ''} ราคา ${new Intl.NumberFormat('th-TH').format(car.price)} บาท ซื้อรถมือสองคุณภาพดีที่ CheckKub`;
     const imageUrl = car.image?.startsWith('http') ? car.image : `${baseUrl}${car.image || '/images/placeholder.jpg'}`;
     const carUrl = `${baseUrl}/cars/${encodeCarId(car.id)}`;
 
     return {
       metadataBase: new URL(baseUrl),
-      title,
+      title: { absolute: title },
       description,
       keywords: [
         `${car.brand} ${car.model}`,

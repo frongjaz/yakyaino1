@@ -6,7 +6,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
-  title: "ติดต่อ CheckKub | ขายรถ รับซื้อรถ - ส่งรายละเอียดรถเพื่อรับข้อเสนอ",
+  title: { absolute: "ติดต่อเรา | ขายรถ รับซื้อรถ | CheckKub" },
   description:
     "ต้องการขายรถ? รับซื้อรถ? ติดต่อ CheckKub เพื่อรับข้อเสนอรับซื้อรถ. กรอกข้อมูลรถหรือโทรหาเราเพื่อรับข้อเสนอรับซื้อรถจำนวนมากจากทีม CheckKub ได้ทันที.",
   keywords: [

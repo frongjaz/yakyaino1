@@ -9,7 +9,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
-  title: "เกี่ยวกับ CheckKub | บริษัทรับซื้อรถ ขายรถมือสองทั่วประเทศ",
+  title: { absolute: "เกี่ยวกับ CheckKub | บริษัทรับซื้อรถ ขายรถมือสอง" },
   description:
     "CheckKub ผู้เชี่ยวชาญด้านการรับซื้อรถและขายรถมือสองคุณภาพดี. ทีมงานมืออาชีพพร้อมประเมินราคายุติธรรม ชำระเงินทันที ดูแลเอกสารครบจบในที่เดียว.",
   keywords: [

@@ -9,7 +9,7 @@ import { encodeCarId } from "@/lib/id-encoder";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
-  title: "ขายรถ รับซื้อรถ | CheckKub - รับซื้อรถมือสอง",
+  title: { absolute: "รถมือสองทั้งหมด | ขายรถ รับซื้อรถ | CheckKub" },
   description: "ขายรถ รับซื้อรถ - ค้นหาและดูรถยนต์มือสองทั้งหมดที่มีจำหน่าย. CheckKub รับซื้อรถมือสองทุกประเภท ราคายุติธรรม. สำหรับผู้ที่ต้องการขายรถ.",
   keywords: [
     "ขายรถ",

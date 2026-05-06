@@ -11,7 +11,7 @@ const SellBanner = () => {
           <div className="relative h-[200px] w-full md:h-[250px]">
             <Image
               src={getImagePath("/images/hero/5467894.webp")}
-              alt="Mercedes-Benz CLA-Class"
+              alt="รถยุโรปมือสอง CheckKub — รับซื้อรถทุกยี่ห้อ Toyota Honda BMW Mercedes-Benz"
               fill
               priority
               fetchPriority="high"
