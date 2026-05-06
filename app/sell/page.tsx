@@ -4,7 +4,6 @@ import SellPolicy from "@/components/SellPage/SellPolicy";
 import AcceptCars from "@/components/SellPage/AcceptCars";
 import SellSteps from "@/components/SellPage/SellSteps";
 import ScrollUp from "@/components/Common/ScrollUp";
-import Script from "next/script";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -162,15 +161,13 @@ export default function SellPage() {
   return (
     <>
       {structuredData.map((data, index) => (
-        <Script
+        <script
           key={index}
-          id={`sell-page-structured-data-${index}`}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />
       ))}
-      <Script
-        id="sell-breadcrumb"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />

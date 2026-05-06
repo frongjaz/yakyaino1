@@ -3,7 +3,6 @@ import AboutUsContent from "@/components/AboutPage/AboutUsContent";
 import HistorySection from "@/components/AboutPage/HistorySection";
 import TikTokVideos from "@/components/AboutPage/TikTokVideos";
 import CustomerReviews from "@/components/AboutPage/CustomerReviews";
-import Script from "next/script";
 
 import { Metadata } from "next";
 
@@ -96,15 +95,13 @@ const AboutPage = () => {
   return (
     <>
       {structuredData.map((data, index) => (
-        <Script
+        <script
           key={index}
-          id={`about-page-structured-data-${index}`}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />
       ))}
-      <Script
-        id="about-breadcrumb"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />

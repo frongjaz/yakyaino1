@@ -2,7 +2,6 @@ import AllCarsHero from "@/components/AllCarsPage/AllCarsHero";
 import CarCarousel from "@/components/CarCarousel";
 import SearchFilterSection from "@/components/AllCarsPage/SearchFilterSection";
 import CarListingsGrid from "@/components/AllCarsPage/CarListingsGrid";
-import Script from "next/script";
 import { Metadata } from "next";
 import { fetchCarsSSR, fetchBrandsSSR, CarSSR, PaginationSSR } from "@/lib/fetchCars";
 import { encodeCarId } from "@/lib/id-encoder";
@@ -94,13 +93,11 @@ export default async function AllCarsPage() {
 
   return (
     <>
-      <Script
-        id="cars-page-structured-data"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <Script
-        id="cars-breadcrumb"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />

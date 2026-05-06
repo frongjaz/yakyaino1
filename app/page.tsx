@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import Script from "next/script";
 import HomePageContent from "@/components/HomePageContent";
 import { fetchCarsSSR } from "@/lib/fetchCars";
 
@@ -264,15 +263,13 @@ export default async function Home() {
 
   return (
     <>
-      <Script
-        id="home-faq-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       {structuredData.map((data, index) => (
-        <Script
+        <script
           key={index}
-          id={`home-structured-data-${index}`}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />

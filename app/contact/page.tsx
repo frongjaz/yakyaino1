@@ -1,6 +1,5 @@
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import Contact from "@/components/Contact";
-import Script from "next/script";
 
 import { Metadata } from "next";
 
@@ -72,13 +71,11 @@ const ContactPage = () => {
 
   return (
     <>
-      <Script
-        id="contact-page-structured-data"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <Script
-        id="contact-breadcrumb"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />

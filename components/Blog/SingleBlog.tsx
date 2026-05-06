@@ -1,3 +1,4 @@
+"use client";
 import { Blog } from "@/types/blog";
 import Image from "next/image";
 import Link from "next/link";
