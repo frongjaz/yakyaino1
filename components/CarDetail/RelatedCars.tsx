@@ -49,46 +49,44 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
 
   useEffect(() => {
     setIsMounted(true);
+
+    const fetchRelatedCars = async () => {
+      try {
+        setLoading(true);
+        const data = await apiGet<{
+          success: boolean;
+          data: CarData[];
+        }>('/api/cars?limit=100');
+
+        if (data.success && data.data) {
+          const availableCars = data.data
+            .filter((car: CarData) =>
+              (car.status === 'available' || !car.status) &&
+              String(car.id) !== String(currentCarId)
+            )
+            .map((car: CarData): RelatedCar => ({
+              id: car.id,
+              brand: car.brand,
+              model: car.model,
+              year: car.year,
+              price: car.price,
+              image: car.image || '/images/placeholder.jpg',
+              photo_count: car.photo_count || 0,
+            }));
+
+          const shuffled = shuffleArray(availableCars);
+          setRelatedCars(shuffled.slice(0, Math.min(count, shuffled.length)));
+        }
+      } catch (error) {
+        console.error('Error fetching related cars:', error);
+        setRelatedCars([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchRelatedCars();
   }, [currentCarId, count]);
-
-  const fetchRelatedCars = async () => {
-    try {
-      setLoading(true);
-      // Fetch all available cars from API
-      const data = await apiGet<{ 
-        success: boolean; 
-        data: CarData[];
-      }>('/api/cars?limit=100'); // Get more cars for better random selection
-      
-      if (data.success && data.data) {
-        // Filter only available cars and exclude current car
-        const availableCars = data.data
-          .filter((car: CarData) => 
-            (car.status === 'available' || !car.status) &&
-            String(car.id) !== String(currentCarId)
-          )
-          .map((car: CarData): RelatedCar => ({
-            id: car.id,
-            brand: car.brand,
-            model: car.model,
-            year: car.year,
-            price: car.price,
-            image: car.image || '/images/placeholder.jpg',
-            photo_count: car.photo_count || 0,
-          }));
-
-        // Shuffle and take the requested count
-        const shuffled = shuffleArray(availableCars);
-        setRelatedCars(shuffled.slice(0, Math.min(count, shuffled.length)));
-      }
-    } catch (error) {
-      console.error('Error fetching related cars:', error);
-      setRelatedCars([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("th-TH").format(price);

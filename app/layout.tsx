@@ -2,17 +2,11 @@ import ConditionalLayout from "@/components/ConditionalLayout";
 import GoogleAnalytics from "@/components/Common/GoogleAnalytics";
 import { Providers } from "./providers";
 import { Inter } from "next/font/google";
-import { Metadata, Viewport } from "next";
+import { Metadata } from "next";
 import "node_modules/react-modal-video/css/modal-video.css";
 import "../styles/index.css";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  themeColor: '#EF4444',
-};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
@@ -31,6 +25,8 @@ export const metadata: Metadata = {
     shortcut: '/favicon.png',
     apple: '/favicon.png',
   },
+  viewport: "width=device-width, initial-scale=1",
+  themeColor: "#EF4444",
   alternates: {
     canonical: "https://www.checkkub.com",
     types: { 'application/rss+xml': 'https://www.checkkub.com/feed.xml' },
