@@ -25,7 +25,7 @@ const AboutUsContent = () => {
           เกี่ยวกับเรา
         </h2>
         <p className="mx-auto mb-8 max-w-3xl text-center text-base leading-relaxed text-gray-700 md:text-lg">
-        
+          CheckKub คือผู้เชี่ยวชาญด้านการรับซื้อรถมือสองทุกประเภท ทั้งรถยนต์ส่วนบุคคล รถบริษัท และรถฟลีตจำนวนมากทั่วประเทศ เราประเมินราคาอย่างยุติธรรม โอนเงินรวดเร็ว พร้อมดูแลเอกสารครบจบในที่เดียว
         </p>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import AllCarsHero from "@/components/AllCarsPage/AllCarsHero";
 import CarCarousel from "@/components/CarCarousel";
 import SearchFilterSection from "@/components/AllCarsPage/SearchFilterSection";
@@ -104,10 +105,20 @@ export default async function AllCarsPage() {
       <AllCarsHero />
       {carouselCars.length > 0 && <CarCarousel cars={carouselCars} />}
       <SearchFilterSection initialBrands={initialBrands} />
-      <CarListingsGrid
-        initialData={initialCars}
-        initialPagination={initialPagination}
-      />
+      <Suspense
+        fallback={
+          <section className="bg-[#1a1a1a] py-12 md:py-16">
+            <div className="container mx-auto px-4 flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#EF4444]"></div>
+            </div>
+          </section>
+        }
+      >
+        <CarListingsGrid
+          initialData={initialCars}
+          initialPagination={initialPagination}
+        />
+      </Suspense>
     </>
   );
 }

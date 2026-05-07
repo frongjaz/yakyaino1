@@ -40,9 +40,8 @@ const SellHero = () => {
               </div>
             </div>
 
-            {/* Sell to Us heading */}
-            <h1 className="mb-8 text-5xl font-bold text-white drop-shadow-lg md:text-6xl lg:text-7xl">
-              Sell to Us
+            <h1 className="mb-8 text-4xl font-bold text-white drop-shadow-lg md:text-5xl lg:text-6xl">
+              ขายรถกับเรา — รับซื้อรถทุกประเภท ราคายุติธรรม
             </h1>
 
             {/* Sell Car button */}
