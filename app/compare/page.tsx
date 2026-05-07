@@ -22,11 +22,13 @@ export const metadata: Metadata = {
     siteName: 'CheckKub',
     type: 'website',
     locale: 'th_TH',
+    images: [{ url: 'https://www.checkkub.com/images/video/car3.jpg', width: 1200, height: 630, alt: 'เปรียบเทียบรถยนต์ CheckKub' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'เปรียบเทียบรถยนต์ | CheckKub',
     description: 'เปรียบเทียบรถยนต์มือสองแบบเคียงข้างกัน เทียบสเปคและราคา',
+    images: ['https://www.checkkub.com/images/video/car3.jpg'],
   },
 };
 

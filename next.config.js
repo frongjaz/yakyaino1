@@ -8,7 +8,7 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '',
   images: {
-    unoptimized: true,
+    unoptimized: process.env.IS_STATIC_EXPORT === 'true',
     domains: ["localhost", "checkkub.com", "yakyai-api.vercel.app"],
     remotePatterns: [
       {

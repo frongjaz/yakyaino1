@@ -1,11 +1,18 @@
 import ConditionalLayout from "@/components/ConditionalLayout";
+import GoogleAnalytics from "@/components/Common/GoogleAnalytics";
 import { Providers } from "./providers";
 import { Inter } from "next/font/google";
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import "node_modules/react-modal-video/css/modal-video.css";
 import "../styles/index.css";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#EF4444',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
@@ -19,7 +26,15 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true },
   },
-  alternates: { canonical: "https://www.checkkub.com" },
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
+  alternates: {
+    canonical: "https://www.checkkub.com",
+    types: { 'application/rss+xml': 'https://www.checkkub.com/feed.xml' },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -30,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://www.checkkub.com" />
       </head>
       <body className={`bg-[#FCFCFC] dark:bg-black ${inter.className}`}>
+        <GoogleAnalytics />
         <Providers>
           <ConditionalLayout>
             {children}

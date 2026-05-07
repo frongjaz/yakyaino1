@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Error Page | Free Next.js Template for Startup and SaaS",
-  description: "This is Error Page for Startup Nextjs Template",
-  // other metadata
+  title: "ไม่พบหน้านี้ | CheckKub",
+  description: "ขออภัย ไม่พบหน้าที่คุณต้องการ กรุณากลับไปหน้าหลัก CheckKub",
+  robots: { index: false, follow: false },
 };
 
 const ErrorPage = () => {

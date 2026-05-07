@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     siteName: "CheckKub",
     type: "website",
     locale: "th_TH",
-    images: [{ url: "https://www.checkkub.com/images/video/car2.jpg", width: 1200, height: 630, alt: "ขายรถ รับซื้อรถ CheckKub" }],
+    images: [{ url: "https://www.checkkub.com/images/video/car3.jpg", width: 1200, height: 630, alt: "ขายรถ รับซื้อรถ CheckKub" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "ขายรถ รับซื้อรถ | CheckKub",
     description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท ราคายุติธรรม ชำระเงินทันที",
-    images: ["https://www.checkkub.com/images/video/car2.jpg"],
+    images: ["https://www.checkkub.com/images/video/car3.jpg"],
   },
 };
 
