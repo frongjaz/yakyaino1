@@ -78,7 +78,7 @@ const AboutPage = () => {
         url: baseUrl,
       },
       sameAs: [
-        "https://www.facebook.com/vautocar",
+        "https://www.facebook.com/checkkub",
       ],
     },
   ];

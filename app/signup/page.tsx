@@ -177,7 +177,7 @@ const SignupPage = () => {
                   </div>
                 </form>
                 <p className="text-center text-base font-medium text-body-color">
-                  Already using Startup?{" "}
+                  มีบัญชีอยู่แล้ว?{" "}
                   <Link href="/signin" className="text-primary hover:underline">
                     Sign in
                   </Link>

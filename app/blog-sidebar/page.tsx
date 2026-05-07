@@ -8,9 +8,9 @@ import Image from "next/image";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Blog Details Page | Free Next.js Template for Startup and SaaS",
-  description: "This is Blog Details Page for Startup Nextjs Template",
-  // other metadata
+  title: "บทความ | CheckKub",
+  description: "บทความความรู้เกี่ยวกับรถยนต์มือสอง เทคนิคการซื้อขายจาก CheckKub",
+  robots: { index: false, follow: false },
 };
 
 const BlogSidebarPage = () => {

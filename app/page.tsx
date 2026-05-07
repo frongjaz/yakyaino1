@@ -179,10 +179,10 @@ export default async function Home() {
       slogan: "ขายรถ รับซื้อรถ - ต้องการขายรถ รับซื้อรถทุกประเภท",
       address: {
         "@type": "PostalAddress",
-        streetAddress: "123 ถนนสุขุมวิท",
-        addressLocality: "เขตวัฒนา",
+        streetAddress: "1647 แขวงบางไผ่ บางแค",
+        addressLocality: "กรุงเทพมหานคร",
         addressRegion: "กรุงเทพมหานคร",
-        postalCode: "10110",
+        postalCode: "10160",
         addressCountry: "TH",
       },
       areaServed: [

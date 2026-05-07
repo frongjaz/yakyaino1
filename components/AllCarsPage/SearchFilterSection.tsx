@@ -274,6 +274,7 @@ const SearchFilterSection = ({ initialBrands }: SearchFilterSectionProps = {}) =
                 value={selectedBrand}
                 onChange={(e) => handleBrandChange(e.target.value)}
                 disabled={loadingBrands}
+                aria-label="กรองตามยี่ห้อรถ"
                 className="w-full appearance-none rounded-lg border border-[#EF4444] bg-gray-800/90 px-4 py-3 text-white transition-all focus:border-[#EF4444] focus:outline-none focus:ring-2 focus:ring-[#EF4444]/20 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="" className="bg-gray-800">
@@ -307,6 +308,7 @@ const SearchFilterSection = ({ initialBrands }: SearchFilterSectionProps = {}) =
               <select
                 value={priceRange}
                 onChange={(e) => handlePriceRangeChange(e.target.value)}
+                aria-label="กรองตามช่วงราคา"
                 className="w-full appearance-none rounded-lg border border-[#EF4444] bg-gray-800/90 px-4 py-3 text-white transition-all focus:border-[#EF4444] focus:outline-none focus:ring-2 focus:ring-[#EF4444]/20 hover:bg-gray-800"
               >
                 <option value="" className="bg-gray-800">

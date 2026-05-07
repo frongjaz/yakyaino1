@@ -91,8 +91,15 @@ const steps: Step[] = [
 function useInView(threshold = 0.2) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mq.matches) {
+      setReducedMotion(true);
+      setVisible(true);
+      return;
+    }
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
@@ -103,7 +110,7 @@ function useInView(threshold = 0.2) {
     return () => obs.disconnect();
   }, [threshold]);
 
-  return { ref, visible };
+  return { ref, visible, reducedMotion };
 }
 
 /* ─── animated line that grows as section enters view ─── */
@@ -120,13 +127,14 @@ function AnimatedLine() {
 
 /* ─── single step row ─── */
 function StepRow({ step, index }: { step: Step; index: number }) {
-  const { ref, visible } = useInView(0.25);
+  const { ref, visible, reducedMotion } = useInView(0.25);
   const isLeft = index % 2 === 0;
-  const delay = `${index * 80}ms`;
+  const delay = reducedMotion ? '0ms' : `${index * 80}ms`;
 
   return (
     <div
       ref={ref}
+      role="listitem"
       className="relative grid grid-cols-2"
       style={{ transitionDelay: delay }}
     >
@@ -159,7 +167,7 @@ function StepRow({ step, index }: { step: Step; index: number }) {
         >
           {step.number}
           {/* pulse ring */}
-          {visible && (
+          {visible && !reducedMotion && (
             <span className="absolute inset-0 rounded-full border-2 border-[#EF4444] animate-ping opacity-30" />
           )}
         </div>
@@ -186,12 +194,13 @@ function StepRow({ step, index }: { step: Step; index: number }) {
 
 /* ─── mobile step item ─── */
 function MobileStepItem({ step, index }: { step: Step; index: number }) {
-  const { ref, visible } = useInView(0.2);
-  const delay = `${index * 80}ms`;
+  const { ref, visible, reducedMotion } = useInView(0.2);
+  const delay = reducedMotion ? '0ms' : `${index * 80}ms`;
 
   return (
     <div
       ref={ref}
+      role="listitem"
       className="relative flex items-start gap-5 py-6 pl-1 transition-all duration-500 ease-out"
       style={{
         opacity: visible ? 1 : 0,
@@ -208,7 +217,7 @@ function MobileStepItem({ step, index }: { step: Step; index: number }) {
         }}
       >
         {step.number}
-        {visible && (
+        {visible && !reducedMotion && (
           <span className="absolute inset-0 rounded-full border-2 border-[#EF4444] animate-ping opacity-25" />
         )}
       </div>
@@ -260,21 +269,21 @@ export default function SellSteps() {
         {/* ── Desktop ── */}
         <div className="relative mx-auto hidden max-w-5xl md:block">
           <AnimatedLine />
-          <div className="flex flex-col gap-0">
+          <ol role="list" className="flex flex-col gap-0">
             {steps.map((step, idx) => (
               <StepRow key={step.number} step={step} index={idx} />
             ))}
-          </div>
+          </ol>
         </div>
 
         {/* ── Mobile ── */}
         <div className="relative mx-auto max-w-sm md:hidden">
           <div className="absolute left-5 top-0 h-full w-0.5 bg-gradient-to-b from-[#EF4444] to-[#EF4444]/20" />
-          <div className="flex flex-col gap-0">
+          <ol role="list" className="flex flex-col gap-0">
             {steps.map((step, idx) => (
               <MobileStepItem key={step.number} step={step} index={idx} />
             ))}
-          </div>
+          </ol>
         </div>
       </div>
     </section>
@@ -283,11 +292,11 @@ export default function SellSteps() {
 
 /* ─── simple fade-in wrapper ─── */
 function FadeIn({ children }: { children: React.ReactNode }) {
-  const { ref, visible } = useInView(0.1);
+  const { ref, visible, reducedMotion } = useInView(0.1);
   return (
     <div
       ref={ref}
-      className="transition-all duration-700 ease-out"
+      className={reducedMotion ? undefined : "transition-all duration-700 ease-out"}
       style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)" }}
     >
       {children}

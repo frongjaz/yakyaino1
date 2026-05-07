@@ -14,6 +14,7 @@ const Contact = () => {
       <div className="relative mb-10 w-full shadow-md">
         <iframe
           src={MAPS_EMBED}
+          title="ที่ตั้ง CheckKub บน Google Maps"
           className="h-[380px] w-full border-0 md:h-[430px] lg:h-[480px]"
           loading="lazy"
           allowFullScreen

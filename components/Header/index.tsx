@@ -7,8 +7,6 @@ import Image from "next/image";
 import menuData from "./menuData";
 import { apiGet } from "@/lib/api";
 import { encodeCarId } from "@/lib/id-encoder";
-import { hasSession } from "@/lib/auth-client";
-
 interface SearchCar {
   id: number;
   brand: string;
@@ -20,15 +18,7 @@ interface SearchCar {
 
 const Header = () => {
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    setIsAdmin(hasSession());
-  }, []);
-
-  const visibleMenu = menuData.filter(
-    (item) => item.path !== "/admin/dashboard" || isAdmin
-  );
+  const visibleMenu = menuData;
 
   // Navbar toggle
   const [navbarOpen, setNavbarOpen] = useState(false);
@@ -109,6 +99,13 @@ const Header = () => {
     }
   };
 
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      setShowResults(false);
+      setSearchQuery('');
+    }
+  };
+
   // Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -182,7 +179,7 @@ const Header = () => {
                       )}
                       <Link
                         href={menuItem.path || "#"}
-                        className={`relative px-3 lg:px-4 py-2 lg:py-3 text-sm font-medium transition-all duration-300 whitespace-nowrap group ${
+                        className={`relative px-3 lg:px-4 py-2 lg:py-3 text-sm font-medium transition-all duration-300 whitespace-nowrap group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF4444]/50 focus-visible:rounded-lg ${
                           usePathName === menuItem.path
                             ? "text-[#EF4444]"
                             : "text-gray-300 hover:text-white"
@@ -210,11 +207,13 @@ const Header = () => {
                     placeholder="ค้นหา..."
                     value={searchQuery}
                     onChange={handleSearchChange}
+                    onKeyDown={handleSearchKeyDown}
                     onFocus={() => {
                       if (searchResults.length > 0) {
                         setShowResults(true);
                       }
                     }}
+                    aria-label="ค้นหารถยนต์"
                     className="w-full h-9 px-3 pl-9 rounded-full border border-gray-500/50 bg-white/5 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none focus:border-[#EF4444]/50 focus:bg-white/10 focus:ring-2 focus:ring-[#EF4444]/20 transition-all duration-300 text-xs"
                   />
                   <button
@@ -343,11 +342,13 @@ const Header = () => {
                     placeholder="ค้นหารถยนต์..."
                     value={searchQuery}
                     onChange={handleSearchChange}
+                    onKeyDown={handleSearchKeyDown}
                     onFocus={() => {
                       if (searchResults.length > 0) {
                         setShowResults(true);
                       }
                     }}
+                    aria-label="ค้นหารถยนต์"
                     className="w-[160px] lg:w-[200px] h-9 lg:h-10 px-4 pl-10 lg:pl-11 rounded-full border border-gray-500/50 bg-white/5 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none focus:border-[#EF4444]/50 focus:bg-white/10 focus:ring-2 focus:ring-[#EF4444]/20 transition-all duration-300 text-sm"
                   />
                   <button

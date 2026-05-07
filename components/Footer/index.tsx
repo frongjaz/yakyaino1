@@ -55,9 +55,6 @@ const Footer = () => {
                   }}
                   />
                 </Link>
-              <p className="mb-6 text-sm leading-relaxed text-white">
-               
-              </p>
               <p className="text-sm text-[#EF4444]">
                 Copyright © {new Date().getFullYear()}. All rights reserved.
               </p>
@@ -127,71 +124,43 @@ const Footer = () => {
               </h3>
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#8BC43F]">
-                    <Image
-                      src={getImagePath("/images/logo/line 01 Icon-06.svg")}
-                      alt="LINE"
-                      width={16}
-                      height={16}
-                      className="h-4 w-4"
-                    />
-            </div>
-                  <span className="text-sm text-white">@nattaauto</span>
-                  </li>
+                  <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#8BC43F]">
+                    <Image src={getImagePath("/images/logo/line 01 Icon-06.svg")} alt="" width={16} height={16} className="h-4 w-4" />
+                  </div>
+                  <Link href="https://line.me/R/ti/p/@nattaauto" target="_blank" rel="noopener noreferrer" aria-label="LINE: @nattaauto" className="text-sm text-white transition hover:text-[#EF4444]">@nattaauto</Link>
+                </li>
                 <li className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1877F2]">
-                    <svg
-                      className="h-4 w-4 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                  <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#1877F2]">
+                    <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                   </div>
-                  <span className="text-sm text-white">thaanaat.k</span>
-                  </li>
+                  <Link href="https://www.facebook.com/thaanaat.k" target="_blank" rel="noopener noreferrer" aria-label="Facebook: thaanaat.k" className="text-sm text-white transition hover:text-[#EF4444]">thaanaat.k</Link>
+                </li>
                 <li className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black">
-                    <svg
-                      className="h-4 w-4 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                  <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-black">
+                    <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                     </svg>
-              </div>
-                  <span className="text-sm text-white">@nattaauto</span>
-                  </li>
+                  </div>
+                  <Link href="https://www.tiktok.com/@nattaauto" target="_blank" rel="noopener noreferrer" aria-label="TikTok: @nattaauto" className="text-sm text-white transition hover:text-[#EF4444]">@nattaauto</Link>
+                </li>
                 <li className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FF0000]">
-                    <svg
-                      className="h-4 w-4 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                  <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#FF0000]">
+                    <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                     </svg>
                   </div>
-                  <span className="text-sm text-white">@nattaauto</span>
-                  </li>
+                  <Link href="https://www.youtube.com/@nattaauto" target="_blank" rel="noopener noreferrer" aria-label="YouTube: @nattaauto" className="text-sm text-white transition hover:text-[#EF4444]">@nattaauto</Link>
+                </li>
                 <li className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
-                    <svg
-                      className="h-4 w-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      />
+                  <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
+                    <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
                   </div>
-                  <span className="text-sm text-white">062-564-6455</span>
-                  </li>
+                  <Link href="tel:+66625646455" aria-label="โทร 062-564-6455" className="text-sm text-white transition hover:text-[#EF4444]">062-564-6455</Link>
+                </li>
                 </ul>
             </div>
           </div>

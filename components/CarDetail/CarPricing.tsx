@@ -16,19 +16,19 @@ const CarPricing = ({ price, monthlyPayment }: CarPricingProps) => {
     <div className="mt-6 flex items-center justify-between">
       <div>
         <div className="mb-2">
-          <button className="rounded-lg bg-[#EF4444] px-6 py-3 text-lg font-bold text-white">
-            PRICE {formatPrice(price)}-
-          </button>
+          <div className="rounded-lg bg-[#EF4444] px-6 py-3 text-lg font-bold text-white">
+            ราคา {formatPrice(price)} บาท
+          </div>
         </div>
         {monthlyPayment && (
           <p className="text-sm text-gray-600">
-            ค่างวด : {formatPrice(monthlyPayment)}-
+            ค่างวดประมาณ : {formatPrice(monthlyPayment)} บาท/เดือน
           </p>
         )}
       </div>
       <div className="flex gap-3">
-        <Image src={getImagePath("/images/logo/car_page_printredIcon-28.svg")} alt="Share" width={50} height={50} />
-        <Image src={getImagePath("/images/logo/car_page_shareredIcon-29.svg")} alt="Share" width={50} height={50} />
+        <Image src={getImagePath("/images/logo/car_page_printredIcon-28.svg")} alt="พิมพ์" width={50} height={50} />
+        <Image src={getImagePath("/images/logo/car_page_shareredIcon-29.svg")} alt="แชร์" width={50} height={50} />
       </div>
     </div>
   );

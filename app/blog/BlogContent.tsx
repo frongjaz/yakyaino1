@@ -20,7 +20,8 @@ export default function BlogContent({ initialBlogs = [] }: Props) {
     if (initialBlogs.length === 0) {
       fetchBlogs();
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialBlogs.length]);
 
   const fetchBlogs = async () => {
     try {
