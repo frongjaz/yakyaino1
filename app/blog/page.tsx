@@ -3,6 +3,8 @@ import Breadcrumb from "@/components/Common/Breadcrumb";
 import { fetchBlogsSSR } from "@/lib/fetchBlogs";
 import { Metadata } from "next";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
   title: { absolute: "บทความขายรถ รถมือสอง | CheckKub" },
