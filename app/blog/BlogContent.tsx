@@ -12,7 +12,7 @@ interface Props {
 
 export default function BlogContent({ initialBlogs = [] }: Props) {
   const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(initialBlogs.length === 0);
   const [error, setError] = useState<string | null>(null);
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.checkkub.com";
 
