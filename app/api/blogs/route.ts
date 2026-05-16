@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
 import { checkAuth } from '@/lib/auth-api';
+
+const BlogSchema = z.object({
+  title: z.string().min(1).max(300),
+  paragraph: z.string().min(1).max(1000),
+  content: z.string().max(50000).optional().nullable(),
+  image: z.string().min(1).max(500),
+  author_name: z.string().min(1).max(100),
+  author_image: z.string().max(500).optional().nullable(),
+  author_designation: z.string().max(100).optional().nullable(),
+  tags: z.array(z.string().max(50)).max(10).optional().nullable(),
+  publish_date: z.string().max(50).optional().nullable(),
+  date_published: z.string().datetime({ offset: true }).optional().nullable(),
+  status: z.enum(['draft', 'published']).default('draft'),
+});
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -122,30 +137,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const {
-      title,
-      paragraph,
-      content,
-      image,
-      author_name,
-      author_image,
-      author_designation,
-      tags,
-      publish_date,
-      date_published,
-      status = 'draft',
-    } = body;
-
-    // ตรวจสอบข้อมูลที่จำเป็น
-    if (!title || !paragraph || !image || !author_name) {
+    const parsed = BlogSchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (หัวข้อ, เนื้อหาย่อ, รูปภาพ, ชื่อผู้เขียน)' },
+        { success: false, message: 'ข้อมูลไม่ถูกต้อง', errors: parsed.error.flatten().fieldErrors },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // Convert tags array to JSON string
+    const {
+      title, paragraph, content, image, author_name, author_image,
+      author_designation, tags, publish_date, date_published, status,
+    } = parsed.data;
+
     const tagsJson = tags && Array.isArray(tags) ? JSON.stringify(tags) : null;
 
     // เพิ่มข้อมูลบทความ

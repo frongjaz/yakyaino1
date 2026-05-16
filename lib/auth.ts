@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/crypto-utils';
 
 export interface Session {
   userId: number;
@@ -10,13 +11,16 @@ export async function getSession(): Promise<Session | null> {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('admin_session');
+    if (!sessionCookie) return null;
 
-    if (!sessionCookie) {
-      return null;
-    }
+    const data = verifySession(sessionCookie.value) as any;
+    if (!data) return null;
 
-    const session = JSON.parse(sessionCookie.value) as Session;
-    return session;
+    return {
+      userId: data.userId ?? data.id,
+      username: data.username,
+      role: data.role,
+    };
   } catch {
     return null;
   }

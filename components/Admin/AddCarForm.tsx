@@ -90,10 +90,7 @@ export default function AddCarForm({ onSuccess, onCancel, initialData }: Props =
   const uploadImageToFTP = async (file: File): Promise<string> => {
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);
-    const sessionToken = localStorage.getItem('admin_session');
-    const headers: HeadersInit = {};
-    if (sessionToken) headers['Authorization'] = `Bearer ${encodeURIComponent(sessionToken)}`;
-    const response = await fetch(getApiUrl('/api/upload'), { method: 'POST', body: uploadFormData, credentials: 'include', headers });
+    const response = await fetch(getApiUrl('/api/upload'), { method: 'POST', body: uploadFormData, credentials: 'include' });
     if (!response.ok) {
       const errorText = await response.text();
       let errorData; try { errorData = JSON.parse(errorText); } catch { errorData = { message: `HTTP ${response.status}` }; }

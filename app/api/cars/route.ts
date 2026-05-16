@@ -1,7 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
 import { checkAuth } from '@/lib/auth-api';
+
+const CarSchema = z.object({
+  brand: z.string().min(1).max(100),
+  model: z.string().min(1).max(100),
+  year: z.number().int().min(1900).max(new Date().getFullYear() + 1),
+  price: z.number().int().min(0),
+  image: z.string().min(1).max(500),
+  image2: z.string().max(500).optional().nullable(),
+  image3: z.string().max(500).optional().nullable(),
+  image4: z.string().max(500).optional().nullable(),
+  image5: z.string().max(500).optional().nullable(),
+  photo_count: z.number().int().min(0).max(5).optional(),
+  description: z.string().max(5000).optional().nullable(),
+  mileage: z.number().int().min(0).optional().nullable(),
+  color: z.string().max(50).optional().nullable(),
+  transmission: z.enum(['auto', 'manual', 'อัตโนมัติ', 'ธรรมดา']).optional().nullable(),
+  fuel_type: z.string().max(50).optional().nullable(),
+  engine_size: z.string().max(50).optional().nullable(),
+  license_plate: z.string().max(20).optional().nullable(),
+  status: z.enum(['available', 'sold', 'pending']).default('available'),
+});
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30; // 30 seconds timeout for Vercel
@@ -185,37 +207,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const {
-      brand,
-      model,
-      year,
-      price,
-      image,
-      image2,
-      image3,
-      image4,
-      image5,
-      photo_count,
-      description,
-      mileage,
-      color,
-      transmission,
-      fuel_type,
-      engine_size,
-      license_plate,
-      status = 'available',
-    } = body;
-
-    // ตรวจสอบข้อมูลที่จำเป็น
-    if (!brand || !model || !year || !price || !image) {
+    const parsed = CarSchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (ยี่ห้อ, รุ่น, ปี, ราคา, รูปภาพหลัก)' },
+        { success: false, message: 'ข้อมูลไม่ถูกต้อง', errors: parsed.error.flatten().fieldErrors },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // เพิ่มข้อมูลรถ
+    const {
+      brand, model, year, price, image, image2, image3, image4, image5,
+      photo_count, description, mileage, color, transmission, fuel_type,
+      engine_size, license_plate, status,
+    } = parsed.data;
+
     const result = await query(
       `INSERT INTO cars (
         brand, model, year, price, image, image2, image3, image4, image5, photo_count, description,

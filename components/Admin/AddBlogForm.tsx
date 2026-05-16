@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { apiPost, getApiUrl, getSessionToken } from '@/lib/api';
+import { apiPost, getApiUrl } from '@/lib/api';
 import { getSession } from '@/lib/auth-client';
 import RichTextEditor from '@/components/Admin/RichTextEditor';
 
@@ -126,20 +126,9 @@ export default function AddBlogForm({ initialData, onSuccess, onCancel }: AddBlo
     const formData = new FormData();
     formData.append('file', file);
 
-    // Get session token for Authorization header
-    const sessionToken = getSessionToken();
-
-    if (!sessionToken) {
-      throw new Error('ไม่พบ session กรุณาเข้าสู่ระบบใหม่');
-    }
-
-    const headers: HeadersInit = {};
-    headers['Authorization'] = `Bearer ${sessionToken}`;
-
     const response = await fetch(getApiUrl('/api/upload'), {
       method: 'POST',
-      headers,
-      credentials: 'include', // Include cookies for same-domain
+      credentials: 'include',
       body: formData,
     });
 

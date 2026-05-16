@@ -1,50 +1,32 @@
-/**
- * Simple cryptographic utilities for signing and verifying data
- * Used to secure the session tokens without external JWT libraries
- */
+import { createHmac, timingSafeEqual } from 'crypto';
 
-const APP_SECRET = process.env.APP_SECRET || 'yakyai_default_secret_key_change_me';
-
-/**
- * Signs a session object and returns a token string
- */
-export function signSession(data: any): string {
-    const payload = JSON.stringify(data);
-    const signature = simpleHash(payload + APP_SECRET);
-    return Buffer.from(payload + "|" + signature).toString('base64');
+function getSecret(): string {
+  return process.env.APP_SECRET || 'yakyai_default_secret_key_change_me';
 }
 
-/**
- * Verifies a token string and returns the session object if valid
- */
-export function verifySession(token: string): any | null {
-    try {
-        const decoded = Buffer.from(token, 'base64').toString('utf8');
-        const [payload, signature] = decoded.split('|');
+export function signSession(data: object): string {
+  const secret = getSecret();
+  const payload = JSON.stringify(data);
+  const sig = createHmac('sha256', secret).update(payload).digest('hex');
+  return Buffer.from(payload + '|' + sig).toString('base64url');
+}
 
-        if (!payload || !signature) return null;
+export function verifySession(token: string): object | null {
+  try {
+    const secret = getSecret();
+    const decoded = Buffer.from(token, 'base64url').toString('utf8');
+    const lastPipe = decoded.lastIndexOf('|');
+    if (lastPipe === -1) return null;
 
-        const expectedSignature = simpleHash(payload + APP_SECRET);
+    const payload = decoded.substring(0, lastPipe);
+    const sig = decoded.substring(lastPipe + 1);
 
-        if (signature === expectedSignature) {
-            return JSON.parse(payload);
-        }
-    } catch (e) {
-        console.error('[verifySession] Error:', e);
-    }
+    const expected = createHmac('sha256', secret).update(payload).digest('hex');
+    if (expected.length !== sig.length) return null;
+    if (!timingSafeEqual(new Uint8Array(Buffer.from(expected)), new Uint8Array(Buffer.from(sig)))) return null;
+
+    return JSON.parse(payload);
+  } catch {
     return null;
-}
-
-/**
- * A very simple hash function for demonstration
- * In a real app, use a proper HMAC with crypto.createHmac
- */
-function simpleHash(str: string): string {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return hash.toString(16);
+  }
 }

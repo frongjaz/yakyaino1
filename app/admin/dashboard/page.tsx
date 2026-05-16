@@ -1,14 +1,18 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import useSWR from 'swr';
+import { toast } from 'sonner';
 import { apiGet, apiDelete, apiDeleteTunnel } from '@/lib/api';
-import { getSession, clearSession } from '@/lib/auth-client';
+import { clearSession } from '@/lib/auth-client';
 import AddCarForm, { CarFormData } from '@/components/Admin/AddCarForm';
 import AddBlogForm, { BlogData } from '@/components/Admin/AddBlogForm';
 import AddBannerForm, { BannerFormData } from '@/components/Admin/AddBannerForm';
 import { getImagePath } from '@/lib/utils';
+
+const fetcher = (url: string) => apiGet(url);
 
 interface Session { userId: number; username: string; role: string }
 interface Car {
@@ -43,30 +47,34 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>('cars');
 
-  const [cars, setCars] = useState<Car[]>([]);
-  const [carsLoading, setCarsLoading] = useState(false);
   const [showAddCar, setShowAddCar] = useState(false);
   const [deletingCarId, setDeletingCarId] = useState<number | null>(null);
+  const [editingCar, setEditingCar] = useState<Car | null>(null);
 
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [blogsLoading, setBlogsLoading] = useState(false);
   const [showAddBlog, setShowAddBlog] = useState(false);
   const [deletingBlogId, setDeletingBlogId] = useState<number | null>(null);
+  const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
 
-  const [banners, setBanners] = useState<Banner[]>([]);
-  const [bannersLoading, setBannersLoading] = useState(false);
   const [showAddBanner, setShowAddBanner] = useState(false);
   const [deletingBannerId, setDeletingBannerId] = useState<number | null>(null);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
 
-  const [editingCar, setEditingCar] = useState<Car | null>(null);
-  const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
+  // ── SWR data ──────────────────────────────────────────────────────────────
+  const { data: carsData, isLoading: carsLoading, mutate: mutateCars } =
+    useSWR(session ? '/api/cars?limit=100' : null, fetcher);
+  const cars: Car[] = carsData?.data ?? [];
+
+  const { data: blogsData, isLoading: blogsLoading, mutate: mutateBlogs } =
+    useSWR(session ? '/api/blogs?admin=true&status=all' : null, fetcher);
+  const blogs: Blog[] = blogsData?.data ?? [];
+
+  const { data: bannersData, isLoading: bannersLoading, mutate: mutateBanners } =
+    useSWR(session ? '/api/banners?admin=true' : null, fetcher);
+  const banners: Banner[] = bannersData?.data ?? [];
 
   // ── auth ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     (async () => {
-      const local = getSession();
-      if (!local) { window.location.href = '/admin/login'; return; }
       try {
         const d = await apiGet<{ success: boolean; authenticated: boolean; user?: Session }>('/api/auth/check');
         if (d.success && d.authenticated && d.user) {
@@ -76,41 +84,12 @@ export default function AdminDashboardPage() {
           window.location.href = '/admin/login';
         }
       } catch {
-        setSession(local);
+        window.location.href = '/admin/login';
       }
       setLoading(false);
     })();
   }, []);
 
-  // ── data ──────────────────────────────────────────────────────────────────
-  const fetchCars = useCallback(async () => {
-    setCarsLoading(true);
-    try {
-      const d = await apiGet<{ success: boolean; data: Car[] }>('/api/cars?limit=100');
-      if (d.success) setCars(d.data ?? []);
-    } catch {}
-    setCarsLoading(false);
-  }, []);
-
-  const fetchBlogs = useCallback(async () => {
-    setBlogsLoading(true);
-    try {
-      const d = await apiGet<{ success: boolean; data: Blog[] }>('/api/blogs?admin=true&status=all');
-      if (d.success) setBlogs(d.data ?? []);
-    } catch {}
-    setBlogsLoading(false);
-  }, []);
-
-  const fetchBanners = useCallback(async () => {
-    setBannersLoading(true);
-    try {
-      const d = await apiGet<{ success: boolean; data: Banner[] }>('/api/banners?admin=true');
-      if (d.success) setBanners(d.data ?? []);
-    } catch {}
-    setBannersLoading(false);
-  }, []);
-
-  useEffect(() => { if (session) { fetchCars(); fetchBlogs(); fetchBanners(); } }, [session, fetchCars, fetchBlogs, fetchBanners]);
 
   // ── delete car ────────────────────────────────────────────────────────────
   const deleteCar = async (id: number) => {
@@ -118,9 +97,10 @@ export default function AdminDashboardPage() {
     setDeletingCarId(id);
     try {
       await apiDelete(`/api/cars/${id}`);
-      setCars(prev => prev.filter(c => c.id !== id));
+      toast.success('ลบรถสำเร็จ');
+      mutateCars();
     } catch (e: any) {
-      alert('ลบไม่สำเร็จ: ' + (e.message ?? ''));
+      toast.error('ลบไม่สำเร็จ: ' + (e.message ?? 'เกิดข้อผิดพลาด'));
     }
     setDeletingCarId(null);
   };
@@ -131,9 +111,10 @@ export default function AdminDashboardPage() {
     setDeletingBannerId(id);
     try {
       await apiDeleteTunnel(`/api/banners?id=${id}`);
-      setBanners(prev => prev.filter(b => b.id !== id));
+      toast.success('ลบ banner สำเร็จ');
+      mutateBanners();
     } catch (e: any) {
-      alert('ลบไม่สำเร็จ: ' + (e.message ?? ''));
+      toast.error('ลบไม่สำเร็จ: ' + (e.message ?? 'เกิดข้อผิดพลาด'));
     }
     setDeletingBannerId(null);
   };
@@ -144,9 +125,10 @@ export default function AdminDashboardPage() {
     setDeletingBlogId(id);
     try {
       await apiDelete(`/api/blogs/${id}`);
-      setBlogs(prev => prev.filter(b => b.id !== id));
+      toast.success('ลบบทความสำเร็จ');
+      mutateBlogs();
     } catch (e: any) {
-      alert('ลบไม่สำเร็จ: ' + (e.message ?? ''));
+      toast.error('ลบไม่สำเร็จ: ' + (e.message ?? 'เกิดข้อผิดพลาด'));
     }
     setDeletingBlogId(null);
   };
@@ -246,7 +228,7 @@ export default function AdminDashboardPage() {
             {showAddCar && (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="font-semibold text-gray-700 mb-4">เพิ่มรถใหม่</h3>
-                <AddCarForm onSuccess={() => { setShowAddCar(false); fetchCars(); }} />
+                <AddCarForm onSuccess={() => { setShowAddCar(false); mutateCars(); }} />
               </div>
             )}
 
@@ -255,7 +237,7 @@ export default function AdminDashboardPage() {
                 <h3 className="font-semibold text-gray-700 mb-4">แก้ไขรถ: {editingCar.brand} {editingCar.model}</h3>
                 <AddCarForm
                   initialData={editingCar as CarFormData}
-                  onSuccess={() => { setEditingCar(null); fetchCars(); }}
+                  onSuccess={() => { setEditingCar(null); mutateCars(); }}
                   onCancel={() => setEditingCar(null)}
                 />
               </div>
@@ -337,7 +319,7 @@ export default function AdminDashboardPage() {
             {showAddBlog && (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="font-semibold text-gray-700 mb-4">เพิ่มบทความใหม่</h3>
-                <AddBlogForm onSuccess={() => { setShowAddBlog(false); fetchBlogs(); }} />
+                <AddBlogForm onSuccess={() => { setShowAddBlog(false); mutateBlogs(); }} />
               </div>
             )}
 
@@ -346,7 +328,7 @@ export default function AdminDashboardPage() {
                 <h3 className="font-semibold text-gray-700 mb-4">แก้ไขบทความ: {editingBlog.title}</h3>
                 <AddBlogForm
                   initialData={{ ...editingBlog, author_name: editingBlog.author?.name } as unknown as BlogData}
-                  onSuccess={() => { setEditingBlog(null); fetchBlogs(); }}
+                  onSuccess={() => { setEditingBlog(null); mutateBlogs(); }}
                   onCancel={() => setEditingBlog(null)}
                 />
               </div>
@@ -426,7 +408,7 @@ export default function AdminDashboardPage() {
             {showAddBanner && !editingBanner && (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="font-semibold text-gray-700 mb-4">เพิ่ม Banner ใหม่</h3>
-                <AddBannerForm onSuccess={() => { setShowAddBanner(false); fetchBanners(); }} />
+                <AddBannerForm onSuccess={() => { setShowAddBanner(false); mutateBanners(); }} />
               </div>
             )}
 
@@ -435,7 +417,7 @@ export default function AdminDashboardPage() {
                 <h3 className="font-semibold text-gray-700 mb-4">แก้ไข Banner ID: {editingBanner.id}</h3>
                 <AddBannerForm
                   initialData={editingBanner as BannerFormData}
-                  onSuccess={() => { setEditingBanner(null); fetchBanners(); }}
+                  onSuccess={() => { setEditingBanner(null); mutateBanners(); }}
                   onCancel={() => setEditingBanner(null)}
                 />
               </div>
