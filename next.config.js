@@ -28,14 +28,16 @@ const nextConfig = {
       },
     ],
   },
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: SECURITY_HEADERS,
-      },
-    ];
-  },
 };
+
+// headers() is incompatible with static export (output: 'export')
+if (process.env.IS_STATIC_EXPORT !== 'true') {
+  nextConfig.headers = async () => [
+    {
+      source: "/:path*",
+      headers: SECURITY_HEADERS,
+    },
+  ];
+}
 
 module.exports = nextConfig;
