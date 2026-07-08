@@ -21,8 +21,21 @@ jobs:
           node-version: "18"
           cache: "npm"
 
+      - name: Configure npm network retries
+        run: |
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+
       - name: Install dependencies
-        run: npm ci
+        run: |
+          for attempt in 1 2 3; do
+            echo "npm ci attempt ${attempt}/3"
+            npm ci && exit 0
+            echo "npm ci failed, retrying in 15s..."
+            sleep 15
+          done
+          exit 1
 
       - name: Temporarily move Next.js API routes (static export cannot include them)
         run: |
