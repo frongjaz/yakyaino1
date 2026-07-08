@@ -1,7 +1,10 @@
+const { SECURITY_HEADERS } = require("./lib/securityHeaders");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable static export ONLY when building for HostAtom
   output: process.env.IS_STATIC_EXPORT === 'true' ? 'export' : undefined,
+  poweredByHeader: false,
   experimental: {
     optimizeCss: true,
   },
@@ -24,6 +27,14 @@ const nextConfig = {
         hostname: "cdn.sanity.io",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: SECURITY_HEADERS,
+      },
+    ];
   },
 };
 
