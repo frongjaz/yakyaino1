@@ -3,8 +3,6 @@ import GoogleAnalytics from "@/components/Common/GoogleAnalytics";
 import { Providers } from "./providers";
 import { Inter } from "next/font/google";
 import { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Toaster } from "sonner";
 import "node_modules/react-modal-video/css/modal-video.css";
 import "../styles/index.css";
@@ -51,8 +49,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ConditionalLayout>
         </Providers>
         <Toaster position="top-right" richColors closeButton />
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );
