@@ -4,6 +4,7 @@ import SellPolicy from "@/components/SellPage/SellPolicy";
 import AcceptCars from "@/components/SellPage/AcceptCars";
 import SellSteps from "@/components/SellPage/SellSteps";
 import LeadForm from "@/components/SellPage/LeadForm";
+import SellCtaBanner from "@/components/SellPage/SellCtaBanner";
 import ScrollUp from "@/components/Common/ScrollUp";
 import { Metadata } from "next";
 
@@ -176,7 +177,7 @@ export default function SellPage() {
       <SellHero />
 
       {/* Lead Form — above the fold after hero */}
-      <section className="bg-white py-14 md:py-20">
+      <section id="lead-form" className="bg-white py-14 md:py-20">
         <div className="container px-4">
           <div className="mx-auto max-w-lg">
             {/* Header */}
@@ -199,7 +200,17 @@ export default function SellPage() {
       <SellBenefits />
       <SellPolicy />
       <AcceptCars />
+      <SellCtaBanner
+        heading="มีรถที่ต้องการขาย?"
+        sub="ส่งข้อมูลรถให้เราประเมินราคาได้ฟรี ภายใน 24 ชั่วโมง"
+        btnText="ประเมินราคารถ"
+      />
       <SellSteps />
+      <SellCtaBanner
+        heading="พร้อมขายรถแล้วใช่ไหม?"
+        sub="เริ่มประเมินราคาได้เลย ไม่มีค่าใช้จ่าย ทีมงานติดต่อกลับภายใน 24 ชั่วโมง"
+        btnText="ส่งข้อมูลรถ"
+      />
     </>
   );
 }
