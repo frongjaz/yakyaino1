@@ -105,7 +105,7 @@ const Hero = () => {
           <h1 className="text-xl font-bold text-white drop-shadow-lg md:text-2xl lg:text-3xl">
             รับซื้อรถ — ขายรถมือสองคุณภาพดี
             <span className="mt-1 block text-sm font-normal text-white/80 md:text-base">
-              ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที ทั่วประเทศ
+              ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินภายใน 1–3 วันทำการ
             </span>
           </h1>
         </div>

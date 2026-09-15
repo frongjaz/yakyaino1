@@ -23,8 +23,9 @@ interface Car {
 }
 interface Blog { id: number; title: string; paragraph: string; image: string; status: string; createdAt: string; author: { name: string } }
 interface Banner { id: number; image_url: string; alt_text: string; sort_order: number; is_active: number; created_at: string }
+interface Lead { id: number; brand: string; model: string; year: number; mileage: number | null; province: string; phone: string; photo_url: string | null; created_at: string }
 
-type Tab = 'cars' | 'blogs' | 'banners';
+type Tab = 'cars' | 'blogs' | 'banners' | 'leads';
 
 function formatPrice(n: number) {
   return new Intl.NumberFormat('th-TH').format(n);
@@ -71,6 +72,10 @@ export default function AdminDashboardPage() {
   const { data: bannersData, isLoading: bannersLoading, mutate: mutateBanners } =
     useSWR(session ? '/api/banners?admin=true' : null, fetcher);
   const banners: Banner[] = bannersData?.data ?? [];
+
+  const { data: leadsData, isLoading: leadsLoading } =
+    useSWR(session ? '/api/leads' : null, fetcher);
+  const leads: Lead[] = leadsData?.data ?? [];
 
   // ── auth ─────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -195,11 +200,18 @@ export default function AdminDashboardPage() {
               <div className="text-xs text-gray-500">Banner ที่ใช้งาน</div>
             </div>
           </div>
+          <div className="bg-white rounded-xl border border-red-200 p-4 flex items-center gap-3">
+            <div className="text-3xl">📋</div>
+            <div>
+              <div className="text-2xl font-bold text-red-600">{leads.length}</div>
+              <div className="text-xs text-gray-500">Lead ทั้งหมด</div>
+            </div>
+          </div>
         </div>
 
         {/* ── Tab Bar ──────────────────────────────────────────────────────── */}
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg mb-4 w-fit">
-          {(['cars', 'blogs', 'banners'] as Tab[]).map(t => (
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg mb-4 w-fit flex-wrap">
+          {(['cars', 'blogs', 'banners', 'leads'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -207,7 +219,7 @@ export default function AdminDashboardPage() {
                 tab === t ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              {t === 'cars' ? '🚗 รถยนต์' : t === 'blogs' ? '📝 บทความ' : '🖼️ Banner'}
+              {t === 'cars' ? '🚗 รถยนต์' : t === 'blogs' ? '📝 บทความ' : t === 'banners' ? '🖼️ Banner' : '📋 Leads'}
             </button>
           ))}
         </div>
@@ -468,6 +480,71 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Leads Tab ────────────────────────────────────────────────────── */}
+        {tab === 'leads' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-gray-700">Lead ที่ส่งเข้ามา ({leads.length})</h2>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              {leadsLoading ? (
+                <div className="p-8 text-center text-gray-400 text-sm">กำลังโหลด...</div>
+              ) : leads.length === 0 ? (
+                <div className="p-8 text-center text-gray-400 text-sm">ยังไม่มี Lead</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">#</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">รถ</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">ไมล์</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">จังหวัด</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">เบอร์โทร</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">รูป</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">วันที่</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {leads.map(lead => (
+                        <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3 text-gray-400 text-xs">{lead.id}</td>
+                          <td className="px-4 py-3">
+                            <div className="font-medium text-gray-800">{lead.brand} {lead.model}</div>
+                            <div className="text-xs text-gray-400">ปี {lead.year}</div>
+                          </td>
+                          <td className="px-4 py-3 text-gray-600 text-xs">
+                            {lead.mileage ? new Intl.NumberFormat('th-TH').format(lead.mileage) + ' กม.' : '—'}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600 text-xs">{lead.province}</td>
+                          <td className="px-4 py-3">
+                            <a href={`tel:${lead.phone}`} className="text-primary font-medium hover:underline">
+                              {lead.phone}
+                            </a>
+                          </td>
+                          <td className="px-4 py-3">
+                            {lead.photo_url ? (
+                              <a href={lead.photo_url} target="_blank" rel="noopener noreferrer">
+                                <div className="relative w-14 h-10 rounded overflow-hidden bg-gray-100">
+                                  <img src={lead.photo_url} alt="รูปรถ" className="w-full h-full object-cover" />
+                                </div>
+                              </a>
+                            ) : <span className="text-gray-300 text-xs">—</span>}
+                          </td>
+                          <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">
+                            {new Date(lead.created_at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>

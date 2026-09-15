@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     default: "ขายรถ รับซื้อรถ | CheckKub",
     template: "%s | CheckKub",
   },
-  description: "CheckKub รับซื้อรถทุกประเภท รถมือสอง รถฟลีต รถบริษัททั่วประเทศ ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที",
+  description: "CheckKub รับซื้อรถทุกประเภท รถมือสอง รถฟลีต รถบริษัททั่วประเทศ ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินภายใน 1–3 วันทำการ",
   robots: {
     index: true,
     follow: true,

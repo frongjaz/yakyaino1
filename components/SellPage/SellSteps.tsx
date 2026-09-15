@@ -60,9 +60,9 @@ const steps: Step[] = [
   },
   {
     number: 6,
-    title: "รับเงินทันที",
-    subtitle: "Instant Payment",
-    description: "โอนเงินเข้าบัญชีทันทีหลังตกลงราคา ภายใน 1-3 วันทำการ",
+    title: "รับเงินภายใน 1–3 วันทำการ",
+    subtitle: "Payment within 1–3 Business Days",
+    description: "โอนเงินเข้าบัญชีภายใน 1–3 วันทำการหลังตกลงราคาและดำเนินเอกสารครบถ้วน",
     icon: (
       <Image src={getImagePath("/images/logo/Sale_page_RIcon-24.svg")} alt="" width={40} height={40} className="h-10 w-10" />
     ),

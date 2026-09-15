@@ -3,13 +3,14 @@ import SellBenefits from "@/components/SellPage/SellBenefits";
 import SellPolicy from "@/components/SellPage/SellPolicy";
 import AcceptCars from "@/components/SellPage/AcceptCars";
 import SellSteps from "@/components/SellPage/SellSteps";
+import LeadForm from "@/components/SellPage/LeadForm";
 import ScrollUp from "@/components/Common/ScrollUp";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
   title: { absolute: "ขายรถ — รับซื้อรถทุกประเภท ราคายุติธรรม | CheckKub" },
-  description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รวดเร็ว โปร่งใส ราคายุติธรรม ชำระเงินทันที. เรารับซื้อรถมือสอง รถฟลีต รถบริษัททั่วประเทศ. ขายรถให้เรา รับซื้อรถที่ไหนดี CheckKub พร้อมให้บริการ.",
+  description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รวดเร็ว โปร่งใส ราคายุติธรรม ชำระเงินภายใน 1–3 วันทำการ. เรารับซื้อรถมือสอง รถฟลีต รถบริษัททั่วประเทศ. ขายรถให้เรา รับซื้อรถที่ไหนดี CheckKub พร้อมให้บริการ.",
   keywords: [
     "ขายรถ",
     "รับซื้อรถ",
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "ขายรถ รับซื้อรถ | CheckKub - ต้องการขายรถ รับซื้อรถทุกประเภท",
-    description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รวดเร็ว โปร่งใส ราคายุติธรรม ชำระเงินทันที",
+    description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท รวดเร็ว โปร่งใส ราคายุติธรรม ชำระเงินภายใน 1–3 วันทำการ",
     url: "https://www.checkkub.com/sell",
     siteName: "CheckKub",
     type: "website",
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ขายรถ รับซื้อรถ | CheckKub",
-    description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท ราคายุติธรรม ชำระเงินทันที",
+    description: "ต้องการขายรถ? รับซื้อรถ? CheckKub รับซื้อรถทุกประเภท ราคายุติธรรม ชำระเงินภายใน 1–3 วันทำการ",
     images: ["https://www.checkkub.com/images/video/car3.jpg"],
   },
 };
@@ -50,7 +51,7 @@ export default function SellPage() {
       "@context": "https://schema.org",
       "@type": "HowTo",
       name: "วิธีขายรถกับ CheckKub",
-      description: "ขั้นตอนการขายรถให้กับ CheckKub อย่างง่ายดาย ประเมินราคารวดเร็ว ชำระเงินทันที",
+      description: "ขั้นตอนการขายรถให้กับ CheckKub อย่างง่ายดาย ประเมินราคารวดเร็ว ชำระเงินภายใน 1–3 วันทำการ",
       totalTime: "P1D",
       estimatedCost: {
         "@type": "MonetaryAmount",
@@ -85,8 +86,8 @@ export default function SellPage() {
         {
           "@type": "HowToStep",
           position: 4,
-          name: "โอนเงินทันทีหลังตรวจสภาพ",
-          text: "เมื่อตรวจสภาพรถเรียบร้อย CheckKub จะชำระเงินทันทีภายใน 1-3 วันทำการ พร้อมดูแลเอกสารโอนกรรมสิทธิ์ครบ",
+          name: "โอนเงินภายใน 1–3 วันทำการหลังตรวจสภาพ",
+          text: "เมื่อตรวจสภาพรถเรียบร้อย CheckKub จะชำระเงินภายใน 1–3 วันทำการภายใน 1-3 วันทำการ พร้อมดูแลเอกสารโอนกรรมสิทธิ์ครบ",
         },
       ],
     },
@@ -107,11 +108,11 @@ export default function SellPage() {
         name: "Thailand",
       },
       description:
-        "ขายรถ รับซื้อรถ - CheckKub รับซื้อรถทุกประเภท สำหรับผู้ที่ต้องการขายรถ. เรามีบริการรับซื้อรถมือสอง รถฟลีต รถบริษัททั่วประเทศ. ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินทันที. ที่รับซื้อรถ CheckKub พร้อมให้บริการ.",
+        "ขายรถ รับซื้อรถ - CheckKub รับซื้อรถทุกประเภท สำหรับผู้ที่ต้องการขายรถ. เรามีบริการรับซื้อรถมือสอง รถฟลีต รถบริษัททั่วประเทศ. ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินภายใน 1–3 วันทำการ. ที่รับซื้อรถ CheckKub พร้อมให้บริการ.",
       offers: {
         "@type": "Offer",
         name: "ขายรถ รับซื้อรถ",
-        description: "รับซื้อรถทุกประเภท ราคายุติธรรม ชำระเงินทันที สำหรับผู้ที่ต้องการขายรถ",
+        description: "รับซื้อรถทุกประเภท ราคายุติธรรม ชำระเงินภายใน 1–3 วันทำการ สำหรับผู้ที่ต้องการขายรถ",
       },
     },
     {
@@ -124,7 +125,7 @@ export default function SellPage() {
           acceptedAnswer: {
             "@type": "Answer",
             text:
-              "หากคุณต้องการขายรถ CheckKub เป็นตัวเลือกที่ดี เพราะเรามีทีมประเมินราคามืออาชีพ ให้ราคาตามสภาพจริง ไม่กดราคา และชำระเงินทันทีหลังตกลงราคา. เรารับซื้อรถทุกประเภท ทั้งรถส่วนบุคคล รถฟลีต และรถบริษัท.",
+              "หากคุณต้องการขายรถ CheckKub เป็นตัวเลือกที่ดี เพราะเรามีทีมประเมินราคามืออาชีพ ให้ราคาตามสภาพจริง ไม่กดราคา และชำระเงินภายใน 1–3 วันทำการหลังตกลงราคา. เรารับซื้อรถทุกประเภท ทั้งรถส่วนบุคคล รถฟลีต และรถบริษัท.",
           },
         },
         {
@@ -142,7 +143,7 @@ export default function SellPage() {
           acceptedAnswer: {
             "@type": "Answer",
             text:
-              "ขายรถที่ CheckKub รับซื้อรถทุกประเภท ให้ราคายุติธรรม ประเมินรวดเร็ว ชำระเงินทันที. เรารับซื้อรถมือสอง รถฟลีต รถบริษัททั่วประเทศ.",
+              "ขายรถที่ CheckKub รับซื้อรถทุกประเภท ให้ราคายุติธรรม ประเมินรวดเร็ว ชำระเงินภายใน 1–3 วันทำการ. เรารับซื้อรถมือสอง รถฟลีต รถบริษัททั่วประเทศ.",
           },
         },
       ],
@@ -173,6 +174,28 @@ export default function SellPage() {
       />
       <ScrollUp />
       <SellHero />
+
+      {/* Lead Form — above the fold after hero */}
+      <section className="bg-white py-14 md:py-20">
+        <div className="container px-4">
+          <div className="mx-auto max-w-lg">
+            {/* Header */}
+            <div className="mb-8 text-center">
+              <span className="mb-3 inline-block rounded-full bg-red-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-[#EF4444]">
+                ฟรี — ไม่มีค่าใช้จ่าย
+              </span>
+              <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">ประเมินราคารถของคุณ</h2>
+              <p className="mt-2 text-sm text-gray-500">กรอกข้อมูล 5 ช่อง รับราคาภายใน 24 ชั่วโมง</p>
+            </div>
+
+            {/* Card */}
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-xl shadow-gray-100 md:p-8">
+              <LeadForm />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <SellBenefits />
       <SellPolicy />
       <AcceptCars />
