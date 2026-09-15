@@ -82,7 +82,7 @@ const Contact = () => {
               {/* QR Code */}
               <div className="rounded-xl border-2 border-red-100 p-3">
                 <Image
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://line.me/ti/p/@nattaauto`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://line.me/ti/p/@831tvslj`}
                   alt="LINE QR Code"
                   width={180}
                   height={180}
@@ -94,7 +94,7 @@ const Contact = () => {
 
               {/* LINE Button */}
               <Link
-                href="https://line.me/ti/p/@nattaauto"
+                href="https://line.me/ti/p/@831tvslj"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#06C755] px-6 py-3.5 text-white font-semibold shadow-sm transition hover:bg-[#05b34c]"
@@ -106,7 +106,7 @@ const Contact = () => {
                   height={22}
                   className="h-[22px] w-[22px]"
                 />
-                LINE: @nattaauto
+                LINE: @831tvslj
               </Link>
 
               {/* Phone Button */}
@@ -164,7 +164,7 @@ const Contact = () => {
             </Link>
 
             <Link
-              href="https://www.youtube.com/@nattaauto"
+              href="https://www.youtube.com/@831tvslj"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center gap-4 rounded-2xl bg-white px-6 py-4 shadow-sm transition hover:shadow-md hover:-translate-y-0.5"
@@ -176,7 +176,7 @@ const Contact = () => {
               </div>
               <div>
                 <p className="font-semibold text-gray-900 group-hover:text-[#FF0000] transition-colors">YouTube</p>
-                <p className="text-sm text-gray-400">@nattaauto</p>
+                <p className="text-sm text-gray-400">@831tvslj</p>
               </div>
             </Link>
           </div>
