@@ -17,7 +17,7 @@ require_auth();
 
 // สร้าง table ถ้ายังไม่มี
 get_pdo()->exec("
-    CREATE TABLE IF NOT EXISTS leads (
+    CREATE TABLE IF NOT EXISTS tb_lead (
         id          INT AUTO_INCREMENT PRIMARY KEY,
         brand       VARCHAR(100) NOT NULL,
         model       VARCHAR(150) NOT NULL,
@@ -33,7 +33,7 @@ get_pdo()->exec("
 try {
     $rows = db_query(
         "SELECT id, brand, model, year, mileage, province, phone, photo_url, created_at
-         FROM leads
+         FROM tb_lead
          ORDER BY id DESC
          LIMIT 500"
     );

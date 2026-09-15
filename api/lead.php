@@ -29,7 +29,7 @@ if (!$brand || !$model || !$year || !$province || !$phone) {
 // ── Create table if needed ────────────────────────────────────────────────────
 try {
     get_pdo()->exec("
-        CREATE TABLE IF NOT EXISTS leads (
+        CREATE TABLE IF NOT EXISTS tb_lead (
             id          INT AUTO_INCREMENT PRIMARY KEY,
             brand       VARCHAR(100) NOT NULL,
             model       VARCHAR(150) NOT NULL,
@@ -67,7 +67,7 @@ if (!empty($_FILES['photo']['tmp_name'])) {
 // ── Save to database ──────────────────────────────────────────────────────────
 try {
     $result = db_execute(
-        "INSERT INTO leads (brand, model, year, mileage, province, phone, photo_url)
+        "INSERT INTO tb_lead (brand, model, year, mileage, province, phone, photo_url)
          VALUES (?, ?, ?, ?, ?, ?, ?)",
         [
             $brand,
