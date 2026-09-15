@@ -13,7 +13,7 @@ const SellBenefits = () => {
       alt: "Car dealership lot",
     },
     {
-      src: "/images/hero/S__5800088_0.jpg",
+      src: "/images/about/S__5800062.webp",
       alt: "Cars in parking lot",
     },
   ];
