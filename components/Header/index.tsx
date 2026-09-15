@@ -42,7 +42,8 @@ const Header = () => {
   };
   useEffect(() => {
     window.addEventListener("scroll", handleStickyNavbar);
-  });
+    return () => window.removeEventListener("scroll", handleStickyNavbar);
+  }, []);
 
   const usePathName = usePathname();
 
@@ -53,6 +54,7 @@ const Header = () => {
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const mobileSearchContainerRef = useRef<HTMLDivElement>(null);
 
   // Handle search input change with debounce
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +111,10 @@ const Header = () => {
   // Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const inDesktop = searchContainerRef.current?.contains(target);
+      const inMobile = mobileSearchContainerRef.current?.contains(target);
+      if (!inDesktop && !inMobile) {
         setShowResults(false);
       }
     };
@@ -200,7 +205,7 @@ const Header = () => {
             {/* Mobile Search and Menu Button */}
             <div className="flex items-center gap-2 px-4 lg:hidden">
               {/* Mobile Search */}
-              <div className="relative flex-1 max-w-[180px]" ref={searchContainerRef}>
+              <div className="relative flex-1 max-w-[180px]" ref={mobileSearchContainerRef}>
                 <form onSubmit={handleSearchSubmit} className="relative">
                 <input
                   type="text"

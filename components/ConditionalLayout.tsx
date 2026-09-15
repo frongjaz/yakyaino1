@@ -8,7 +8,7 @@ import CompareBar from "@/components/Compare/CompareBar";
 
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
+  const isAdmin = pathname?.startsWith('/admin') || pathname?.startsWith('/ads-plan');
 
   return (
     <>
