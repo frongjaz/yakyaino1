@@ -5,6 +5,7 @@ import AcceptCars from "@/components/SellPage/AcceptCars";
 import SellSteps from "@/components/SellPage/SellSteps";
 import LeadForm from "@/components/SellPage/LeadForm";
 import SellCtaBanner from "@/components/SellPage/SellCtaBanner";
+import SellTrustBar from "@/components/SellPage/SellTrustBar";
 import ScrollUp from "@/components/Common/ScrollUp";
 import { Metadata } from "next";
 
@@ -175,6 +176,7 @@ export default function SellPage() {
       />
       <ScrollUp />
       <SellHero />
+      <SellTrustBar />
 
       {/* Lead Form — above the fold after hero */}
       <section id="lead-form" className="bg-white py-14 md:py-20">
