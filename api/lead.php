@@ -43,7 +43,6 @@ try {
             created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
-    // Add asking_price column if table already exists without it
     get_pdo()->exec("ALTER TABLE tb_lead ADD COLUMN IF NOT EXISTS asking_price INT NULL AFTER photo_url");
 } catch (Exception $e) {
     http_response_code(500);
@@ -91,22 +90,28 @@ try {
     exit;
 }
 
-// ── LINE Notify ───────────────────────────────────────────────────────────────
-$lineToken = env('LINE_NOTIFY_TOKEN');
-if ($lineToken) {
-    $msg = "\n🚗 Lead ใหม่ #$leadId\n"
-         . "ยี่ห้อ: $brand $model ($year)\n"
-         . ($mileage ? "ไมล์: " . number_format((int)$mileage) . " km\n" : '')
-         . "จังหวัด: $province\n"
-         . "โทร: $phone";
+// ── LINE Notification (direct to LINE Messaging API) ─────────────────────────
+$lineToken   = getenv('LINE_CHANNEL_TOKEN');
+$lineGroupId = getenv('LINE_GROUP_ID');
 
-    $ch = curl_init('https://notify-api.line.me/api/notify');
+if ($lineToken && $lineGroupId && function_exists('curl_init')) {
+    $mileageText  = $mileage !== '' ? "\nไมล์: " . number_format((int)$mileage) . " km" : '';
+    $priceText    = $asking_price !== '' ? "\nราคาที่ต้องการ: " . number_format((int)$asking_price) . " บาท" : '';
+    $msg = "🚗 Lead ใหม่ #{$leadId}\nยี่ห้อ: {$brand} {$model} ({$year}){$mileageText}\nจังหวัด: {$province}\nโทร: {$phone}{$priceText}";
+
+    $ch = curl_init('https://api.line.me/v2/bot/message/push');
     curl_setopt_array($ch, [
         CURLOPT_POST           => true,
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER     => ["Authorization: Bearer $lineToken"],
-        CURLOPT_POSTFIELDS     => ['message' => $msg],
-        CURLOPT_TIMEOUT        => 5,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $lineToken,
+        ],
+        CURLOPT_POSTFIELDS => json_encode([
+            'to'       => $lineGroupId,
+            'messages' => [['type' => 'text', 'text' => $msg]],
+        ]),
+        CURLOPT_TIMEOUT => 8,
     ]);
     curl_exec($ch);
     curl_close($ch);

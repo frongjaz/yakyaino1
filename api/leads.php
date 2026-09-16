@@ -6,6 +6,8 @@ require_once __DIR__ . '/_lib/auth.php';
 
 handle_preflight();
 header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
@@ -14,6 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 require_auth();
+
+// Force OPcache invalidate for lead.php (fixes cached bytecode issue)
+if (function_exists('opcache_invalidate')) {
+    opcache_invalidate(__DIR__ . '/lead.php', true);
+}
 
 // สร้าง table ถ้ายังไม่มี
 get_pdo()->exec("
