@@ -79,7 +79,7 @@ export default function LeadForm() {
         setStatus("success");
         trackLeadFormSubmit();
         // Send LINE notification via Vercel (fire-and-forget)
-        fetch("/api/notify-line", {
+        fetch("https://yakyaino1.vercel.app/api/notify-line", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: data.id, ...form }),
