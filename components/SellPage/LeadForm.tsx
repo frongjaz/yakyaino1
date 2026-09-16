@@ -41,7 +41,7 @@ const Field = ({ label, required, children }: { label: string; required?: boolea
 const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#EF4444] focus:bg-white focus:ring-2 focus:ring-[#EF4444]/20 appearance-none";
 
 export default function LeadForm() {
-  const [form, setForm] = useState({ brand: "", model: "", year: "", mileage: "", province: "", phone: "" });
+  const [form, setForm] = useState({ brand: "", model: "", year: "", mileage: "", province: "", phone: "", asking_price: "" });
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -94,10 +94,10 @@ export default function LeadForm() {
         </div>
         <h3 className="text-xl font-bold text-gray-900">ส่งข้อมูลสำเร็จ!</h3>
         <p className="max-w-xs text-sm text-gray-500">
-          ทีมงานจะติดต่อกลับภายใน 24 ชั่วโมง<br />เพื่อแจ้งราคาประเมิน
+          ทีมงานจะแจ้งราคาประเมิน<br />ภายใน 5 นาที
         </p>
         <button
-          onClick={() => { setForm({ brand:"",model:"",year:"",mileage:"",province:"",phone:"" }); setPhoto(null); setPreview(null); setStatus("idle"); }}
+          onClick={() => { setForm({ brand:"",model:"",year:"",mileage:"",province:"",phone:"",asking_price:"" }); setPhoto(null); setPreview(null); setStatus("idle"); }}
           className="mt-2 rounded-full border border-gray-200 px-6 py-2 text-sm text-gray-600 hover:border-[#EF4444] hover:text-[#EF4444] transition"
         >
           ส่งข้อมูลรถคันอื่น
@@ -147,6 +147,11 @@ export default function LeadForm() {
         <input name="phone" value={form.phone} onChange={set("phone")} type="tel" placeholder="08x-xxx-xxxx" className={inputCls} />
       </Field>
 
+      {/* Row 5: asking price */}
+      <Field label="ราคาที่ต้องการขาย (บาท)">
+        <input name="asking_price" value={form.asking_price} onChange={set("asking_price")} type="number" min="0" placeholder="เช่น 350000" className={inputCls} />
+      </Field>
+
       {/* Photo upload */}
       <div>
         <p className="mb-1.5 text-sm font-medium text-gray-700">รูปรถ <span className="text-gray-400 font-normal">(ไม่บังคับ — ช่วยให้ประเมินได้แม่นยำขึ้น)</span></p>
@@ -194,7 +199,7 @@ export default function LeadForm() {
       </button>
 
       <p className="text-center text-xs text-gray-400">
-        ทีมงานจะติดต่อกลับภายใน 24 ชั่วโมง · ไม่มีค่าใช้จ่าย
+        รับราคาประเมินภายใน 5 นาที · ไม่มีค่าใช้จ่าย
       </p>
     </form>
   );

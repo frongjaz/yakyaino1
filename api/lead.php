@@ -18,7 +18,8 @@ $model    = trim($_POST['model']    ?? '');
 $year     = trim($_POST['year']     ?? '');
 $mileage  = trim($_POST['mileage']  ?? '');
 $province = trim($_POST['province'] ?? '');
-$phone    = trim($_POST['phone']    ?? '');
+$phone        = trim($_POST['phone']        ?? '');
+$asking_price = trim($_POST['asking_price'] ?? '');
 
 if (!$brand || !$model || !$year || !$province || !$phone) {
     http_response_code(422);
@@ -37,10 +38,13 @@ try {
             mileage     INT          NULL,
             province    VARCHAR(100) NOT NULL,
             phone       VARCHAR(20)  NOT NULL,
-            photo_url   VARCHAR(500) NULL,
-            created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+            photo_url    VARCHAR(500) NULL,
+            asking_price INT          NULL,
+            created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
+    // Add asking_price column if table already exists without it
+    get_pdo()->exec("ALTER TABLE tb_lead ADD COLUMN IF NOT EXISTS asking_price INT NULL AFTER photo_url");
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Database error']);
@@ -67,8 +71,8 @@ if (!empty($_FILES['photo']['tmp_name'])) {
 // ── Save to database ──────────────────────────────────────────────────────────
 try {
     $result = db_execute(
-        "INSERT INTO tb_lead (brand, model, year, mileage, province, phone, photo_url)
-         VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO tb_lead (brand, model, year, mileage, province, phone, photo_url, asking_price)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [
             $brand,
             $model,
@@ -77,6 +81,7 @@ try {
             $province,
             $phone,
             $photoUrl,
+            $asking_price !== '' ? (int) $asking_price : null,
         ]
     );
     $leadId = $result['insert_id'];

@@ -25,14 +25,16 @@ get_pdo()->exec("
         mileage     INT          NULL,
         province    VARCHAR(100) NOT NULL,
         phone       VARCHAR(20)  NOT NULL,
-        photo_url   VARCHAR(500) NULL,
-        created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+        photo_url    VARCHAR(500) NULL,
+        asking_price INT          NULL,
+        created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ALTER TABLE tb_lead ADD COLUMN IF NOT EXISTS asking_price INT NULL AFTER photo_url;
 ");
 
 try {
     $rows = db_query(
-        "SELECT id, brand, model, year, mileage, province, phone, photo_url, created_at
+        "SELECT id, brand, model, year, mileage, province, phone, photo_url, asking_price, created_at
          FROM tb_lead
          ORDER BY id DESC
          LIMIT 500"

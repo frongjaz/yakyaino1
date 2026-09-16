@@ -23,7 +23,7 @@ interface Car {
 }
 interface Blog { id: number; title: string; paragraph: string; image: string; status: string; createdAt: string; author: { name: string } }
 interface Banner { id: number; image_url: string; alt_text: string; sort_order: number; is_active: number; created_at: string }
-interface Lead { id: number; brand: string; model: string; year: number; mileage: number | null; province: string; phone: string; photo_url: string | null; created_at: string }
+interface Lead { id: number; brand: string; model: string; year: number; mileage: number | null; province: string; phone: string; photo_url: string | null; asking_price: number | null; created_at: string }
 
 type Tab = 'cars' | 'blogs' | 'banners' | 'leads';
 
@@ -508,6 +508,7 @@ export default function AdminDashboardPage() {
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">ไมล์</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">จังหวัด</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">เบอร์โทร</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">ราคาที่ต้องการ</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">รูป</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">วันที่</th>
                       </tr>
@@ -528,6 +529,9 @@ export default function AdminDashboardPage() {
                             <a href={`tel:${lead.phone}`} className="text-primary font-medium hover:underline">
                               {lead.phone}
                             </a>
+                          </td>
+                          <td className="px-4 py-3 text-gray-600 text-xs">
+                            {lead.asking_price ? new Intl.NumberFormat('th-TH').format(lead.asking_price) + ' ฿' : '—'}
                           </td>
                           <td className="px-4 py-3">
                             {lead.photo_url ? (

@@ -188,7 +188,7 @@ export default function SellPage() {
                 ฟรี — ไม่มีค่าใช้จ่าย
               </span>
               <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">ประเมินราคารถของคุณ</h2>
-              <p className="mt-2 text-sm text-gray-500">กรอกข้อมูล 5 ช่อง รับราคาภายใน 24 ชั่วโมง</p>
+              <p className="mt-2 text-sm text-gray-500">กรอกข้อมูล 5 ช่อง รับราคาภายใน 5 นาที</p>
             </div>
 
             {/* Card */}
@@ -204,13 +204,13 @@ export default function SellPage() {
       <AcceptCars />
       <SellCtaBanner
         heading="มีรถที่ต้องการขาย?"
-        sub="ส่งข้อมูลรถให้เราประเมินราคาได้ฟรี ภายใน 24 ชั่วโมง"
+        sub="ส่งข้อมูลรถให้เราประเมินราคาได้ฟรี รับราคาภายใน 5 นาที"
         btnText="ประเมินราคารถ"
       />
       <SellSteps />
       <SellCtaBanner
         heading="พร้อมขายรถแล้วใช่ไหม?"
-        sub="เริ่มประเมินราคาได้เลย ไม่มีค่าใช้จ่าย ทีมงานติดต่อกลับภายใน 24 ชั่วโมง"
+        sub="เริ่มประเมินราคาได้เลย ไม่มีค่าใช้จ่าย รับราคาภายใน 5 นาที"
         btnText="ส่งข้อมูลรถ"
       />
     </>
