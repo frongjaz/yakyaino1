@@ -3,7 +3,6 @@ import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
 import { checkAuth } from '@/lib/auth-api';
 
-export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 export async function OPTIONS(request: NextRequest) {

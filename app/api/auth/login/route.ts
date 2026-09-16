@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 import { getCorsHeaders } from '@/lib/cors';
 import { signSession } from '@/lib/crypto-utils';
 
-export const dynamic = 'force-dynamic';
 
 // Simple in-memory rate limiter: 5 attempts per IP per minute
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();

@@ -18,7 +18,6 @@ const BlogSchema = z.object({
   status: z.enum(['draft', 'published']).default('draft'),
 });
 
-export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 // Handle OPTIONS request for CORS

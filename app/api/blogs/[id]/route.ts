@@ -3,7 +3,9 @@ import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
 import { checkAuth } from '@/lib/auth-api';
 
-export const dynamic = 'force-dynamic';
+// Required for static export compatibility
+export async function generateStaticParams() { return []; }
+
 export const maxDuration = 30;
 
 // Handle OPTIONS request for CORS

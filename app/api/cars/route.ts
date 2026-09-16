@@ -25,7 +25,6 @@ const CarSchema = z.object({
   status: z.enum(['available', 'sold', 'pending']).default('available'),
 });
 
-export const dynamic = 'force-dynamic';
 export const maxDuration = 30; // 30 seconds timeout for Vercel
 
 // Handle OPTIONS request for CORS

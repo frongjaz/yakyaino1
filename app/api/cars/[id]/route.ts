@@ -3,7 +3,9 @@ import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
 import { decodeCarId } from '@/lib/id-encoder';
 
-export const dynamic = 'force-dynamic';
+// Required for static export compatibility
+export async function generateStaticParams() { return []; }
+
 export const maxDuration = 30; // 30 seconds timeout for Vercel
 
 // Handle OPTIONS request for CORS

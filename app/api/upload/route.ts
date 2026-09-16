@@ -4,7 +4,6 @@ import { Client } from 'basic-ftp';
 import { checkAuth } from '@/lib/auth-api';
 import { Readable } from 'stream';
 
-export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');

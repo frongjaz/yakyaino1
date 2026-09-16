@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCorsHeaders } from '@/lib/cors';
 
-export const dynamic = 'force-dynamic';
 
 // Handle OPTIONS request for CORS
 export async function OPTIONS(request: NextRequest) {

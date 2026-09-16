@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import { getApiUrl } from "@/lib/api";
+import { trackLeadFormSubmit } from "@/lib/gtag";
 
 const BRANDS = [
   "Toyota","Honda","Mazda","Isuzu","Ford","Mitsubishi","Nissan","Suzuki",
@@ -74,7 +75,16 @@ export default function LeadForm() {
     try {
       const res = await fetch(getApiUrl("api/lead.php"), { method: "POST", body: fd });
       const data = await res.json();
-      if (data.success) { setStatus("success"); } else {
+      if (data.success) {
+        setStatus("success");
+        trackLeadFormSubmit();
+        // Send LINE notification via Vercel (fire-and-forget)
+        fetch("https://yakyaino1.vercel.app/api/notify-line", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: data.id, ...form }),
+        }).catch(() => {});
+      } else {
         setErrorMsg(data.message || "เกิดข้อผิดพลาด กรุณาลองอีกครั้ง");
         setStatus("error");
       }

@@ -1,5 +1,6 @@
 "use client";
 import { getImagePath } from "@/lib/utils";
+import { trackPhoneClick, trackLineClick } from "@/lib/gtag";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -52,6 +53,7 @@ const SellHero = () => {
                 <a
                   href="tel:0625646455"
                   aria-label="โทรหาเรา"
+                  onClick={() => trackPhoneClick("sell_hero")}
                   className="group flex items-center gap-2.5 rounded-full bg-[#EF4444] px-6 py-3 text-sm font-semibold text-white shadow-xl ring-2 ring-white/20 transition-all duration-200 hover:bg-[#DC2626] hover:scale-105 hover:shadow-red-500/40 hover:shadow-2xl"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 shrink-0">
@@ -65,6 +67,7 @@ const SellHero = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="ติดต่อผ่าน LINE"
+                  onClick={() => trackLineClick("sell_hero")}
                   className="group flex items-center gap-2.5 rounded-full bg-[#06C755] px-6 py-3 text-sm font-semibold text-white shadow-xl ring-2 ring-white/20 transition-all duration-200 hover:bg-[#05b34c] hover:scale-105 hover:shadow-green-500/40 hover:shadow-2xl"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 shrink-0">

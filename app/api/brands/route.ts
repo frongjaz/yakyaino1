@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
 
-export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 // Handle OPTIONS request for CORS
