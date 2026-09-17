@@ -1,30 +1,28 @@
-import Script from 'next/script';
-
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 const AW_ID = process.env.NEXT_PUBLIC_AW_ID;
 
 export default function GoogleAnalytics() {
-  if (!GA_ID) return null;
+  if (!AW_ID && !GA_ID) return null;
 
-  const configs = [
-    `gtag('config', '${GA_ID}');`,
-    AW_ID ? `gtag('config', '${AW_ID}');` : "",
-  ].filter(Boolean).join("\n          ");
+  // ใช้ AW_ID เป็น primary ใน src URL — Google Ads verification ต้องการเห็น AW ID ใน script src
+  const primaryId = AW_ID || GA_ID!;
+
+  const configLines = [
+    AW_ID ? `gtag('config','${AW_ID}');` : '',
+    GA_ID ? `gtag('config','${GA_ID}');` : '',
+  ].filter(Boolean).join('');
 
   return (
     <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-        strategy="afterInteractive"
+      <script
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${primaryId}`}
       />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          ${configs}
-        `}
-      </Script>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());${configLines}`,
+        }}
+      />
     </>
   );
 }

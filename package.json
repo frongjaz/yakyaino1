@@ -13,6 +13,7 @@
     "lint": "next lint",
     "export": "next build && next export",
     "deploy": "npm run build:prod && pm2 restart nextjs-app",
+    "deploy:static": "node scripts/deploy-static.js",
     "deploy:root": "npm run build:root && pm2 restart nextjs-app",
     "test:db": "node scripts/test-db-connection.js",
     "create:admin": "node scripts/create-admin.js",
