@@ -1,5 +1,12 @@
 <?php
 declare(strict_types=1);
+// Force OPcache to reload this file
+if (function_exists('opcache_invalidate')) {
+    opcache_invalidate(__FILE__, true);
+}
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
 require_once __DIR__ . '/_lib/config.php';
 require_once __DIR__ . '/_lib/cors.php';
 
@@ -117,4 +124,15 @@ if ($lineToken && $lineGroupId && function_exists('curl_init')) {
     curl_close($ch);
 }
 
-echo json_encode(['success' => true, 'id' => $leadId]);
+// ── Temporary debug (remove after diagnosis) ─────────────────────────────────
+$lineToken2   = getenv('LINE_CHANNEL_TOKEN');
+$lineGroupId2 = getenv('LINE_GROUP_ID');
+$debug = [
+    'token_set'      => !empty($lineToken2),
+    'group_set'      => !empty($lineGroupId2),
+    'curl_available' => function_exists('curl_init'),
+    'php_version'    => PHP_VERSION,
+    'file_path'      => __FILE__,
+];
+
+echo json_encode(['success' => true, 'id' => $leadId, 'debug' => $debug]);
