@@ -2,18 +2,28 @@
 # deploy-server.sh — รันบน server ผ่าน SSH
 # ใช้: bash /domains/checkkub.com/public_html/deploy-server.sh
 
-set -e
 DIR="/domains/checkkub.com/public_html"
 cd "$DIR"
+
+# ตั้ง PATH ให้ครอบคลุม node/pnpm ที่อาจอยู่นอก cron PATH
+export PATH="$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node/ 2>/dev/null | tail -1)/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
 echo "📥 git pull..."
 git pull origin main
 
-echo "📦 pnpm install..."
-pnpm install --frozen-lockfile 2>/dev/null || npm install
+echo "📦 install..."
+if command -v pnpm &>/dev/null; then
+  pnpm install --frozen-lockfile
+else
+  npm install
+fi
 
 echo "🔨 build..."
-pnpm run build
+if command -v pnpm &>/dev/null; then
+  pnpm run build
+else
+  npm run build
+fi
 
 echo "🔄 restart Node.js server..."
 
