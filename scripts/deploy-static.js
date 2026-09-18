@@ -75,7 +75,7 @@ async function ftpUpload() {
     console.log(`\n🔗 กำลังเชื่อมต่อ FTP: ${FTP_HOST}`);
     await client.access({
       host: FTP_HOST,
-      user: FTP_USER,
+      user: 'checkk',          // ต้องใช้ main user เท่านั้น — cazfrongz upload ผิด path
       password: FTP_PASSWORD,
       secure: false,
     });

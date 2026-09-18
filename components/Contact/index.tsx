@@ -82,12 +82,11 @@ const Contact = () => {
               {/* QR Code */}
               <div className="rounded-xl border-2 border-red-100 p-3">
                 <Image
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://line.me/ti/p/@831tvslj`}
+                  src="/images/line-qr.png"
                   alt="LINE QR Code"
                   width={180}
                   height={180}
                   className="h-[180px] w-[180px]"
-                  unoptimized
                 />
               </div>
               <p className="text-sm text-gray-400 -mt-2">สแกน QR เพื่อเพิ่มเพื่อน LINE</p>
