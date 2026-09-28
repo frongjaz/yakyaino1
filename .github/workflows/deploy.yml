@@ -12,7 +12,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Upload source files via FTP
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+        env:
+          NODE_ENV: production
+
+      - name: Upload source + .next via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftp.checkkub.com
@@ -20,15 +37,16 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
           server-dir: domains/checkkub.com/public_html/
-          timeout: 120000
+          timeout: 300000
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
-            **/.next/**
             **/.env*
             **/tsconfig.tsbuildinfo
+            **/.claude/**
+            **/scripts/**
 
-      - name: Trigger build & restart on server
+      - name: Restart pm2 via PHP
         run: |
-          curl -sL --max-time 600 "https://checkkub.com/api/run-deploy.php?key=ck2024deploy"
+          curl -sL --max-time 30 "https://checkkub.com/api/restart-pm2.php?key=ck2024restart" || true
