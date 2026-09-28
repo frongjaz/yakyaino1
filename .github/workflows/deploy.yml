@@ -1,93 +1,22 @@
-name: Deploy Next.js + PHP API to HostAtom (Production)
+name: Deploy to checkkub.com (Production)
 
 on:
   push:
     branches:
       - main
-      - master
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: SSH into server and run deploy script
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          node-version: "18"
-          cache: "npm"
-
-      - name: Configure npm network retries
-        run: |
-          npm config set fetch-retries 5
-          npm config set fetch-retry-mintimeout 20000
-          npm config set fetch-retry-maxtimeout 120000
-
-      - name: Install dependencies
-        run: |
-          for attempt in 1 2 3; do
-            echo "npm ci attempt ${attempt}/3"
-            npm ci && exit 0
-            echo "npm ci failed, retrying in 15s..."
-            sleep 15
-          done
-          exit 1
-
-      - name: Temporarily move Next.js API routes (static export cannot include them)
-        run: |
-          if [ -d "app/api" ]; then
-            mv app/api .api_backup
-          fi
-
-      - name: Build static Next.js
-        run: npm run build:root
-        env:
-          NODE_ENV: production
-          IS_STATIC_EXPORT: 'true'
-          # No NEXT_PUBLIC_API_URL — frontend uses relative /api/* (same domain)
-
-      - name: Restore Next.js API routes
-        if: always()
-        run: |
-          if [ -d ".api_backup" ]; then
-            mv .api_backup app/api
-          fi
-
-      - name: Stage deploy folder (static + PHP API)
-        run: |
-          rm -rf deploy
-          mkdir -p deploy
-          cp -r out/. deploy/
-          cp -r api deploy/api
-          echo "=== deploy/ structure ==="
-          ls -la deploy/
-          echo "=== deploy/api/ ==="
-          ls -la deploy/api/
-          echo "=== Total files ==="
-          find deploy/ -type f | wc -l
-
-      - name: Deploy to HostAtom via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ftp.checkkub.com
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          local-dir: ./deploy/
-          server-dir: domains/checkkub.com/public_html/
-          timeout: 300000
-          log-level: standard
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/.DS_Store
-            **/node_modules/**
-            .env.local
-            restart-pm2.php
-            ecosystem.config.js
-            server.js
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          command_timeout: 10m
+          script: |
+            bash /domains/checkkub.com/public_html/deploy-server.sh
