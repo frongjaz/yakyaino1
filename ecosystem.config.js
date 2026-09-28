@@ -8,7 +8,7 @@ module.exports = {
     script: 'server.js',
     instances: 1,
     exec_mode: 'fork',
-    cwd: '/domains/checkkub.com/public_html',
+    cwd: '/home/checkk/domains/checkkub.com/public_html',
     env_file: '.env.local', // PM2 จะอ่าน env จากไฟล์นี้
     env: {
       NODE_ENV: 'production',
