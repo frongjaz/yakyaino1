@@ -10,6 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger server deploy via PHP endpoint
+      - uses: actions/checkout@v4
+
+      - name: Upload source files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ftp.checkkub.com
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: domains/checkkub.com/public_html/
+          timeout: 120000
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.next/**
+            **/.env*
+            **/tsconfig.tsbuildinfo
+
+      - name: Trigger build & restart on server
         run: |
           curl -sL --max-time 600 "https://checkkub.com/api/run-deploy.php?key=ck2024deploy"
