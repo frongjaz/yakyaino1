@@ -40,7 +40,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://www.checkkub.com" />
         <link rel="dns-prefetch" href="https://www.checkkub.com" />
-        <GoogleAnalytics />
       </head>
       <body className={`bg-[#FCFCFC] dark:bg-black ${inter.className}`}>
         <Providers>
@@ -49,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ConditionalLayout>
         </Providers>
         <Toaster position="top-right" richColors closeButton />
+        <GoogleAnalytics />
       </body>
     </html>
   );

@@ -23,7 +23,7 @@ const SellHero = () => {
 
         {/* Content */}
         <div className="container relative z-10 h-full px-4">
-          <div className="flex h-full flex-col items-center justify-center text-center">
+          <div className="flex h-full flex-col items-center justify-center text-center pt-20 lg:pt-28">
             {/* Phone numbers - Top left */}
      
 
@@ -63,7 +63,7 @@ const SellHero = () => {
                 </a>
 
                 <a
-                  href="https://line.me/ti/p/@831tvslj"
+                  href="https://line.me/ti/p/@checkkub"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="ติดต่อผ่าน LINE"

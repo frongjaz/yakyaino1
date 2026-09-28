@@ -13,7 +13,7 @@ const CarContactSection = () => {
       <div className="space-y-3">
         {/* LINE Button */}
         <Link
-          href="https://line.me/ti/p/@nattaauto"
+          href="https://line.me/ti/p/@checkkub"
           target="_blank"
           rel="noopener noreferrer"
           className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#8BC43F] px-6 py-3 font-semibold text-white transition hover:bg-[#7AB32F]"
@@ -25,7 +25,7 @@ const CarContactSection = () => {
             height={24}
             className="h-6 w-6"
           />
-          <span>@nattaauto</span>
+          <span>@checkkub</span>
         </Link>
         
         {/* Phone Button */}

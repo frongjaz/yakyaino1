@@ -93,7 +93,7 @@ const Contact = () => {
 
               {/* LINE Button */}
               <Link
-                href="https://line.me/ti/p/@831tvslj"
+                href="https://line.me/ti/p/@checkkub"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#06C755] px-6 py-3.5 text-white font-semibold shadow-sm transition hover:bg-[#05b34c]"
@@ -105,7 +105,7 @@ const Contact = () => {
                   height={22}
                   className="h-[22px] w-[22px]"
                 />
-                LINE: @831tvslj
+                LINE: @checkkub
               </Link>
 
               {/* Phone Button */}

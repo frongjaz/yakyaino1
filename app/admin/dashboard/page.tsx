@@ -23,7 +23,8 @@ interface Car {
 }
 interface Blog { id: number; title: string; paragraph: string; image: string; status: string; createdAt: string; author: { name: string } }
 interface Banner { id: number; image_url: string; alt_text: string; sort_order: number; is_active: number; created_at: string }
-interface Lead { id: number; brand: string; model: string; year: number; mileage: number | null; province: string; phone: string; photo_url: string | null; asking_price: number | null; created_at: string }
+type TrackingStatus = 'new' | 'following' | 'closed' | 'stopped';
+interface Lead { id: number; brand: string; model: string; year: number; mileage: number | null; province: string; phone: string; photo_url: string | null; asking_price: number | null; tracking_status: TrackingStatus; note: string | null; created_at: string }
 
 type Tab = 'cars' | 'blogs' | 'banners' | 'leads';
 
@@ -41,6 +42,22 @@ function StatusBadge({ status }: { status: string }) {
   };
   const s = map[status] ?? { label: status, cls: 'bg-gray-100 text-gray-500' };
   return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.cls}`}>{s.label}</span>;
+}
+
+const TRACKING_MAP: Record<TrackingStatus, { label: string; cls: string; icon: string }> = {
+  new:       { label: 'ใหม่',              cls: 'bg-blue-100 text-blue-700',   icon: '🆕' },
+  following: { label: 'กำลังติดตาม',      cls: 'bg-yellow-100 text-yellow-700', icon: '📞' },
+  closed:    { label: 'ปิดเคสแล้ว',       cls: 'bg-green-100 text-green-700',  icon: '✅' },
+  stopped:   { label: 'ยุติการติดตาม',    cls: 'bg-gray-100 text-gray-500',   icon: '🚫' },
+};
+
+function TrackingBadge({ status }: { status: TrackingStatus }) {
+  const s = TRACKING_MAP[status] ?? TRACKING_MAP.new;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${s.cls}`}>
+      {s.icon} {s.label}
+    </span>
+  );
 }
 
 export default function AdminDashboardPage() {
@@ -73,9 +90,15 @@ export default function AdminDashboardPage() {
     useSWR(session ? '/api/banners?admin=true' : null, fetcher);
   const banners: Banner[] = bannersData?.data ?? [];
 
-  const { data: leadsData, isLoading: leadsLoading } =
+  const { data: leadsData, isLoading: leadsLoading, mutate: mutateLeads } =
     useSWR(session ? '/api/leads' : null, fetcher);
   const leads: Lead[] = leadsData?.data ?? [];
+
+  const [trackingLead, setTrackingLead] = useState<Lead | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<TrackingStatus>('new');
+  const [pendingNote, setPendingNote] = useState('');
+  const [updatingLeadId, setUpdatingLeadId] = useState<number | null>(null);
+  const [imageModal, setImageModal] = useState<string | null>(null);
 
   // ── auth ─────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -136,6 +159,25 @@ export default function AdminDashboardPage() {
       toast.error('ลบไม่สำเร็จ: ' + (e.message ?? 'เกิดข้อผิดพลาด'));
     }
     setDeletingBlogId(null);
+  };
+
+  const updateLeadStatus = async (id: number, status: TrackingStatus, note: string) => {
+    setUpdatingLeadId(id);
+    try {
+      const fd = new FormData();
+      fd.append('id', String(id));
+      fd.append('tracking_status', status);
+      fd.append('note', note);
+      const res = await fetch('/api/lead_update.php', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message ?? 'เกิดข้อผิดพลาด');
+      await mutateLeads();
+      setTrackingLead(null);
+      toast.success('อัพเดตสถานะสำเร็จ');
+    } catch (e: any) {
+      toast.error('อัพเดตไม่สำเร็จ: ' + (e.message ?? 'เกิดข้อผิดพลาด'));
+    }
+    setUpdatingLeadId(null);
   };
 
   if (loading) return (
@@ -503,20 +545,22 @@ export default function AdminDashboardPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">#</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">วันที่</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">รถ</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">ไมล์</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">จังหวัด</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">เบอร์โทร</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">ราคาที่ต้องการ</th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">รูป</th>
-                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">วันที่</th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">สถานะ</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {leads.map(lead => (
                         <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-3 text-gray-400 text-xs">{lead.id}</td>
+                          <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">
+                            {new Date(lead.created_at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}
+                          </td>
                           <td className="px-4 py-3">
                             <div className="font-medium text-gray-800">{lead.brand} {lead.model}</div>
                             <div className="text-xs text-gray-400">ปี {lead.year}</div>
@@ -535,15 +579,20 @@ export default function AdminDashboardPage() {
                           </td>
                           <td className="px-4 py-3">
                             {lead.photo_url ? (
-                              <a href={lead.photo_url} target="_blank" rel="noopener noreferrer">
-                                <div className="relative w-14 h-10 rounded overflow-hidden bg-gray-100">
+                              <button onClick={() => setImageModal(lead.photo_url)} className="block">
+                                <div className="relative w-14 h-10 rounded overflow-hidden bg-gray-100 hover:opacity-80 transition-opacity ring-1 ring-gray-200">
                                   <img src={lead.photo_url} alt="รูปรถ" className="w-full h-full object-cover" />
                                 </div>
-                              </a>
+                              </button>
                             ) : <span className="text-gray-300 text-xs">—</span>}
                           </td>
-                          <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">
-                            {new Date(lead.created_at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })}
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => { setTrackingLead(lead); setPendingStatus((lead.tracking_status ?? 'new') as TrackingStatus); setPendingNote(lead.note ?? ''); }}
+                              className="hover:opacity-80 transition-opacity"
+                            >
+                              <TrackingBadge status={(lead.tracking_status ?? 'new') as TrackingStatus} />
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -555,6 +604,89 @@ export default function AdminDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* ── Tracking Status Modal ─────────────────────────────────────────────── */}
+      {trackingLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setTrackingLead(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="font-bold text-gray-800 text-lg">อัพเดตสถานะ Lead</h3>
+                <p className="text-sm text-gray-500 mt-0.5">{trackingLead.brand} {trackingLead.model} ปี {trackingLead.year}</p>
+                <p className="text-xs text-gray-400">{trackingLead.phone}</p>
+              </div>
+              <button onClick={() => setTrackingLead(null)} className="text-gray-400 hover:text-gray-600 p-1">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Status options */}
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {(Object.entries(TRACKING_MAP) as [TrackingStatus, typeof TRACKING_MAP[TrackingStatus]][]).map(([key, val]) => {
+                const isSelected = pendingStatus === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setPendingStatus(key)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-left transition-all ${
+                      isSelected ? 'border-primary bg-primary/5' : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="text-lg">{val.icon}</span>
+                    <span className={`font-medium text-xs ${isSelected ? 'text-primary' : 'text-gray-600'}`}>{val.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Note */}
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">หมายเหตุ / Note</label>
+              <textarea
+                value={pendingNote}
+                onChange={e => setPendingNote(e.target.value)}
+                placeholder="เช่น ราคาไม่ตรง, นัดดูรถ 20 ก.ย., ลูกค้าขอคิดก่อน..."
+                rows={3}
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 outline-none resize-none focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition"
+              />
+            </div>
+
+            {/* Save */}
+            <button
+              onClick={() => updateLeadStatus(trackingLead.id, pendingStatus, pendingNote)}
+              disabled={updatingLeadId === trackingLead.id}
+              className="w-full py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            >
+              {updatingLeadId === trackingLead.id ? 'กำลังบันทึก...' : 'บันทึก'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Image Preview Modal ───────────────────────────────────────────────── */}
+      {imageModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setImageModal(null)}>
+          <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setImageModal(null)}
+              className="absolute -top-10 right-0 text-white/80 hover:text-white flex items-center gap-1.5 text-sm"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              ปิด
+            </button>
+            <img
+              src={imageModal}
+              alt="รูปรถจาก Lead"
+              className="w-full max-h-[80vh] object-contain rounded-xl shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

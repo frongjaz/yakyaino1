@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { getApiUrl } from "@/lib/api";
 import { trackLeadFormSubmit } from "@/lib/gtag";
 
@@ -39,7 +39,91 @@ const Field = ({ label, required, children }: { label: string; required?: boolea
   </div>
 );
 
-const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-[#EF4444] focus:bg-white focus:ring-2 focus:ring-[#EF4444]/20 appearance-none";
+const inputCls = "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-base text-gray-900 outline-none transition focus:border-[#EF4444] focus:bg-white focus:ring-2 focus:ring-[#EF4444]/20";
+
+function CustomSelect({ value, onChange, options, placeholder, searchable = false }: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder: string;
+  searchable?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false); setSearch("");
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    if (open && searchable) setTimeout(() => searchRef.current?.focus(), 50);
+  }, [open, searchable]);
+
+  const filtered = searchable && search
+    ? options.filter(o => o.toLowerCase().includes(search.toLowerCase()))
+    : options;
+
+  const pick = (v: string) => { onChange(v); setOpen(false); setSearch(""); };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className={`w-full flex items-center justify-between rounded-xl border px-4 py-3 text-base text-left transition
+          ${value ? "text-gray-900" : "text-gray-400"}
+          ${open ? "border-[#EF4444] bg-white ring-2 ring-[#EF4444]/20" : "border-gray-200 bg-gray-50 hover:border-gray-300"}`}
+      >
+        <span className="truncate">{value || placeholder}</span>
+        <svg className={`h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-gray-200 bg-white shadow-xl overflow-hidden">
+          {searchable && (
+            <div className="p-2 border-b border-gray-100">
+              <input
+                ref={searchRef}
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="ค้นหา..."
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-[#EF4444] focus:ring-1 focus:ring-[#EF4444]/20"
+              />
+            </div>
+          )}
+          <div className="max-h-60 overflow-y-auto overscroll-contain">
+            {filtered.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-gray-400 text-center">ไม่พบข้อมูล</p>
+            ) : filtered.map(opt => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => pick(opt)}
+                className={`w-full px-4 py-3 text-left text-sm transition-colors
+                  ${opt === value
+                    ? "bg-red-50 text-[#EF4444] font-semibold"
+                    : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function LeadForm() {
   const [form, setForm] = useState({ brand: "", model: "", year: "", mileage: "", province: "", phone: "", asking_price: "" });
@@ -49,8 +133,10 @@ export default function LeadForm() {
   const [errorMsg, setErrorMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(prev => ({ ...prev, [key]: e.target.value }));
+  const setField = (key: string) => (v: string) =>
+    setForm(prev => ({ ...prev, [key]: v }));
 
   const onPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -90,19 +176,39 @@ export default function LeadForm() {
 
   if (status === "success") {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+      <div className="flex flex-col items-center gap-5 py-8 text-center">
+        {/* Success icon */}
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
           <svg className="h-10 w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="text-xl font-bold text-gray-900">ส่งข้อมูลสำเร็จ!</h3>
-        <p className="max-w-xs text-sm text-gray-500">
-          ทีมงานจะแจ้งราคาประเมิน<br />ภายใน 5 นาที
-        </p>
+        <div>
+          <h3 className="text-xl font-bold text-gray-900">ส่งข้อมูลสำเร็จ!</h3>
+          <p className="mt-1 text-sm text-gray-500">ทีมงานได้รับข้อมูลของคุณแล้ว</p>
+        </div>
+
+        {/* LINE hook card */}
+        <div className="w-full rounded-2xl bg-gradient-to-br from-[#06C755] to-[#05a847] p-5 shadow-lg shadow-green-200">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-green-100">รับราคาเร็วกว่า 3 เท่า</p>
+          <p className="mb-1 text-lg font-bold text-white">เพิ่มเพื่อน LINE เพื่อรับราคาทันที</p>
+          <p className="mb-4 text-sm text-green-100">ทีมเราจะทักกลับใน LINE ของคุณทันที<br />ไม่ต้องรอ SMS หรือโทรกลับ</p>
+          <a
+            href="https://line.me/ti/p/@checkkub"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-white py-3.5 text-base font-bold text-[#06C755] shadow-md transition hover:scale-[1.02] hover:shadow-lg active:scale-100"
+          >
+            <svg viewBox="0 0 24 24" fill="#06C755" className="h-6 w-6 shrink-0">
+              <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.41-.097-.54-.271l-2.396-3.27v2.914c0 .345-.282.629-.631.629-.345 0-.627-.284-.627-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .4.099.528.271l2.397 3.27V8.108c0-.345.282-.63.628-.63.349 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.631-.63.345 0 .627.285.627.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+            </svg>
+            เพิ่มเพื่อน @checkkub ใน LINE
+          </a>
+        </div>
+
         <button
           onClick={() => { setForm({ brand:"",model:"",year:"",mileage:"",province:"",phone:"",asking_price:"" }); setPhoto(null); setPreview(null); setStatus("idle"); }}
-          className="mt-2 rounded-full border border-gray-200 px-6 py-2 text-sm text-gray-600 hover:border-[#EF4444] hover:text-[#EF4444] transition"
+          className="text-sm text-gray-400 underline underline-offset-2 hover:text-gray-600 transition"
         >
           ส่งข้อมูลรถคันอื่น
         </button>
@@ -113,18 +219,12 @@ export default function LeadForm() {
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
       {/* Row 1: brand + year */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="ยี่ห้อรถ" required>
-          <select name="brand" value={form.brand} onChange={set("brand")} className={inputCls}>
-            <option value="">เลือกยี่ห้อ</option>
-            {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
-          </select>
+          <CustomSelect value={form.brand} onChange={setField("brand")} options={BRANDS} placeholder="เลือกยี่ห้อ" />
         </Field>
         <Field label="ปีรถ" required>
-          <select name="year" value={form.year} onChange={set("year")} className={inputCls}>
-            <option value="">เลือกปี</option>
-            {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
+          <CustomSelect value={form.year} onChange={setField("year")} options={YEARS} placeholder="เลือกปี" />
         </Field>
       </div>
 
@@ -134,15 +234,12 @@ export default function LeadForm() {
       </Field>
 
       {/* Row 3: mileage + province */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="เลขไมล์ (กม.)">
           <input name="mileage" value={form.mileage} onChange={set("mileage")} type="number" min="0" placeholder="เช่น 80000" className={inputCls} />
         </Field>
         <Field label="จังหวัด" required>
-          <select name="province" value={form.province} onChange={set("province")} className={inputCls}>
-            <option value="">เลือกจังหวัด</option>
-            {PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
-          </select>
+          <CustomSelect value={form.province} onChange={setField("province")} options={PROVINCES} placeholder="เลือกจังหวัด" searchable />
         </Field>
       </div>
 

@@ -35,7 +35,7 @@ const SellBanner = () => {
                 ขายรถ
               </Link>
               <Link
-                href="https://line.me/ti/p/@nattaauto"
+                href="https://line.me/ti/p/@checkkub"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-12 w-12 items-center justify-center rounded-full bg-[#8BC43F] transition hover:bg-[#7AB32F]"

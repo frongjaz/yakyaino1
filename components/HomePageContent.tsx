@@ -46,7 +46,7 @@ export default function HomePageContent({ initialCars }: HomePageContentProps) {
       <HowToSell />
       <AboutUs />
       <FAQ />
-      <SocialVideos />
+      {/* <SocialVideos /> */}
     </>
   );
 }

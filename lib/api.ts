@@ -170,6 +170,18 @@ export async function apiPut<T = any>(
   return handleResponse(response, url);
 }
 
+export async function apiPatch<T = any>(
+  endpoint: string,
+  data?: any
+): Promise<T> {
+  const url = getApiUrl(endpoint);
+  const response = await apiFetch(endpoint, {
+    method: 'PATCH',
+    body: data ? JSON.stringify(data) : undefined,
+  });
+  return handleResponse(response, url);
+}
+
 /**
  * DELETE request helper
  */

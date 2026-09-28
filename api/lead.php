@@ -51,6 +51,7 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ");
     get_pdo()->exec("ALTER TABLE tb_lead ADD COLUMN IF NOT EXISTS asking_price INT NULL AFTER photo_url");
+    try { get_pdo()->exec("ALTER TABLE tb_lead ADD COLUMN tracking_status VARCHAR(20) NOT NULL DEFAULT 'new' AFTER asking_price"); } catch (\Exception $e) {}
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Database error']);

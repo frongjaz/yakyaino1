@@ -3,7 +3,6 @@ import SellBenefits from "@/components/SellPage/SellBenefits";
 import SellPolicy from "@/components/SellPage/SellPolicy";
 import AcceptCars from "@/components/SellPage/AcceptCars";
 import SellSteps from "@/components/SellPage/SellSteps";
-import LeadForm from "@/components/SellPage/LeadForm";
 import SellCtaBanner from "@/components/SellPage/SellCtaBanner";
 import SellTrustBar from "@/components/SellPage/SellTrustBar";
 import ScrollUp from "@/components/Common/ScrollUp";
@@ -178,26 +177,52 @@ export default function SellPage() {
       <SellHero />
       <SellTrustBar />
 
-      {/* Lead Form — above the fold after hero */}
-      <section id="lead-form" className="bg-white py-14 md:py-20">
+      {/* LINE CTA — Primary hook */}
+      <section className="bg-white py-14 md:py-20">
         <div className="container px-4">
-          <div className="mx-auto max-w-lg">
-            {/* Header */}
-            <div className="mb-8 text-center">
-              <span className="mb-3 inline-block rounded-full bg-red-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-[#EF4444]">
-                ฟรี — ไม่มีค่าใช้จ่าย
-              </span>
-              <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">ประเมินราคารถของคุณ</h2>
-              <p className="mt-2 text-sm text-gray-500">กรอกข้อมูล 5 ช่อง รับราคาภายใน 5 นาที</p>
-            </div>
-
-            {/* Card */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-xl shadow-gray-100 md:p-8">
-              <LeadForm />
-            </div>
+          <div className="mx-auto max-w-lg text-center">
+            <span className="mb-3 inline-block rounded-full bg-green-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-[#06C755]">
+              รับราคาภายใน 5 นาที · ฟรี
+            </span>
+            <h2 className="mb-2 text-2xl font-bold text-gray-900 md:text-3xl">ทักผ่าน LINE ได้เลย</h2>
+            <p className="mb-8 text-gray-500">ทีมเราพร้อมตอบทันที ไม่มีข้อผูกมัด ไม่มีค่าใช้จ่าย</p>
+            <a
+              href="https://line.me/ti/p/@checkkub"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-between gap-4 rounded-2xl bg-[#06C755] px-6 py-5 shadow-lg shadow-green-200 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-green-300 active:scale-100"
+            >
+              <div className="text-left">
+                <p className="text-xs font-semibold uppercase tracking-widest text-green-100">ช่องทางที่เร็วที่สุด</p>
+                <p className="mt-0.5 text-xl font-bold text-white">@checkkub</p>
+                <p className="text-sm text-green-100">ทีมเราตอบทันที · ประเมินฟรีภายใน 5 นาที</p>
+              </div>
+              <div className="flex flex-col items-center gap-1 shrink-0">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-md">
+                  <svg viewBox="0 0 24 24" fill="#06C755" className="h-8 w-8">
+                    <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.41-.097-.54-.271l-2.396-3.27v2.914c0 .345-.282.629-.631.629-.345 0-.627-.284-.627-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .4.099.528.271l2.397 3.27V8.108c0-.345.282-.63.628-.63.349 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.631-.63.345 0 .627.285.627.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+                  </svg>
+                </div>
+                <span className="text-xs font-bold text-white">เปิด LINE</span>
+              </div>
+            </a>
           </div>
         </div>
       </section>
+
+      {/* Floating LINE button — mobile only */}
+      <a
+        href="https://line.me/ti/p/@checkkub"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-5 right-4 z-50 flex items-center gap-2.5 rounded-full bg-[#06C755] px-5 py-3.5 shadow-2xl shadow-green-400/50 transition-transform hover:scale-105 active:scale-95 lg:hidden"
+        aria-label="ติดต่อผ่าน LINE"
+      >
+        <svg viewBox="0 0 24 24" fill="white" className="h-5 w-5 shrink-0">
+          <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.41-.097-.54-.271l-2.396-3.27v2.914c0 .345-.282.629-.631.629-.345 0-.627-.284-.627-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .4.099.528.271l2.397 3.27V8.108c0-.345.282-.63.628-.63.349 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.631-.63.345 0 .627.285.627.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+        </svg>
+        <span className="text-sm font-bold text-white">ทักหาเราผ่าน LINE</span>
+      </a>
 
       <SellBenefits />
       <SellPolicy />
