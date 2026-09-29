@@ -28,3 +28,19 @@ export async function PATCH(
 
   return NextResponse.json({ success: true });
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> | { id: string } }
+) {
+  const auth = await checkAuth(req as any);
+  if (!auth.authenticated) return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }, { status: 401 });
+
+  const { id } = await Promise.resolve(params);
+  const leadId = parseInt(id, 10);
+  if (isNaN(leadId)) return NextResponse.json({ success: false, message: 'ID ไม่ถูกต้อง' }, { status: 400 });
+
+  await query('DELETE FROM tb_lead WHERE id = ?', [leadId]);
+
+  return NextResponse.json({ success: true });
+}
