@@ -4,7 +4,6 @@ import { getCorsHeaders } from '@/lib/cors';
 import { checkAuth } from '@/lib/auth-api';
 
 // Required for static export compatibility
-export async function generateStaticParams() { return []; }
 
 export const maxDuration = 30;
 

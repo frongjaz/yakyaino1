@@ -4,9 +4,6 @@ import { getCorsHeaders } from '@/lib/cors';
 import { decodeCarId } from '@/lib/id-encoder';
 import { checkAuth } from '@/lib/auth-api';
 
-// Required for static export compatibility
-export async function generateStaticParams() { return []; }
-
 export const maxDuration = 30; // 30 seconds timeout for Vercel
 
 // Handle OPTIONS request for CORS

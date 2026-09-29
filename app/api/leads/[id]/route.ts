@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { checkAuth } from '@/lib/auth-api';
 
-export async function generateStaticParams() { return []; }
-
 const VALID_STATUSES = ['new', 'following', 'closed', 'stopped'];
 
 export async function PATCH(
