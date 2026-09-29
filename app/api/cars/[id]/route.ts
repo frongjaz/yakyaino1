@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getCorsHeaders } from '@/lib/cors';
 import { decodeCarId } from '@/lib/id-encoder';
+import { checkAuth } from '@/lib/auth-api';
 
 // Required for static export compatibility
 export async function generateStaticParams() { return []; }
@@ -162,5 +163,27 @@ export async function GET(
       { status: 500, headers: corsHeaders }
     );
   }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> | { id: string } }
+) {
+  const origin = request.headers.get('origin');
+  const corsHeaders = getCorsHeaders(origin);
+
+  const auth = await checkAuth(request as any);
+  if (!auth.authenticated) {
+    return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์เข้าถึง' }, { status: 401, headers: corsHeaders });
+  }
+
+  const { id } = await Promise.resolve(params);
+  const carId = parseInt(id, 10);
+  if (isNaN(carId)) {
+    return NextResponse.json({ success: false, message: 'ID ไม่ถูกต้อง' }, { status: 400, headers: corsHeaders });
+  }
+
+  await query('DELETE FROM cars WHERE id = ?', [carId]);
+  return NextResponse.json({ success: true }, { headers: corsHeaders });
 }
 
