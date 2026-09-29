@@ -1,51 +1,34 @@
 #!/bin/bash
-# pm2 watchdog — runs every minute via DirectAdmin cron
-
-APPDIR="/home/checkk/domains/checkkub.com/public_html"
-TRIGGER="/home/checkk/pm2-restart-trigger.txt"
-LOG="/home/checkk/pm2-watchdog.log"
-
+export HOME=/home/checkk
+APPDIR="$HOME/domains/checkkub.com/public_html"
+TRIGGER="$HOME/pm2-restart-trigger.txt"
+LOG="$HOME/pm2-watchdog.log"
 ts() { date '+%Y-%m-%d %H:%M:%S'; }
 
-# find pm2 binary via glob (works without nvm init)
-PM2=$(ls /home/checkk/.nvm/versions/node/*/bin/pm2 2>/dev/null | sort -rV | head -1)
-NODE=$(ls /home/checkk/.nvm/versions/node/*/bin/node 2>/dev/null | sort -rV | head -1)
+NODE="" PM2=""
+for d in $HOME/.nvm/versions/node/*/bin /opt/alt/nodejs*/bin \
+/opt/alt/node*/bin /usr/local/bin /usr/bin; do
+    [ -x "$d/node" ] && [ -z "$NODE" ] && NODE="$d/node"
+    [ -x "$d/pm2"  ] && [ -z "$PM2"  ] && PM2="$d/pm2"
+done
 
-if [ -z "$PM2" ]; then
-    echo "$(ts) [ERROR] pm2 not found in nvm" >> "$LOG"
-    exit 1
+echo "$(ts) node=$NODE pm2=$PM2" >> "$LOG"
+
+if [ -z "$PM2" ] && [ -n "$NODE" ]; then
+    NDIR=$(dirname "$NODE")
+    "$NDIR/npm" install -g pm2 >> "$LOG" 2>&1 && PM2=$(ls $NDIR/pm2 2>/dev/null)
 fi
 
-NODE_BIN=$(dirname "$PM2")
-export PATH="$NODE_BIN:$PATH"
-export HOME="/home/checkk"
-export PM2_HOME="/home/checkk/.pm2"
+if [ -f "$TRIGGER" ]; then rm -f "$TRIGGER"; fi
 
-echo "$(ts) [INFO] pm2=$PM2" >> "$LOG"
-
-do_start() {
+if [ -n "$PM2" ]; then
+    export PATH="$(dirname $PM2):$PATH"
+    "$PM2" list 2>/dev/null | grep -q 'nextjs-app.*online' || \
     "$PM2" start "$APPDIR/ecosystem.config.js" >> "$LOG" 2>&1
-    echo "$(ts) [INFO] start rc=$?" >> "$LOG"
-}
-
-do_restart() {
-    "$PM2" restart nextjs-app >> "$LOG" 2>&1 || do_start
-    echo "$(ts) [INFO] restart rc=$?" >> "$LOG"
-}
-
-# handle deploy trigger
-if [ -f "$TRIGGER" ]; then
-    rm -f "$TRIGGER"
-    echo "$(ts) [DEPLOY] trigger found, restarting" >> "$LOG"
-    do_restart
-    exit 0
-fi
-
-# watchdog: start if not online
-if ! "$PM2" list 2>/dev/null | grep -q 'nextjs-app.*online'; then
-    echo "$(ts) [WATCHDOG] not online, starting" >> "$LOG"
-    "$PM2" resurrect >> "$LOG" 2>&1
-    if ! "$PM2" list 2>/dev/null | grep -q 'nextjs-app.*online'; then
-        do_start
-    fi
+    echo "$(ts) pm2 rc=$?" >> "$LOG"
+elif [ -n "$NODE" ]; then
+    pgrep -f "node.*server.js" > /dev/null && exit 0
+    echo "$(ts) [FALLBACK] nohup node" >> "$LOG"
+    cd "$APPDIR" && PORT=3000 NODE_ENV=production nohup "$NODE" server.js \
+>> "$HOME/node.log" 2>&1 &
 fi

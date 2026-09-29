@@ -1,39 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCorsHeaders } from '@/lib/cors';
-import { Client } from 'basic-ftp';
 import { checkAuth } from '@/lib/auth-api';
+import { Client } from 'basic-ftp';
 import { Readable } from 'stream';
 
 export const maxDuration = 60;
+
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
-  const headers = getCorsHeaders(origin);
-  
-  return new NextResponse(null, {
-    status: 200,
-    headers,
-  });
+  return new NextResponse(null, { status: 200, headers: getCorsHeaders(origin) });
 }
 
 export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin');
   const corsHeaders = getCorsHeaders(origin);
-  
+
   try {
-    // Check authentication
     const auth = await checkAuth(request);
-    
     if (!auth.authenticated) {
       return NextResponse.json(
-        { 
-          success: false, 
-          message: 'ไม่มีสิทธิ์เข้าถึง'
-        },
+        { success: false, message: 'ไม่มีสิทธิ์เข้าถึง' },
         { status: 401, headers: corsHeaders }
       );
     }
 
-    // Get form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
@@ -43,16 +33,12 @@ export async function POST(request: NextRequest) {
         { status: 400, headers: corsHeaders }
       );
     }
-
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       return NextResponse.json(
         { success: false, message: 'กรุณาเลือกไฟล์รูปภาพเท่านั้น' },
         { status: 400, headers: corsHeaders }
       );
     }
-
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
         { success: false, message: 'ขนาดไฟล์ไม่ควรเกิน 10MB' },
@@ -60,11 +46,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get FTP configuration
     const ftpHost = process.env.FTP_HOST;
     const ftpUser = process.env.FTP_USER;
     const ftpPassword = process.env.FTP_PASSWORD;
-    const ftpPath = process.env.FTP_PATH || '/domains/checkkub.com/public_html/images/cars/';
 
     if (!ftpHost || !ftpUser || !ftpPassword) {
       return NextResponse.json(
@@ -73,109 +57,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique filename
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 15);
-    const fileExtension = file.name.split('.').pop() || 'jpg';
-    const fileName = `car_${timestamp}_${randomString}.${fileExtension}`;
-    const remotePath = `${ftpPath}${fileName}`;
+    const randomStr = Math.random().toString(36).substring(2, 15);
+    const ext = file.name.split('.').pop() || 'jpg';
+    const fileName = `car_${timestamp}_${randomStr}.${ext}`;
 
-    // Convert file to buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Upload to FTP
+    const buffer = Buffer.from(await file.arrayBuffer());
     const client = new Client();
 
     try {
-      // Connect to FTP with timeout
       await Promise.race([
-        client.access({
-          host: ftpHost,
-          user: ftpUser,
-          password: ftpPassword,
-          secure: false,
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('FTP connection timeout')), 15000)
-        ),
+        client.access({ host: ftpHost, user: ftpUser, password: ftpPassword, secure: false }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('FTP connection timeout')), 15000)),
       ]);
 
-      // Ensure directory exists
-      await client.ensureDir(ftpPath);
-      
-      // Convert buffer to Readable stream
+      // FTP home for cazfrongz@checkkub.com is already /images/cars/ on HostAtom
+      // Upload directly to FTP root = the target directory
       const stream = Readable.from(buffer);
-      
-      // Upload file with timeout
       await Promise.race([
-        client.uploadFrom(stream, remotePath),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('FTP upload timeout')), 45000)
-        ),
+        client.uploadFrom(stream, fileName),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('FTP upload timeout')), 45000)),
       ]);
-
-      // Close connection
       client.close();
 
-      // Generate public URL
-      const relativePath = ftpPath.replace(/^\/domains\/[^\/]+\/public_html/, '');
-      const publicUrl = `${relativePath}${fileName}`.replace(/\/+/g, '/');
-      const fullUrl = process.env.NEXT_PUBLIC_BASE_URL 
-        ? `${process.env.NEXT_PUBLIC_BASE_URL}${publicUrl}`
-        : publicUrl;
+      // Relative URL — Vercel rewrite proxies this through the HostAtom Node.js
+      const publicUrl = `/images/cars/${fileName}`;
 
       return NextResponse.json({
         success: true,
         message: 'อัพโหลดไฟล์สำเร็จ',
-        url: fullUrl,
-        fileName: fileName,
-      }, {
-        headers: corsHeaders,
-      });
-    } catch (ftpError: any) {
-      try {
-        client.close();
-      } catch (closeError) {
-        // Ignore close errors
-      }
-      
-      console.error('FTP upload error:', {
-        message: ftpError.message,
-        code: ftpError.code,
-        stack: ftpError.stack,
-      });
+        url: publicUrl,
+        fileName,
+      }, { headers: corsHeaders });
 
-      // Provide more specific error messages
-      let errorMessage = 'เกิดข้อผิดพลาดในการอัพโหลดไฟล์';
-      if (ftpError.message) {
-        if (ftpError.message.includes('ECONNREFUSED') || ftpError.message.includes('ETIMEDOUT') || ftpError.message.includes('timeout')) {
-          errorMessage = 'ไม่สามารถเชื่อมต่อกับ FTP server ได้ กรุณาตรวจสอบ FTP_HOST และ network connection';
-        } else if (ftpError.message.includes('530') || ftpError.message.includes('Login')) {
-          errorMessage = 'FTP credentials ไม่ถูกต้อง กรุณาตรวจสอบ FTP_USER และ FTP_PASSWORD';
-        } else if (ftpError.message.includes('550') || ftpError.message.includes('directory')) {
-          errorMessage = 'Directory ไม่มีอยู่หรือไม่มีสิทธิ์เข้าถึง กรุณาตรวจสอบ FTP_PATH';
-        } else {
-          errorMessage = `FTP Error: ${ftpError.message}`;
-        }
-      }
+    } catch (ftpError: any) {
+      try { client.close(); } catch {}
+      console.error('FTP upload error:', ftpError.message);
+
+      let message = 'เกิดข้อผิดพลาดในการอัพโหลดไฟล์';
+      if (ftpError.message?.includes('timeout')) message = 'FTP connection timeout';
+      else if (ftpError.message?.includes('530') || ftpError.message?.includes('Login')) message = 'FTP credentials ไม่ถูกต้อง';
+      else if (ftpError.message?.includes('421')) message = 'FTP home directory ไม่พร้อม — กรุณาสร้าง folder images/cars บน HostAtom';
 
       return NextResponse.json(
-        { 
-          success: false, 
-          message: errorMessage,
-          error: ftpError.message,
-          code: ftpError.code,
-        },
+        { success: false, message, error: ftpError.message },
         { status: 500, headers: corsHeaders }
       );
     }
   } catch (error: any) {
-    console.error('Upload error:', error);
     return NextResponse.json(
       { success: false, message: 'เกิดข้อผิดพลาด', error: error.message },
       { status: 500, headers: corsHeaders }
     );
   }
 }
-

@@ -26,6 +26,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "cdn.sanity.io",
       },
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
 };
@@ -40,14 +48,17 @@ if (process.env.IS_STATIC_EXPORT !== 'true') {
   ];
 
   // Proxy uploaded images from HostAtom storage to Vercel
+  // Proxy /images/ and /uploads/ through an API route that sets the correct
+  // Host header so HostAtom's nginx routes to the right vhost and Node.js
+  // serves the file from its local filesystem.
   nextConfig.rewrites = async () => [
     {
       source: "/images/:path*",
-      destination: "http://203.170.129.6/images/:path*",
+      destination: "/api/img/images/:path*",
     },
     {
       source: "/uploads/:path*",
-      destination: "http://203.170.129.6/uploads/:path*",
+      destination: "/api/img/uploads/:path*",
     },
   ];
 }
