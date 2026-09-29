@@ -38,6 +38,18 @@ if (process.env.IS_STATIC_EXPORT !== 'true') {
       headers: SECURITY_HEADERS,
     },
   ];
+
+  // Proxy uploaded images from HostAtom storage to Vercel
+  nextConfig.rewrites = async () => [
+    {
+      source: "/images/:path*",
+      destination: "http://203.170.129.6/images/:path*",
+    },
+    {
+      source: "/uploads/:path*",
+      destination: "http://203.170.129.6/uploads/:path*",
+    },
+  ];
 }
 
 module.exports = nextConfig;
