@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCorsHeaders } from '@/lib/cors';
-
+import { verifySession } from '@/lib/crypto-utils';
 
 // Handle OPTIONS request for CORS
 export async function OPTIONS(request: NextRequest) {
@@ -26,13 +26,11 @@ export async function GET(request: NextRequest) {
     let session: any = null;
     
     if (sessionCookie) {
-      // Same-domain: use cookie
-      session = JSON.parse(sessionCookie.value);
+      session = verifySession(sessionCookie.value);
     } else if (authHeader && authHeader.startsWith('Bearer ')) {
-      // Cross-domain: use Authorization header
       try {
         const token = authHeader.replace('Bearer ', '');
-        session = JSON.parse(decodeURIComponent(token));
+        session = verifySession(token);
       } catch {
         // Invalid token
       }
