@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import HomePageContent from "@/components/HomePageContent";
 import { fetchCarsSSR } from "@/lib/fetchCars";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.checkkub.com"),
   title: { absolute: "ขายรถ รับซื้อรถ | CheckKub — รับซื้อรถทุกประเภท ราคายุติธรรม" },

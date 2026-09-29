@@ -1,4 +1,7 @@
 import { Suspense } from "react";
+
+export const dynamic = 'force-dynamic';
+
 import AllCarsHero from "@/components/AllCarsPage/AllCarsHero";
 import CarCarousel from "@/components/CarCarousel";
 import SearchFilterSection from "@/components/AllCarsPage/SearchFilterSection";
