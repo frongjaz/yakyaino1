@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import { apiGet } from "@/lib/api";
@@ -166,15 +165,13 @@ const CarCarousel = ({ cars: propCars }: CarCarouselProps = { cars: undefined })
                   <div className={`relative w-full overflow-hidden rounded-xl bg-gray-50 shadow-sm transition-all duration-300 group-hover:shadow-lg ${
                     isMobile ? "aspect-[3/2] min-h-[350px]" : "aspect-square"
                   }`}>
-                    <Image
+                    <img
                       src={getImagePath(car.image)}
                       alt={car.name}
-                      fill
-                      className="object-contain rounded-xl transition-transform duration-300 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="absolute inset-0 h-full w-full object-contain rounded-xl transition-transform duration-300 group-hover:scale-105"
                       onError={(e) => {
-                        const t = e.target as HTMLImageElement;
-                        if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = IMAGE_PLACEHOLDER;
                       }}
                     />
                   </div>
