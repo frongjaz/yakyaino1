@@ -12,25 +12,21 @@ export const LOGO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 export function getImagePath(imagePath: string): string {
   if (!imagePath) return "/images/placeholder.jpg";
 
-  // Strip localhost origin so stored URLs like http://localhost:3000/images/x.jpg
-  // become /images/x.jpg and go through the normal path resolution below
-  const localhostMatch = imagePath.match(/^https?:\/\/localhost(:\d+)?(\/.*)?$/);
-  if (localhostMatch) {
-    imagePath = localhostMatch[2] || "/";
+  // Strip our own domain origins (localhost or checkkub.com) so images are
+  // served as relative paths. This prevents Next.js image optimizer from making
+  // external HTTP requests back to the same server (which appeared in hosting
+  // logs as 203.170.129.6 requesting its own images thousands of times).
+  const ownOriginMatch = imagePath.match(
+    /^https?:\/\/(localhost(:\d+)?|(?:www\.)?checkkub\.com)(\/.*)?$/
+  );
+  if (ownOriginMatch) {
+    imagePath = ownOriginMatch[3] || "/";
   }
 
-  // External URL — return as-is
+  // Third-party CDN / external URL — return as-is
   if (imagePath.startsWith("http")) return imagePath;
 
-  // Ensure path starts with a slash
-  const pathWithSlash = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
-
-  // In production, use full URL to checkkub.com
-  if (process.env.NODE_ENV === 'production') {
-    return `https://checkkub.com${pathWithSlash}`;
-  }
-
-  return pathWithSlash;
+  return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 }
 
 /**
