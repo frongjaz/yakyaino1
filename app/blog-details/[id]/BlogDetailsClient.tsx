@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import SharePost from "@/components/Blog/SharePost";
 import TagButton from "@/components/Blog/TagButton";
-import Image from "next/image";
 import Script from "next/script";
 import { apiGet } from "@/lib/api";
 import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
@@ -174,12 +173,11 @@ export default function BlogDetailsClient() {
                                             <div className="mb-5 mr-10 flex items-center">
                                                 <div className="mr-4">
                                                     <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                                                        <Image
+                                                        <img
                                                             src={getImagePath(blog.author.image)}
                                                             alt={blog.author.name}
-                                                            fill
-                                                            className="object-cover"
-                                                            onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
+                                                            className="absolute inset-0 h-full w-full object-cover"
+                                                            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = IMAGE_PLACEHOLDER; }}
                                                         />
                                                     </div>
                                                 </div>
@@ -238,12 +236,11 @@ export default function BlogDetailsClient() {
                                     {blog.image && (
                                         <div className="mb-10 w-full overflow-hidden rounded">
                                             <div className="relative aspect-[97/60] w-full sm:aspect-[97/44]">
-                                                <Image
+                                                <img
                                                     src={getImagePath(blog.image)}
                                                     alt={blog.title}
-                                                    fill
-                                                    className="object-cover object-center"
-                                                    onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }}
+                                                    className="absolute inset-0 h-full w-full object-cover object-center"
+                                                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = IMAGE_PLACEHOLDER; }}
                                                 />
                                             </div>
                                         </div>
