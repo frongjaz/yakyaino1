@@ -47,20 +47,10 @@ if (process.env.IS_STATIC_EXPORT !== 'true') {
     },
   ];
 
-  // Proxy uploaded images from HostAtom storage to Vercel
-  // Proxy /images/ and /uploads/ through an API route that sets the correct
-  // Host header so HostAtom's nginx routes to the right vhost and Node.js
-  // serves the file from its local filesystem.
-  nextConfig.rewrites = async () => [
-    {
-      source: "/images/:path*",
-      destination: "/api/img/images/:path*",
-    },
-    {
-      source: "/uploads/:path*",
-      destination: "/api/img/uploads/:path*",
-    },
-  ];
+  // NOTE: rewrites for /images/ and /uploads/ are intentionally removed.
+  // They caused an infinite loop on HostAtom: image proxy → fetch checkkub.com
+  // → nginx → Next.js rewrite → image proxy → repeat (957+ requests per image).
+  // server.js already serves /images/ and /uploads/ directly from disk.
 }
 
 module.exports = nextConfig;
