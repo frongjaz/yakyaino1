@@ -174,7 +174,7 @@ export default async function Home() {
       image: "https://www.checkkub.com/images/video/car2.jpg",
       url: "https://www.checkkub.com/",
       logo: "https://www.checkkub.com/images/logo/logo.svg",
-      telephone: "+66-62-564-6455",
+      telephone: "+66-65-414-4141",
       email: "sales@v-autocar.com",
       description:
         "ขายรถ รับซื้อรถ - CheckKub รับซื้อรถทุกประเภท สำหรับผู้ที่ต้องการขายรถ. เรารับซื้อรถมือสอง รถฟลีต รถบริษัททั่วประเทศ. ประเมินรวดเร็ว ราคายุติธรรม ชำระเงินภายใน 1–3 วันทำการ. หากคุณต้องการขายรถ ต้องการขายรถให้ใคร หรือกำลังมองหาที่รับซื้อรถ CheckKub พร้อมให้บริการรับซื้อรถทุกประเภท.",
