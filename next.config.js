@@ -20,6 +20,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "www.checkkub.com",
+      },
+      {
+        protocol: "https",
         hostname: "yakyai-api.vercel.app",
       },
       {

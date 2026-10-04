@@ -12,10 +12,7 @@ export const LOGO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.
 export function getImagePath(imagePath: string): string {
   if (!imagePath) return "/images/placeholder.jpg";
 
-  // Strip our own domain origins (localhost or checkkub.com) so images are
-  // served as relative paths. This prevents Next.js image optimizer from making
-  // external HTTP requests back to the same server (which appeared in hosting
-  // logs as 203.170.129.6 requesting its own images thousands of times).
+  // Strip own-domain origins so we always work with a clean relative path
   const ownOriginMatch = imagePath.match(
     /^https?:\/\/(localhost(:\d+)?|(?:www\.)?checkkub\.com)(\/.*)?$/
   );
@@ -26,7 +23,15 @@ export function getImagePath(imagePath: string): string {
   // Third-party CDN / external URL — return as-is
   if (imagePath.startsWith("http")) return imagePath;
 
-  return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+  const pathWithSlash = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+
+  // In dev, images aren't stored locally — fetch from production so they render.
+  // In production, server.js serves /images/ directly from disk (no external request).
+  if (process.env.NODE_ENV !== "production") {
+    return `https://www.checkkub.com${pathWithSlash}`;
+  }
+
+  return pathWithSlash;
 }
 
 /**
