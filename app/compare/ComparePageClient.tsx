@@ -2,7 +2,6 @@
 
 import { useEffect, useState, Suspense, Fragment } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { apiGet } from '@/lib/api';
 import { decodeCarId, encodeCarId } from '@/lib/id-encoder';
@@ -167,16 +166,11 @@ function CompareContent() {
                 className="bg-[#1a1a1a] rounded-2xl overflow-hidden border border-white/5"
               >
                 <div className="relative w-full bg-[#111]" style={{ paddingBottom: '66.66%' }}>
-                  <Image
+                  <img
                     src={getImagePath(car.image)}
                     alt={`${car.brand} ${car.model}`}
-                    fill
-                    className="object-contain"
-                    onError={(e) => {
-                      const t = e.target as HTMLImageElement;
-                      if (t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
-                    }}
-                    unoptimized
+                    className="absolute inset-0 h-full w-full object-contain"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = IMAGE_PLACEHOLDER; }}
                   />
                 </div>
                 <div className="p-4">

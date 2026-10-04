@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { apiGet } from '@/lib/api';
 import { getImagePath } from '@/lib/utils';
 
@@ -114,15 +113,11 @@ export default function CarsList() {
             <tr key={car.id} className="hover:bg-gray-50">
               <td className="px-4 py-3 whitespace-nowrap">
                 <div className="relative h-16 w-24 rounded overflow-hidden">
-                  <Image
+                  <img
                     src={getImagePath(car.image)}
                     alt={`${car.brand} ${car.model}`}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/404.svg';
-                    }}
-                    unoptimized
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/images/404.svg'; }}
                   />
                 </div>
               </td>

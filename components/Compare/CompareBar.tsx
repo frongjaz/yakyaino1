@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   getCompareCars,
@@ -47,16 +46,11 @@ export default function CompareBar() {
                 className="relative flex items-center gap-2 bg-[#242424] rounded-lg px-3 py-2 shrink-0 border border-white/10"
               >
                 <div className="relative w-12 h-8 rounded overflow-hidden shrink-0 bg-[#333]">
-                  <Image
+                  <img
                     src={getImagePath(car.image)}
                     alt={`${car.brand} ${car.model}`}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      const t = e.target as HTMLImageElement;
-                      if (t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
-                    }}
-                    unoptimized
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = IMAGE_PLACEHOLDER; }}
                   />
                 </div>
                 <div className="min-w-0">
