@@ -1,6 +1,5 @@
 "use client";
 import { Blog } from "@/types/blog";
-import Image from "next/image";
 import Link from "next/link";
 import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 
@@ -22,14 +21,13 @@ const SingleBlog = ({ blog }: { blog: Blog }) => {
               {tags[0]}
             </span>
           )}
-          <Image 
-            src={getImagePath(image)} 
-            alt="image" 
-            fill 
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          <img
+            src={getImagePath(image)}
+            alt="image"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
-              const t = e.target as HTMLImageElement;
-              if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = IMAGE_PLACEHOLDER;
             }}
           />
         </Link>
@@ -50,7 +48,7 @@ const SingleBlog = ({ blog }: { blog: Blog }) => {
               {author.image && (
                 <div className="mr-4">
                   <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                    <Image src={getImagePath(author.image)} alt={author.name || "author"} fill className="object-cover" onError={(e) => { const t = e.target as HTMLImageElement; if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER; }} />
+                    <img src={getImagePath(author.image)} alt={author.name || "author"} className="absolute inset-0 h-full w-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = IMAGE_PLACEHOLDER; }} />
                   </div>
                 </div>
               )}

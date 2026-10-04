@@ -1,6 +1,5 @@
 "use client";
 import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { encodeCarId } from "@/lib/id-encoder";
@@ -144,17 +143,14 @@ const RelatedCars = ({ currentCarId, count = 3 }: RelatedCarsProps) => {
             >
               {/* Car Image */}
               <div className="relative w-full overflow-hidden bg-[#111]" style={{ paddingBottom: "66.66%" }}>
-                <Image
+                <img
                   src={getImagePath(car.image)}
                   alt={`${car.brand} ${car.model}`}
-                  fill
-                  className="object-contain transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="absolute inset-0 h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
-                    const t = e.target as HTMLImageElement;
-                    if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = IMAGE_PLACEHOLDER;
                   }}
-                  unoptimized
                 />
                 <div className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-md bg-black/70 backdrop-blur-sm px-2 py-1">
                   <svg className="h-3 w-3 text-white/80" fill="currentColor" viewBox="0 0 20 20">

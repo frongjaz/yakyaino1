@@ -1,7 +1,6 @@
 "use client";
-import { getImagePath } from "@/lib/utils";
+import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import { apiGet } from "@/lib/api";
-import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
 interface Banner {
@@ -47,25 +46,26 @@ const Hero = () => {
     <div className="relative w-full max-w-full">
       {/* Mobile */}
       <div className="relative block w-full md:hidden">
-        <Image
+        <img
           src={getImagePath(slide.image_url)}
           alt={slide.alt_text}
-          width={1200}
-          height={675}
-          priority
           className="h-auto w-full object-contain object-center"
-          sizes="100vw"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = IMAGE_PLACEHOLDER;
+          }}
         />
       </div>
       {/* Desktop */}
       <div className="hidden md:block relative h-[400px] w-full lg:h-[500px] xl:h-[600px]">
-        <Image
+        <img
           src={getImagePath(slide.image_url)}
           alt={slide.alt_text}
-          fill
-          priority
-          className="h-full w-full object-cover object-center"
-          sizes="100vw"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = IMAGE_PLACEHOLDER;
+          }}
         />
       </div>
     </div>

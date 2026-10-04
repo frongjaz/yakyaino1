@@ -2,7 +2,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 import { apiGet } from "@/lib/api";
 import { encodeCarId } from "@/lib/id-encoder";
@@ -210,18 +209,14 @@ const CarListingsGrid = ({
                       className="relative w-full overflow-hidden bg-[#111]"
                       style={{ paddingBottom: "66.66%" }}
                     >
-                      <Image
+                      <img
                         src={getImagePath(car.image)}
                         alt={`${car.brand} ${car.model}`}
-                        fill
-                        className="object-contain transition-transform duration-500 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
                         onError={(e) => {
-                          const t = e.target as HTMLImageElement;
-                          if (t && t.src !== IMAGE_PLACEHOLDER)
-                            t.src = IMAGE_PLACEHOLDER;
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = IMAGE_PLACEHOLDER;
                         }}
-                        unoptimized
                       />
 
                       {/* Photo count badge */}

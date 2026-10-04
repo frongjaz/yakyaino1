@@ -264,15 +264,13 @@ const Header = () => {
                             }}
                           >
                             <div className="relative w-12 h-12 flex-shrink-0 rounded overflow-hidden bg-gray-200">
-                              <Image
+                              <img
                                 src={getImagePath(car.image)}
                                 alt={`${car.brand} ${car.model}`}
-                                fill
-                                className="object-cover"
-                                sizes="48px"
+                                className="absolute inset-0 h-full w-full object-cover"
                                 onError={(e) => {
-                                  const t = e.target as HTMLImageElement;
-                                  if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = IMAGE_PLACEHOLDER;
                                 }}
                               />
                             </div>
@@ -397,15 +395,13 @@ const Header = () => {
                             }}
                           >
                             <div className="relative w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-200">
-                              <Image
+                              <img
                                 src={getImagePath(car.image)}
                                 alt={`${car.brand} ${car.model}`}
-                                fill
-                                className="object-cover"
-                                sizes="64px"
+                                className="absolute inset-0 h-full w-full object-cover"
                                 onError={(e) => {
-                                  const t = e.target as HTMLImageElement;
-                                  if (t && t.src !== IMAGE_PLACEHOLDER) t.src = IMAGE_PLACEHOLDER;
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = IMAGE_PLACEHOLDER;
                                 }}
                               />
                             </div>
