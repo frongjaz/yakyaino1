@@ -1,3 +1,4 @@
+"use client";
 import { getImagePath, IMAGE_PLACEHOLDER } from "@/lib/utils";
 import Link from "next/link";
 
